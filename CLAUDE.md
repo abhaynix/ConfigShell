@@ -74,7 +74,7 @@ not represented by empty files.
     deliberate dependency decision, not an oversight.
   - The workspace is named `web`, so both `--filter web` and `--filter ./apps/web` resolve.
 - **`packages/catalog`**: real, and as of Phase 2 the **single source of truth for
-  application metadata** — 31 verified applications, the data model, a dependency-free
+  application metadata** — 160 verified applications, the data model, a dependency-free
   validation function, and its own tests. Published to the workspace as
   `@configshell/catalog` and consumed by `apps/web`, `packages/installer` and `apps/server`
   via `workspace:*`. It also owns the **environment model** (`environment.ts`:

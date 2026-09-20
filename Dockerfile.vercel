@@ -1,5 +1,5 @@
 # =============================================================================
-# configshell — server image
+# configshell — production server image
 #
 # One container serves the whole product, exactly as `pnpm build && pnpm start`
 # does on a development machine. The Express application (apps/server) already
@@ -9,20 +9,37 @@
 #   /api/*       the read-only planning API
 #   /mcp         the MCP server over Streamable HTTP   (path = MCP_PATH)
 #
+# ## Why this filename
+#
+# `Dockerfile.vercel` at the repository root is the filename Vercel detects to
+# build a project as a container image, so the name is dictated by that
+# platform. The image itself is **not** Vercel-specific: `compose.yml` builds
+# this same file, and `docker build -f Dockerfile.vercel .` produces the image
+# any container host can run. It is the single production image definition —
+# there is deliberately not a second one to drift out of sync with this.
+#
 # A separate web/nginx tier is also provided (docker/web.Dockerfile +
 # compose.web.yml) for setups that want a reverse proxy in front, but this
 # single container is the default because it is what the architecture is.
 #
 # Splitting the MCP endpoint into its own container was considered and rejected
-# here: the MCP server shares the
-# catalog, the resolver and the process with the API, has no independent
-# scaling story, and a second container would double the deploy surface to gain
-# nothing. The stdio transport (the "local agent" surface) is packaged
-# separately in docker/mcp.Dockerfile — see docs/deployment.md.
+# here: the MCP server shares the catalog, the resolver and the process with the
+# API, has no independent scaling story, and a second container would double the
+# deploy surface to gain nothing. The stdio transport (the "local agent"
+# surface) is packaged separately in docker/mcp.Dockerfile — see
+# docs/deployment.md.
+#
+# ## Node version
+#
+# Node 24 (active LTS). Vercel disables Node.js 20 in project settings on
+# 2026-10-01 and names 24 as the migration target; a container carries its own
+# runtime, so this pin is what the deployed process actually runs, independent
+# of any platform default. The repository's own `engines` field and CI matrix
+# are a separate question and are unchanged by this.
 # =============================================================================
 
 # ---------------------------------------------------------------- build stage
-FROM node:22.23-alpine AS build
+FROM node:24.21-alpine AS build
 
 # corepack pins pnpm to the version declared in package.json's packageManager
 # field, so the image resolves dependencies with exactly the pnpm the lockfile
@@ -55,7 +72,7 @@ COPY . .
 RUN pnpm build
 
 # -------------------------------------------------------------- runtime stage
-FROM node:22.23-alpine AS runtime
+FROM node:24.21-alpine AS runtime
 
 ENV COREPACK_HOME=/opt/corepack
 RUN corepack enable \
@@ -65,6 +82,15 @@ RUN corepack enable \
 
 WORKDIR /app
 ENV NODE_ENV=production
+
+# The port the Express process binds, read by apps/server/src/config/env.ts.
+#
+# Vercel connects to port 80 unless the project sets a PORT environment
+# variable, so a container deployment must set PORT to this value in project
+# settings — see docs/deployment.md. It stays 3000 here rather than 80 because
+# binding a privileged port would require handing this process a capability it
+# has no business holding: it generates installation commands as text and must
+# never be in a position to run one.
 ENV PORT=3000
 
 # Runtime dependencies only. The server is TypeScript executed by `tsx` with no
@@ -105,6 +131,7 @@ USER node
 EXPOSE 3000
 
 # The server handles SIGTERM/SIGINT itself (index.ts closes the listener before
-# exiting), so it must be the process that receives the signal. Exec form =
-# no wrapping shell.
+# exiting), so it must be the process that receives the signal. That matters on
+# Vercel, which sends SIGTERM with a 30-second grace period when an idle
+# instance scales down. Exec form = no wrapping shell to swallow the signal.
 CMD ["pnpm", "--filter", "server", "start"]

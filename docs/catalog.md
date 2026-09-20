@@ -211,12 +211,13 @@ binary it could not put on `PATH`.
 
 ## Current contents
 
-**31 applications**, **116 verified installation sources**, **26 with a verified binary name**.
+**160 applications**, **512 verified installation sources**, **141 with a verified binary name**.
 
-**openSUSE coverage is the open gap.** 23 of 31 applications already resolve there through
-Flatpak or Snap, which are distribution-agnostic. The seven that do not — `git`, `curl`,
-`htop`, `github-cli`, `gnome-tweaks`, `timeshift`, `gparted` — need a verified `zypper`
-identifier each. That is a good first contribution: one line of data, checked against
+**openSUSE coverage is the open gap.** No catalog entry carries a `zypper` identifier yet,
+so the 103 applications that resolve there do so only through Flatpak or Snap, which are
+distribution-agnostic; **52 have no route at all** — `git`, `curl`, `htop`, `github-cli`,
+`gnome-tweaks`, `timeshift`, `gparted`, `vim`, `nano`, `tmux` and the rest of the
+command-line entries among them. Each needs one verified `zypper` identifier. That is a good first contribution: one line of data, checked against
 `software.opensuse.org`, following the same "verified or omitted" rule as every other
 identifier.
 

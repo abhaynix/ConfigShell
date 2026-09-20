@@ -107,7 +107,7 @@ catalog → environment → resolution → setup plan → command generation
 ```
 
 `installer/plan.test.ts` asserts that for each of the five supported distributions, **every
-one of the 31 applications is accounted for** — installed, manual, or reported unavailable —
+one of the catalog's applications is accounted for** — installed, manual, or reported unavailable —
 so nothing can be silently dropped. `mcp/integration.test.ts` drives the same path through
 the protocol with the official client.
 

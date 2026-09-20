@@ -136,6 +136,44 @@ been verified is the protocol: the official MCP client and the official MCP
 Inspector both connect over Streamable HTTP, discover all seven tools and call
 them successfully.
 
+### Verifying a remote deployment
+
+An HTTP 200 from `/` proves nothing about MCP: the website, the API and the MCP
+endpoint are three different surfaces of one process, and only one of them
+speaks the protocol. Verify the protocol.
+
+The minimum real check is an `initialize` handshake:
+
+```sh
+curl -sS -X POST "$PUBLIC_BASE_URL/mcp" \
+  -H 'content-type: application/json' \
+  -H 'accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{
+        "protocolVersion":"2025-11-25","capabilities":{},
+        "clientInfo":{"name":"probe","version":"0"}}}'
+```
+
+A working endpoint answers with `serverInfo.name: "configshell"` and the
+negotiated `protocolVersion`. The response is an SSE frame (`event: message`),
+which is the Streamable HTTP transport behaving correctly — not an error.
+
+The stronger check, and the one worth trusting, is the **official MCP client**
+against the deployed URL, comparing its answers to stdio's. That is what
+`packages/mcp/src/http.test.ts` does locally for every tool, every resource and
+the prompt; pointing the same client at a remote URL extends it to a
+deployment. The MCP Inspector (`npx @modelcontextprotocol/inspector`) does the
+same interactively.
+
+What to confirm, beyond "it connected":
+
+- all **seven** tools are listed, and `detect_system`, `check_installed` and
+  `execute_setup` are **absent**;
+- both resources and the one prompt are listed;
+- a real `generate_setup` call returns the same plan stdio returns;
+- hostile arguments are still rejected — an identifier such as
+  `git; rm -rf /`, an unknown application id, an unsupported distribution, and
+  an unrecognised argument like `commands` must each come back as an error.
+
 ### Authentication status
 
 **None.** The endpoint is public and read-only, which is the smallest safe

@@ -1,4 +1,4 @@
-# Deployment — Docker & Docker Compose
+# Deployment — Docker, Docker Compose & Vercel
 
 ConfigShell ships as production Docker images and a one-command Compose stack.
 This document is the source of truth for the container layout, the runtime
@@ -12,6 +12,7 @@ development (which Docker is *not* part of).
 - [The three images](#the-three-images)
 - [Compose: default mode (one container)](#compose-default-mode-one-container)
 - [Compose: reverse-proxy mode (nginx front)](#compose-reverse-proxy-mode-nginx-front)
+- [Deploying to Vercel](#deploying-to-vercel)
 - [MCP over stdio](#mcp-over-stdio)
 - [Configuration](#configuration)
 - [Security model in the container](#security-model-in-the-container)
@@ -76,14 +77,17 @@ docker compose down --remove-orphans
 
 ### `configshell` — the product, one container
 
-`docker/server.Dockerfile`, built by the default `compose.yml`. A two-stage
-build:
+`Dockerfile.vercel` at the repository root, built by the default
+`compose.yml` **and** deployed as-is to Vercel — one image definition, so a
+container host and the hosted deployment cannot run different builds. The
+filename is the one Vercel detects; nothing in the image is Vercel-specific.
+A two-stage build:
 
-1. **build** — `node:22-alpine`, corepack-prepares `pnpm@12.3.4` from the
+1. **build** — `node:24.21-alpine`, corepack-prepares `pnpm@12.3.4` from the
    `packageManager` field, `pnpm install --frozen-lockfile`, then `pnpm build`
    (Vite) to produce `apps/web/dist`. Manifests and the lockfile are copied
    first so dependency layers are cached until they actually change.
-2. **runtime** — fresh `node:22-alpine`, production-only filtered install
+2. **runtime** — fresh `node:24.21-alpine`, production-only filtered install
    (`pnpm install --frozen-lockfile --prod --filter server...`), the built web
    bundle copied in, non-root `USER node`, exec-form `CMD`.
 
@@ -134,12 +138,12 @@ static bundle:
 
 ```sh
 docker compose -f compose.yml -f compose.web.yml up -d --build
-curl -fsS http://localhost:80/api/health
+curl -fsS http://localhost:8080/api/health
 ```
 
 In this mode:
 
-- `web` (nginx) is the only published service (`${WEB_PORT:-80}:80`); the
+- `web` (nginx) is the only published service (`${WEB_PORT:-8080}:8080`); the
   backend has **no host port** (`ports: !reset []`).
 - `web` starts only after the backend is healthy (`depends_on: condition:
   service_healthy`).
@@ -153,6 +157,65 @@ In this mode:
 
 Set `PUBLIC_BASE_URL` to the public origin (https unless localhost) in this
 mode so the MCP URL the backend advertises is reachable.
+
+## Deploying to Vercel
+
+Vercel builds `Dockerfile.vercel` from the repository root and routes all
+traffic to the container — the *same* image Compose builds, so the hosted
+deployment is the product, not a variant of it. One deployment serves the
+website, the API and the remote MCP endpoint, because one Express process
+already serves all three.
+
+The container mechanism Vercel uses here is
+[Container Images](https://vercel.com/docs/functions/container-images), which
+is in **beta** and gated per account — a deploy fails with a permissions error
+if the feature is not enabled for the team.
+
+### Required project settings
+
+Two environment variables must be set on the Vercel project (Settings →
+Environment Variables), for the Production environment:
+
+| Variable | Value | Why it is required |
+| -------- | ----- | ------------------ |
+| `PORT` | `3000` | Vercel connects to port **80** unless the project sets `PORT`. The image binds 3000 deliberately — binding a privileged port would mean granting this process a capability it must never hold. Without this, requests never reach the container. |
+| `PUBLIC_BASE_URL` | the canonical https origin, e.g. `https://configshell.example` | Derives the public MCP URL the deployment advertises. Nothing routes on it, so a wrong value misreports a URL rather than breaking the server. |
+
+`MCP_PATH` is optional and defaults to `/mcp`; set it only to mount the
+endpoint elsewhere. `NODE_ENV` is already `production` in the image.
+
+**`PUBLIC_BASE_URL` is deliberately not defaulted from `VERCEL_URL`.** That
+value changes with every deployment, so a user who copied it into an AI host
+would find their connector broken by the next push. A canonical public URL is
+an operator decision.
+
+### Deployment protection
+
+A Vercel project with **Deployment Protection** (Vercel Authentication) enabled
+returns an SSO challenge to unauthenticated callers. An external MCP host is an
+unauthenticated, server-to-server caller with no browser, so it cannot answer
+that challenge: the endpoint must be reachable without it for Claude, ChatGPT
+or any other host to connect. Either disable protection for production, or put
+the canonical domain on an exempt custom domain.
+
+### After deploying
+
+Verify the MCP endpoint itself, not just that the site loads — an HTTP 200 from
+`/` says nothing about the protocol:
+
+```sh
+# initialize handshake (a real MCP request, not a liveness check)
+curl -sS -X POST "$PUBLIC_BASE_URL/mcp" \
+  -H 'content-type: application/json' \
+  -H 'accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{
+        "protocolVersion":"2025-11-25","capabilities":{},
+        "clientInfo":{"name":"probe","version":"0"}}}'
+```
+
+The repository's own check is stronger and is what should be trusted: connect
+the **official MCP client** to the deployed URL and compare its answers with
+stdio's. See [`mcp.md`](mcp.md#verifying-a-remote-deployment).
 
 ## MCP over stdio
 
@@ -185,7 +248,7 @@ repo-root `.env` (copy of `.env.example`). The server itself reads
 | `MCP_PATH` | `/mcp` | HTTP MCP mount path; cannot collide with `/api` or `/health` |
 | `PUBLIC_BASE_URL` | `http://localhost:3000` | canonical public origin; only derives/display the MCP URL; https required unless localhost |
 | `API_PORT` | `3000` | *host-side* published port in default mode |
-| `WEB_PORT` | `80` | *host-side* published port in reverse-proxy mode |
+| `WEB_PORT` | `8080` | *host-side* published port in reverse-proxy mode |
 
 Secrets policy is unchanged from the rest of the repository: there are none.
 No AI key, database URL, or auth token exists to configure, and `.env` files
@@ -216,16 +279,20 @@ depend on it.
 
 ### Base image pinning and scanning
 
-The images build on `node:22.23-alpine` (pinned to a Node minor, not a floating
-`22` tag) so the vulnerability posture is reproducible instead of changing with
-every base-image push. An `npx trivy`-style container scan of the built images
+The server image builds on `node:24.21-alpine` (pinned to a Node minor, not a
+floating `24` tag) so the vulnerability posture is reproducible instead of
+changing with every base-image push. Node 24 is the active LTS line and the
+version Vercel names as the migration target now that Node 20 is disabled in
+project settings from 2026-10-01; because the deployment is a container, this
+pin — not any platform default — is what the process actually runs. An
+`npx trivy`-style container scan of the built images
 reports only findings in the base image's **bundled `npm`** — `npm` ships inside
-`node:22-alpine` but no ConfigShell runtime ever invokes it (package management
+the Node alpine base but no ConfigShell runtime ever invokes it (package management
 is pnpm via Corepack; the entry points are `pnpm`/`tsx`). The runtime
 dependency tree that a container actually loads is clean: no OS-level findings
 and none in the installed `.pnpm` store. The `configshell-web` (nginx + static
 bundle) image reports zero findings. When a Node minor with fixes is released,
-bump the `node:X.Y-alpine` pin in `docker/*.Dockerfile` and rebuild; a future
+bump the `node:X.Y-alpine` pin in `Dockerfile.vercel` and `docker/*.Dockerfile` and rebuild; a future
 npm-free base (e.g. distroless) would remove the bundled-npm surface entirely.
 
 ## Validation matrix
@@ -241,7 +308,7 @@ pnpm install --frozen-lockfile
 pnpm lint && pnpm typecheck && pnpm test && pnpm build
 
 # 1 — no host node_modules / .env leaks into any build context
-docker build --check -f docker/server.Dockerfile .        # requires BuildKit
+docker build --check -f Dockerfile.vercel .               # requires BuildKit
 docker compose config
 
 # 2 — images build and inspect cleanly
@@ -285,8 +352,8 @@ printf '%s\n' \
 
 # 9 — reverse-proxy mode
 docker compose -f compose.yml -f compose.web.yml up -d --build
-curl -fsS http://localhost:80/api/health
-curl -fsS -X POST http://localhost:80/api/plan \
+curl -fsS http://localhost:8080/api/health
+curl -fsS -X POST http://localhost:8080/api/plan \
   -H 'content-type: application/json' \
   -d '{"environment":{"distro":"ubuntu"},"applicationIds":["git"]}'
 docker compose -f compose.yml -f compose.web.yml down

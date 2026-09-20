@@ -1,7 +1,7 @@
 # `@configshell/catalog`
 
 The verified application catalog — the **single source of truth** for application metadata
-in this repository. 31 applications, 116 verified installation sources.
+in this repository. 160 applications, 512 verified installation sources.
 
 TypeScript source with **no build step**: `main`/`types`/`exports` point straight at
 `src/index.ts`, and both Vite and `tsc` resolve it through the pnpm workspace symlink.

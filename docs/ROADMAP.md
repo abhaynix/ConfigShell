@@ -30,7 +30,7 @@ future integration layer and is *not* blocked on AI — see [`mcp.md`](mcp.md).
 - Responsive layout.
 
 ### Phase 2 — the catalog
-- `packages/catalog`: 31 applications, 116 verified installation sources, consumed by the
+- `packages/catalog`: 160 applications, 512 verified installation sources, consumed by the
   web app through `workspace:*`.
 - Data model separating `method` / `identifier` / `origin` / `distros`, with no commands
   and no version numbers anywhere.
@@ -49,7 +49,7 @@ future integration layer and is *not* blocked on AI — see [`mcp.md`](mcp.md).
 ### Phase 4 — the deterministic core and the planning API
 - `packages/catalog` gains the **environment model** (`Environment`, `parseEnvironment`,
   the distro↔ecosystem mapping in one place), read-only **queries**, and optional
-  **verification metadata** (`verify.binary`, 26 of 31 entries).
+  **verification metadata** (`verify.binary`, 141 of 160 entries).
 - `packages/installer`: **resolution → setup plan → command generation**, as three pure
   functions with no I/O and no execution. PRD §22's trust hierarchy encoded explicitly;
   sources needing a third-party repository skipped in favour of the vendor's instructions;

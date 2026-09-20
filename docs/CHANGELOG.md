@@ -12,6 +12,56 @@ version is below `1.0.0`, the public surface may change in a minor release — s
 
 ## [Unreleased]
 
+### Added
+
+- **The production image is deployable to Vercel.** `Dockerfile.vercel` at the repository
+  root is the filename Vercel detects to build a project as a container, and it is the
+  *same* image `compose.yml` builds — there is one production image definition, not a
+  hosted variant that could drift from the local one. One deployment serves the website,
+  the API and the remote MCP endpoint, because one Express process already serves all
+  three. Requires `PORT=3000` in the Vercel project's environment variables: Vercel
+  connects to port 80 unless told otherwise, and the image binds 3000 deliberately rather
+  than take a capability it must never hold. See `docs/deployment.md`.
+
+### Changed
+
+- **`docker/server.Dockerfile` moved to `Dockerfile.vercel`** and the base image moved from
+  `node:22.23-alpine` to `node:24.21-alpine`. Node 24 is the active LTS and the version
+  Vercel names as the migration target now that Node 20 is disabled in project settings
+  from 2026-10-01; a container carries its own runtime, so this pin is what the deployed
+  process runs. The repository's `engines` field and CI matrix are a separate question and
+  are unchanged.
+
+### Fixed
+
+- **`.env.example` had a block of stray text pasted into it** — eight lines of an
+  interactive prompt's options, appended to the `# --- API server` comment header and
+  continuing as non-comment lines. Harmless to `dotenv`, which ignores lines that are not
+  `KEY=VALUE`, but the file is copied to `.env` by hand and documents the deployment's
+  configuration, so it has to be readable. Removed; no variable changed.
+
+- **Documentation counts no longer describe a catalog a fifth the current size.** The
+  catalog holds **160 applications, 512 verified installation sources, 8 roles and 8
+  categories**, with 141 carrying a verified binary name; `README.md`, `CLAUDE.md`,
+  `docs/catalog.md`, `docs/ROADMAP.md`, `docs/testing.md` and `packages/catalog/README.md`
+  all still said 31 applications and 116 sources. The openSUSE gap is restated with it: no
+  entry carries a `zypper` identifier, so **52 applications have no route there at all**.
+
+- **`README.md` said MCP does not exist.** It listed MCP alongside AI and the local agent
+  as unimplemented, drew it that way in the architecture diagram, and described the
+  transport as stdio-only — while `packages/mcp` has been a working server with seven
+  tools over both stdio and Streamable HTTP. "Remote MCP over HTTP" also sat in the
+  not-implemented list; what is actually missing there is authorization, not the transport.
+
+- **The first good-first-issue sent contributors to add applications that already exist.**
+  All nine it named as "obvious absences" — GIMP, Inkscape, Blender, Thunderbird,
+  LibreOffice, Neovim, Audacity, OBS Studio, Kdenlive — are in the catalog. It now points
+  at the real gap, which is openSUSE `zypper` identifiers.
+
+- **`docs/deployment.md` described the nginx overlay on port 80.** The overlay moved to the
+  unprivileged nginx image (UID 101, port 8080) and the document had not followed.
+
+
 ### Fixed
 
 - **A selection is deduplicated by the plan builder, not by each adapter.** Asking for the

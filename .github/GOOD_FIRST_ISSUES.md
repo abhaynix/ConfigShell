@@ -24,7 +24,9 @@ a design decision.
 | **Files** | `packages/catalog/src/applications.ts`, `docs/catalog.md` (counts table) |
 | **Skills** | TypeScript basics, careful research |
 
-The catalog has 31 applications; obvious absences include GIMP, Inkscape, Blender, Thunderbird, LibreOffice, Neovim, Audacity, OBS Studio, and Kdenlive. Pick one, verify every installation identifier against an authoritative source, add the entry, update the counts.
+The catalog has 160 applications. The clearest remaining gap is **openSUSE**: no entry carries a `zypper` identifier, so 52 applications — `git`, `curl`, `htop`, `vim`, `tmux` and most of the other command-line entries — have no route there at all, while everything else reaches openSUSE only through Flatpak or Snap. Pick one, verify its `zypper` identifier against `software.opensuse.org`, add the source, and update the counts.
+
+Adding an application that is missing entirely works the same way; check `packages/catalog/src/applications.ts` first, because the obvious desktop names are already in.
 
 **Done when:** the entry is added, `pnpm --filter @configshell/catalog test` passes, and the pull request lists a source link for every identifier. Read the rules in [`docs/catalog.md`](../docs/catalog.md) first — the AUR is not `pacman`, and an unverified identifier is omitted, never guessed.
 

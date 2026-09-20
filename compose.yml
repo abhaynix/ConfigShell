@@ -2,7 +2,7 @@
 # configshell — default Docker Compose stack
 #
 # One service, because the product is one Express process that already serves
-# all three surfaces (see docker/server.Dockerfile and apps/server/src/app.ts):
+# all three surfaces (see Dockerfile.vercel and apps/server/src/app.ts):
 #
 #   :3000/         the built web app (static)
 #   :3000/api/*    the read-only planning API
@@ -24,7 +24,10 @@ services:
   server:
     build:
       context: .
-      dockerfile: docker/server.Dockerfile
+      # The single production image definition. Named for Vercel's detection
+      # rule (see the file header); it is an ordinary image and this is the
+      # same one deployed there, so Compose and production cannot diverge.
+      dockerfile: Dockerfile.vercel
     image: configshell:latest
     environment:
       # Matches apps/server/src/config/env.ts defaults; every value is

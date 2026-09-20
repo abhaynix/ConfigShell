@@ -76,8 +76,8 @@ See [Security](#security) and [`docs/security-model.md`](docs/security-model.md)
   steps explained, copy-to-clipboard. Dark/light theme, dark by default.
   **The page never executes anything**; it displays commands you run yourself.
 
-- **A real, verified application catalog** (`packages/catalog`) — 31 applications across
-  seven categories, with 116 installation sources whose identifiers were each checked
+- **A real, verified application catalog** (`packages/catalog`) — 160 applications across
+  eight categories, with 512 installation sources whose identifiers were each checked
   against an authoritative source (the distribution's own package database, Flathub, the
   Snap Store, or vendor documentation). It is the single source of truth for application
   metadata; the web app consumes it via `@configshell/catalog` and owns no
@@ -124,8 +124,8 @@ See [Security](#security) and [`docs/security-model.md`](docs/security-model.md)
 
 **Not implemented (planned):** system detection beyond "does the browser look like Linux",
 application icons, selection persistence across reloads, search by tags and aliases,
-component-level tests for the web app, remote MCP over HTTP with authorization, AI features,
-the local Linux agent, database storage, and authentication. See
+component-level tests for the web app, authorization for the remote MCP endpoint, AI
+features, the local Linux agent, database storage, and authentication. See
 [`ROADMAP.md`](docs/ROADMAP.md).
 
 *There is no screenshot or demo in this README yet — run it locally with `pnpm dev`; it
@@ -154,16 +154,19 @@ Validated System
 Operation             The only layer that can change the system
 ```
 
-**The catalog, the interface, and the deterministic planning core between them exist.**
-AI, MCP and the local agent do not:
+**The catalog, the interface, the deterministic planning core between them, and the MCP
+integration boundary exist.** AI and the local agent do not:
 
 ```mermaid
 flowchart LR
     CATALOG["packages/catalog<br/>verified application data"] -- "bundled at build time" --> WEB["apps/web<br/>React interface"]
     CATALOG --> INSTALLER["packages/installer<br/>resolve · plan · commands"]
     INSTALLER --> SERVER["apps/server<br/>read-only planning API"]
+    INSTALLER --> MCP["packages/mcp<br/>read-only MCP tools"]
     WEB -- "POST /api/plan" --> SERVER
-    SERVER -. "does not exist" .-> REST["AI · MCP · local agent"]
+    SERVER -- "mounts /mcp" --> MCP
+    MCP -. "stdio · Streamable HTTP" .-> HOST["external AI host"]
+    SERVER -. "does not exist" .-> REST["AI layer · local agent"]
 ```
 
 Two paths on purpose: the catalog is **compiled into** the web bundle, so browsing, search
@@ -211,8 +214,9 @@ Website → Linux detection state → Distribution selection → Application cat
 | Selection persistence across reloads | not started |
 | Application icons | not started |
 
-V1 does **not** include real package installation, arbitrary shell execution, MCP, AI, or a
-local agent — those are out of scope for V1 entirely.
+V1 does **not** include real package installation, arbitrary shell execution, AI, or a
+local agent — those are out of scope for V1 entirely. MCP was outside V1 and has since been
+built: it is a read-only boundary over the same core, and it executes nothing.
 
 ### Important distro detection rule
 
@@ -244,7 +248,7 @@ Every application belongs to exactly one category. See
 | Monorepo | pnpm workspaces (no Turborepo pipeline — root pnpm scripts orchestrate) |
 | Lint / types / tests | ESLint (flat config), `tsc --noEmit`, Node's built-in test runner |
 | CI | GitHub Actions, Node 20 and 22 |
-| MCP | `@modelcontextprotocol/server` v2 (official SDK), Zod schemas, stdio transport |
+| MCP | `@modelcontextprotocol/server` v2 (official SDK), Zod schemas, stdio + Streamable HTTP transports |
 | Planned | AI/LLM providers, a local Linux agent, PostgreSQL, Zod, Vitest, Playwright |
 
 ---
@@ -284,7 +288,7 @@ packages/
 │   └── src/           types.ts · applications.ts · environment.ts · query.ts · validate.ts
 ├── installer/         the deterministic core — resolution, plan, commands
 │   └── src/           policy.ts · resolve.ts · plan.ts · commands.ts · types.ts
-└── mcp/               MCP server (stdio) — read-only tools over the core
+└── mcp/               MCP server (stdio + Streamable HTTP) — read-only tools over the core
     └── src/           tools.ts · validate.ts · server.ts · bin.ts · errors.ts
 
 docs/                  architecture · catalog · security · development · ai · agent · mcp
@@ -413,7 +417,7 @@ pnpm check       # lint → typecheck → test → build, what CI runs
 ```
 
 They exercise real data and the real application rather than fixtures and mocks: the catalog
-suite validates all 31 entries, the installer suite asserts no generated command can contain
+suite validates all 160 entries, the installer suite asserts no generated command can contain
 a shell metacharacter on any distribution, the server suite drives the actual Express app,
 and the MCP suite connects the **official MCP client** over the real protocol.
 
