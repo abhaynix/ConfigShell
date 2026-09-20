@@ -5,6 +5,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppCatalog } from '@/components/applications/AppCatalog';
+import { ConnectView } from '@/components/connect/ConnectView';
 import { AppDetailSheet } from '@/components/applications/AppDetailSheet';
 import { EnvironmentStep } from '@/components/environment/EnvironmentStep';
 import { AppShell } from '@/components/layout/AppShell';
@@ -30,10 +31,32 @@ import { gsap, useGSAP, shouldSkipEntrance, MOTION_EASINGS } from '@/lib/motion'
  *
  * Selection state lives here and is the single source of truth for both views.
  */
-type View = 'build' | 'plan';
+type View = 'build' | 'plan' | 'connect';
+
+/**
+ * The one path with a real URL.
+ *
+ * `build` and `plan` are steps in a single task and share `/`; moving between
+ * them is not a navigation a user would bookmark or share. `connect` is: it
+ * shows the MCP endpoint someone is meant to copy, link to and come back to, so
+ * it gets an address.
+ *
+ * Deliberately not `/mcp` — that path is the MCP endpoint itself, mounted by
+ * the server ahead of this app, and a browser hitting it gets protocol frames
+ * rather than a page.
+ *
+ * Hand-rolled rather than adding a router: two routes do not justify the
+ * dependency, and the server's SPA fallback already serves index.html for any
+ * path outside `/api`, `/health` and the MCP endpoint.
+ */
+const CONNECT_PATH = '/connect';
 
 export default function App() {
-  const [view, setView] = useState<View>('build');
+  const [view, setView] = useState<View>(() =>
+    typeof window !== 'undefined' && window.location.pathname === CONNECT_PATH
+      ? 'connect'
+      : 'build',
+  );
   const [distro, setDistro] = useState<Distro | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [appliedRoleId, setAppliedRoleId] = useState<string | null>(null);
@@ -81,6 +104,28 @@ export default function App() {
   useEffect(() => {
     reset();
   }, [selectedIds, distro, reset]);
+
+  /** Navigate to the connect page, keeping the address bar honest. */
+  const openConnect = useCallback(() => {
+    window.history.pushState({}, '', CONNECT_PATH);
+    setView('connect');
+  }, []);
+
+  /** Leave it again, restoring `/`. */
+  const leaveConnect = useCallback(() => {
+    window.history.pushState({}, '', '/');
+    setView('build');
+  }, []);
+
+  // Back/forward must work like any other page, not strand the user on a view
+  // the address bar disagrees with.
+  useEffect(() => {
+    const onPopState = () => {
+      setView(window.location.pathname === CONNECT_PATH ? 'connect' : 'build');
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   const canContinue = distro !== null && selectedIds.size > 0;
   const blockedReason =
@@ -149,9 +194,21 @@ export default function App() {
     { dependencies: [view], scope: mainRef },
   );
 
+  // The connect page is its own <main> and shares none of the build/plan
+  // layout, so it renders beside that container rather than inside it.
+  if (view === 'connect') {
+    return (
+      <TooltipProvider>
+        <AppShell onOpenConnect={openConnect} connectActive>
+          <ConnectView onBack={leaveConnect} />
+        </AppShell>
+      </TooltipProvider>
+    );
+  }
+
   return (
     <TooltipProvider>
-      <AppShell>
+      <AppShell onOpenConnect={openConnect}>
         <PageContainer as="main" ref={mainRef} className="flex-1 pb-6">
           {view === 'build' ? (
             <>

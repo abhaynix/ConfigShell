@@ -1,11 +1,18 @@
-import { Github } from 'lucide-react';
+import { Github, Plug } from 'lucide-react';
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { ThemeToggle } from './ThemeToggle';
 import { gsap, useGSAP, shouldSkipEntrance, MOTION_DURATIONS, MOTION_EASINGS } from '@/lib/motion';
 
-export function SiteHeader() {
+interface SiteHeaderProps {
+  /** Navigate to the connect page. */
+  onOpenConnect: () => void;
+  /** True while that page is showing, so the link can mark itself current. */
+  connectActive?: boolean;
+}
+
+export function SiteHeader({ onOpenConnect, connectActive }: SiteHeaderProps) {
   const headerRef = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -65,6 +72,35 @@ export function SiteHeader() {
         </p>
 
         <div className="col-start-3 flex items-center gap-1">
+          {/*
+            A real link, not a button: the connect page has an address, so it
+            must be middle-clickable, shareable and openable in a new tab. The
+            click handler routes in-app; the href is what makes it a link.
+          */}
+          <div className="header-action-item">
+            <Button
+              variant={connectActive ? 'secondary' : 'ghost'}
+              size="sm"
+              asChild
+              {...(connectActive ? { 'aria-current': 'page' as const } : {})}
+            >
+              <a
+                href="/connect"
+                onClick={(event) => {
+                  // Let the browser handle modified clicks (new tab, new
+                  // window, download) exactly as it would any other link.
+                  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                  if (event.button !== 0) return;
+                  event.preventDefault();
+                  onOpenConnect();
+                }}
+              >
+                <Plug aria-hidden="true" />
+                <span className="hidden sm:inline">Connect AI</span>
+                <span className="sr-only sm:hidden">Connect ConfigShell to your AI</span>
+              </a>
+            </Button>
+          </div>
           <div className="header-action-item">
             <Button type="button" variant="ghost" size="icon" asChild>
               <a

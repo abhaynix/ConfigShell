@@ -119,7 +119,7 @@ See [Security](#security) and [`docs/security-model.md`](docs/security-model.md)
   **No model is involved anywhere.**
 
 - **Repository tooling** — pnpm workspaces, repository-wide ESLint, per-workspace
-  typechecking, 285 tests across seven workspaces, and CI that runs all of it on Node 20
+  typechecking, 293 tests across seven workspaces, and CI that runs all of it on Node 20
   and 22.
 
 **Not implemented (planned):** system detection beyond "does the browser look like Linux",
@@ -371,7 +371,7 @@ pnpm check       # lint → typecheck → test → build (what CI runs)
 
 pnpm lint        # ESLint across the repository
 pnpm typecheck   # tsc --noEmit for every TypeScript workspace
-pnpm test        # 285 tests across seven workspaces
+pnpm test        # 293 tests across seven workspaces
 pnpm build       # production build of apps/web → apps/web/dist
 ```
 
@@ -403,17 +403,16 @@ docker compose up -d --build   # http://localhost:3000 (override host port: API_
 ```
 
 The same image runs anywhere a container runs. Render, Railway, Fly and a plain VPS detect
-the root `Dockerfile` with no configuration; Vercel detects `Dockerfile.vercel`, which is a
-symlink to it, so there is no second definition to keep in sync. Usually the only thing to
-set is `PUBLIC_BASE_URL` — the public MCP URL is derived from it as
-`PUBLIC_BASE_URL + /mcp`.
+the root `Dockerfile` with no configuration; `vercel.json` points Vercel at the same file,
+so there is no second definition to keep in sync. Usually the only thing to set is
+`PUBLIC_BASE_URL` — the public MCP URL is derived from it as `PUBLIC_BASE_URL + /mcp`.
 
 Configuration, the platform-specific settings, the security model and the exact validation
 commands are in [`docs/deployment.md`](docs/deployment.md).
 
 ## Testing
 
-**285 tests** across seven workspaces, on Node's built-in runner via `tsx`.
+**293 tests** across seven workspaces, on Node's built-in runner via `tsx`.
 
 ```sh
 pnpm test        # all of them

@@ -32,6 +32,7 @@ is a pure function of the request.
 | `GET` | `/api/catalog/roles` | Deterministic role/use-case presets |
 | `GET` | `/api/catalog/roles/:id` | One preset |
 | `GET` | `/api/catalog/stats` | Counts, computed from the data |
+| `GET` | `/api/mcp` | How to connect an AI host: the public MCP URL, the tools, and what is withheld |
 | `POST` | `/api/plan` | Selection + environment → plan, commands, manual steps |
 | `POST` | `/api/plan/resolve` | Selection + environment → resolutions only |
 

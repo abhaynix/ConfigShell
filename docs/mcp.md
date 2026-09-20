@@ -122,6 +122,17 @@ find their connector broken by the next push.
 
 ### Connecting an external AI host
 
+The deployed site has a **`/connect` page** that shows the endpoint URL and the
+setup steps, so a user does not have to read this document to find it. It is
+linked from the site header as "Connect AI". The URL it displays comes from
+`GET /api/mcp`, which derives it from `PUBLIC_BASE_URL` — the page does not
+guess from the browser's origin except as a labelled fallback when the API is
+unreachable.
+
+The page is at `/connect`, not `/mcp`: `/mcp` is the endpoint itself and a
+browser that visits it gets protocol frames rather than a page.
+
+
 **Claude** — Settings → Connectors → *Add custom connector*, paste the URL.
 Custom connectors are available on Free, Pro, Max, Team and Enterprise (Free is
 limited to one). OAuth is optional; an unauthenticated server is supported. The

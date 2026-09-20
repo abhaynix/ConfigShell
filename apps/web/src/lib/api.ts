@@ -242,3 +242,28 @@ export async function fetchApplicationResolution(
   }
   return data.resolution;
 }
+
+/** How to connect an external AI host to this deployment. See `GET /api/mcp`. */
+export interface McpConnection {
+  /** The URL a user pastes into Claude, ChatGPT, Cursor, … */
+  url: string;
+  path: string;
+  transport: string;
+  authentication: string;
+  tools: { name: string; title: string; description: string }[];
+  /** Capabilities deliberately not offered, each with its reason. */
+  withheld: { name: string; reason: string }[];
+  executesCommands: boolean;
+}
+
+/**
+ * How to connect an AI host to this deployment.
+ *
+ * Comes from the server because only it knows `PUBLIC_BASE_URL`, and because
+ * the tool list belongs to `@configshell/mcp`. A copy compiled into this bundle
+ * would be a second source of truth, and it would go stale silently — the same
+ * reason this app asks the API for anything the resolver decides.
+ */
+export function fetchMcpConnection(): Promise<McpConnection> {
+  return request<McpConnection>('/mcp');
+}

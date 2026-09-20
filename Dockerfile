@@ -15,10 +15,10 @@
 # `Dockerfile` at the repository root, which is what Docker, Render, Railway,
 # Fly and most other container platforms detect with no configuration.
 #
-# Vercel is the exception: it detects `Dockerfile.vercel` (or
-# `Containerfile.vercel`) and nothing else. That file exists at the root as a
-# **symlink to this one**, so there is no second definition to drift — see
-# docs/deployment.md.
+# Vercel is the exception: its zero-config detection looks for
+# `Dockerfile.vercel`. Rather than keep a second file, `vercel.json` points
+# Vercel at this one (`services.configshell.entrypoint`), so there is still
+# exactly one build definition — see docs/deployment.md.
 #
 # `compose.yml` builds this file too, so what runs locally is what deploys.
 #

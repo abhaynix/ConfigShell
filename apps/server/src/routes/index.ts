@@ -15,6 +15,7 @@
  *   GET  /api/catalog/roles           deterministic role/use-case presets
  *   GET  /api/catalog/roles/:id       one preset
  *   GET  /api/catalog/stats           counts, computed from the data
+ *   GET  /api/mcp                     how to connect an AI host to this deployment
  *   POST /api/plan                    selection + environment → plan + commands
  *   POST /api/plan/resolve            selection + environment → resolutions only
  *
@@ -32,6 +33,7 @@ import { Router } from "express";
 import { healthHandler } from "../controllers/health.controller.js";
 import { appsRouter } from "./apps.routes.js";
 import { catalogRouter } from "./catalog.routes.js";
+import { getMcpConnectionHandler } from "../controllers/mcp.controller.js";
 import { planRouter } from "./plan.routes.js";
 
 export const apiRouter = Router();
@@ -44,4 +46,9 @@ apiRouter.get("/health", healthHandler);
 
 apiRouter.use("/applications", appsRouter);
 apiRouter.use("/catalog", catalogRouter);
+// Connection *metadata* for the MCP endpoint — not the endpoint itself, which
+// is mounted at MCP_PATH (default `/mcp`) outside this router, ahead of the
+// JSON body parser. This is what the web app's Connect page reads.
+apiRouter.get("/mcp", getMcpConnectionHandler);
+
 apiRouter.use("/plan", planRouter);

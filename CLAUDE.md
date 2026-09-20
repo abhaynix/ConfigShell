@@ -147,9 +147,9 @@ not represented by empty files.
   options (`strict`, `moduleResolution: "bundler"`, `noEmit`, …); every workspace
   `tsconfig.json` extends it and adds only its own `include` (and on the server, a
   `types: ["node"]`). Keep shared options there rather than per-workspace.
-- **Tests**: **285**, on Node's built-in runner via `tsx`, in seven workspaces —
+- **Tests**: **293**, on Node's built-in runner via `tsx`, in seven workspaces —
   `packages/test-utils` (6), `packages/catalog` (49), `packages/installer` (79),
-  `packages/mcp` (57), `apps/server` (53), `packages/contract-tests` (13), `apps/web` (28). `docs/testing.md` is the
+  `packages/mcp` (57), `apps/server` (53), `packages/contract-tests` (13), `apps/web` (36). `docs/testing.md` is the
   authority on coverage and gaps. `test-utils` holds the **architecture enforcement** tests:
   dependency direction, acyclicity, and that command syntax stays inside the installer.
   They exercise real data and the real app, not fixtures and mocks. **`apps/web` has no DOM
@@ -211,7 +211,7 @@ pnpm build                       # == pnpm --filter web build
 pnpm start                       # == pnpm --filter server start (API + apps/web/dist)
 pnpm lint                        # eslint . across the whole repo (real ESLint)
 pnpm typecheck                   # tsc --noEmit for every TS workspace (strict, shared base)
-pnpm test                        # 285 tests across seven workspaces
+pnpm test                        # 293 tests across seven workspaces
 pnpm mcp                         # start the MCP server on stdio
 pnpm check                       # lint -> typecheck -> test -> build (what CI runs)
 ```
@@ -286,11 +286,11 @@ truth; the short version:
   24-alpine, non-root `node` user, binds `0.0.0.0:$PORT`, handles SIGTERM. It packages the
   single Express process that already serves `/` (web), `/api/*`, `/mcp` and `/health` —
   do not add a second image or split MCP into its own service.
-- **`Dockerfile.vercel` is a symlink to `Dockerfile`.** Vercel detects only that filename;
-  every other platform (Render, Railway, Fly, a VPS) detects the root `Dockerfile`. Keep it
-  a symlink — a real second file would be a duplicate definition to drift. If you must
-  replace the mechanism, `vercel.json` with `services.entrypoint: "Dockerfile"` preserves
-  the single-definition property.
+- **`vercel.json` points Vercel at that same `Dockerfile`** via
+  `services.configshell.entrypoint`. Vercel's zero-config detection only looks for
+  `Dockerfile.vercel`; the config file exists so there is no second Dockerfile to drift.
+  Never add a `Dockerfile.vercel` back as a real file — if the config route ever fails,
+  make it a **symlink** to `Dockerfile`, which preserves the one-definition property.
 - **`compose.yml`** builds the same `Dockerfile` and adds hardening flags for local runs.
   It is a convenience wrapper, not a separate deployment target.
 - **Configuration is one variable in practice**: `PUBLIC_BASE_URL`. The public MCP URL is

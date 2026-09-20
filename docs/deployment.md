@@ -75,32 +75,27 @@ Platforms supply `$PORT` themselves; the server reads it. Do not hardcode one.
 
 ### Vercel
 
-Vercel is the one exception to zero-config: it detects **`Dockerfile.vercel`**
-(or `Containerfile.vercel`) at the repository root and no other filename. So
-that file exists — as a **symlink to `Dockerfile`**:
+Vercel's zero-config detection looks for `Dockerfile.vercel` and no other
+filename. Rather than keep a second Dockerfile, **`vercel.json` points Vercel at
+the canonical one**:
 
+```json
+{
+  "services": {
+    "configshell": { "runtime": "container", "root": ".", "entrypoint": "Dockerfile" }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": { "service": "configshell" } }]
+}
 ```
-Dockerfile.vercel -> Dockerfile
-```
 
-Git stores it as a symlink (mode `120000`) and restores it on checkout, so
-Vercel builds the identical definition. There is no second Dockerfile to keep
-in sync, and nothing in the image is Vercel-specific.
+One build definition, no duplicate to drift.
 
-> If a future Vercel builder stops following the symlink, the documented
-> alternative is a `vercel.json` naming the canonical file, which keeps the
-> single-definition property:
->
-> ```json
-> {
->   "services": { "configshell": { "runtime": "container", "root": ".", "entrypoint": "Dockerfile" } },
->   "rewrites": [{ "source": "/(.*)", "destination": { "service": "configshell" } }]
-> }
-> ```
-
-Vercel's container support ([Container Images](https://vercel.com/docs/functions/container-images))
-is in **beta** and gated per account; a deploy fails with a permissions error if
-the feature is not enabled for the team.
+Both [Container Images](https://vercel.com/docs/functions/container-images) and
+[Services](https://vercel.com/docs/services) are **beta** and gated per account;
+a deploy fails with a permissions error if either is not enabled for the team.
+If the `services` route is unavailable, the fallback that still avoids a second
+definition is a `Dockerfile.vercel` **symlink** to `Dockerfile` — git stores it
+as a symlink and restores it on checkout. Do not add a real second Dockerfile.
 
 Two project settings are required, beyond `PUBLIC_BASE_URL`:
 
@@ -197,9 +192,8 @@ pnpm check                     # lint → typecheck → test → build
 The container itself needs a daemon, so these are run by hand:
 
 ```sh
-# 1 — the image builds, and builds through the Vercel symlink too
+# 1 — the image builds
 docker build -t configshell .
-docker build -f Dockerfile.vercel -t configshell .    # same definition
 
 # 2 — it runs unprivileged with an exec-form entrypoint
 docker image inspect configshell \

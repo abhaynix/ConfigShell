@@ -12,6 +12,48 @@ version is below `1.0.0`, the public surface may change in a minor release — s
 
 ## [Unreleased]
 
+### Added
+
+- **A `/connect` page on the site**, linked from the header as "Connect AI". It shows this
+  deployment's MCP URL with a copy button, setup steps for Claude, ChatGPT and Cursor,
+  example questions to ask once connected, the tools the assistant gains, the capabilities
+  ConfigShell withholds and why, and the safety boundary. The MCP endpoint is the product's
+  one shareable artifact — a user should be able to find it on the deployed site rather
+  than in a README.
+
+  It is at `/connect`, not `/mcp`: `/mcp` is the endpoint itself and a browser that visits
+  it gets protocol frames, not a page.
+
+- **`GET /api/mcp`** — the public MCP URL (derived from `PUBLIC_BASE_URL`), the transport,
+  the authentication status, the registered tools and the withheld capabilities. The page
+  reads this rather than hardcoding any of it: the URL is only known to the server, and the
+  tool list belongs to `@configshell/mcp`, so a copy in the browser bundle would be a
+  second source of truth that goes stale silently.
+
+- **8 render tests for the connect page** (`ConnectView.test.ts`), using the same server-
+  renderer approach as `PlanView.test.ts` — no DOM runner, no new dependency. They assert
+  the page cannot invent a tool the server did not report, and that the withheld
+  capabilities and the safety boundary are actually on the screen.
+
+### Changed
+
+- **Vercel is configured through `vercel.json` instead of a second Dockerfile.**
+  `Dockerfile.vercel` is gone; `vercel.json` points Vercel's container build at the
+  canonical root `Dockerfile` via `services.configshell.entrypoint`. One build definition,
+  and the root `Dockerfile` is now the only container file in the repository.
+
+### Removed
+
+- **`docs/design.md`** — 264 lines of design tokens for "a dark, data-dense React component
+  registry", complete with a logo URL on a third-party domain. It described a different
+  product: none of its colours, fonts or surfaces appear anywhere in `apps/web`, which uses
+  shadcn/ui with oklch tokens and Geist. Nothing referenced it, and a contributor reading
+  `docs/` would have been actively misled about the design system.
+
+- **`.agents/skills/design-system/SKILL.md`** — byte-identical duplicate of the `.claude/`
+  copy.
+
+
 ### Changed
 
 - **One container definition for every platform.** `Dockerfile.vercel` is now the canonical
