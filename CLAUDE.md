@@ -279,5 +279,28 @@ This is a public repository. Keep these accurate when you change anything they d
 
 ## Deployment
 
-`.antideploy.json` at the repo root configures Antideploy for this project (just an
-`applicationId`); there's no further deployment config checked in.
+**One container, one `Dockerfile`, every platform.** `docs/deployment.md` is the source of
+truth; the short version:
+
+- **`Dockerfile`** (repo root) is the *only* container definition. Multi-stage, Node
+  24-alpine, non-root `node` user, binds `0.0.0.0:$PORT`, handles SIGTERM. It packages the
+  single Express process that already serves `/` (web), `/api/*`, `/mcp` and `/health` —
+  do not add a second image or split MCP into its own service.
+- **`Dockerfile.vercel` is a symlink to `Dockerfile`.** Vercel detects only that filename;
+  every other platform (Render, Railway, Fly, a VPS) detects the root `Dockerfile`. Keep it
+  a symlink — a real second file would be a duplicate definition to drift. If you must
+  replace the mechanism, `vercel.json` with `services.entrypoint: "Dockerfile"` preserves
+  the single-definition property.
+- **`compose.yml`** builds the same `Dockerfile` and adds hardening flags for local runs.
+  It is a convenience wrapper, not a separate deployment target.
+- **Configuration is one variable in practice**: `PUBLIC_BASE_URL`. The public MCP URL is
+  derived as `PUBLIC_BASE_URL + MCP_PATH` (default `/mcp`); `$PORT` comes from the platform.
+  No domain is hardcoded anywhere in source, and `PUBLIC_BASE_URL` is deliberately not
+  defaulted from `VERCEL_URL` — that changes per deployment and would break a saved
+  connector.
+- There is **no nginx tier and no separate stdio-MCP image**; both were removed as
+  duplicated deployment logic (the nginx config hardcoded `/mcp`, defeating `MCP_PATH`).
+  The stdio transport is a local developer tool — `pnpm mcp`.
+
+`.antideploy.json` at the repo root configures Antideploy (just an `applicationId`). It
+predates the container work and nothing in this repository reads it.

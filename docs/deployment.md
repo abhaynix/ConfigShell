@@ -1,210 +1,142 @@
-# Deployment — Docker, Docker Compose & Vercel
+# Deployment
 
-ConfigShell ships as production Docker images and a one-command Compose stack.
-This document is the source of truth for the container layout, the runtime
-graph, configuration, security, and how to validate a deployment. It describes
-only what exists and is tested; see `docs/development.md` for local
-development (which Docker is *not* part of).
+ConfigShell deploys as **one container**. There is one `Dockerfile` in the
+repository, and every platform runs that same image.
 
-- [What gets a container — and why](#what-gets-a-container--and-why)
-- [Prerequisites](#prerequisites)
-- [Quick start](#quick-start)
-- [The three images](#the-three-images)
-- [Compose: default mode (one container)](#compose-default-mode-one-container)
-- [Compose: reverse-proxy mode (nginx front)](#compose-reverse-proxy-mode-nginx-front)
-- [Deploying to Vercel](#deploying-to-vercel)
-- [MCP over stdio](#mcp-over-stdio)
+```
+GitHub repository
+      ↓
+  Dockerfile            one build definition, no platform-specific logic
+      ↓
+  container image
+      ↓
+  any container platform      Docker · a VPS · Render · Railway · Fly · Vercel
+```
+
+- [What is in the container](#what-is-in-the-container)
+- [Option A — run it with Docker](#option-a--run-it-with-docker)
+- [Option B — deploy to a container platform](#option-b--deploy-to-a-container-platform)
 - [Configuration](#configuration)
+- [Verifying MCP after deploying](#verifying-mcp-after-deploying)
 - [Security model in the container](#security-model-in-the-container)
-- [Validation matrix](#validation-matrix)
+- [Validating a change](#validating-a-change)
 
-## What gets a container — and why
+## What is in the container
 
-The audit result first: the repository is a pnpm workspace whose runtime
-surface is **one Express process** (`apps/server`) that already serves every
-surface — the built web app, the `/api/*` read-only planning API, and the MCP
-server over Streamable HTTP at `/mcp` (see `apps/server/src/app.ts`). That is
-the architecture `pnpm build && pnpm start` runs, and Docker packages it
-rather than replacing it.
+One Express process (`apps/server`) already serves every surface, so the image
+packages exactly that — it does not add a topology of its own:
 
-| Package | Kind | Runtime home |
-| ------- | ---- | ------------ |
-| `apps/web` | static SPA build | bundled into the server image; also the nginx image in reverse-proxy mode |
-| `apps/server` | runtime service (Express) | `configshell` image, port 3000 |
-| `packages/catalog` | library (TypeScript source) | compiled into consumers; no container |
-| `packages/installer` | library | compiled into consumers; no container |
-| `packages/mcp` | library + stdio bin | HTTP surface inside `configshell`; stdio surface as `configshell-mcp` |
-| `packages/test-utils` | test-only | never shipped |
-| `packages/contract-tests` | test-only | never shipped |
+| Path | What it serves |
+| ---- | -------------- |
+| `/` | the built web app (`apps/web/dist`, static) |
+| `/api/*` | the read-only planning API |
+| `/mcp` | the MCP server over Streamable HTTP (path = `MCP_PATH`) |
+| `/health` | liveness plus catalog integrity |
 
-## Prerequisites
+There is **no second container**. The MCP endpoint shares the catalog, the
+resolver and the process with the API; splitting it out would double the deploy
+surface and gain nothing. The stdio MCP transport is a local developer tool
+(`pnpm mcp`), not a deployed service.
 
-- Docker Engine ≥ 24 with the Compose plugin (or Docker Desktop).
-- A shell. Everything below is exact; every command is part of the validation
-  matrix at the end of this document.
+The container:
 
-The images are built against the frozen lockfile with exactly the pnpm declared
-in the root `package.json` `packageManager` field (`pnpm@12.3.4`), so the same
-dependency graph CI installs is the one the image resolves. No host
-`node_modules` is ever copied into a build context — `.dockerignore` excludes
-it — and no `.env` or other secret can enter an image.
+- builds reproducibly from the lockfile (`pnpm install --frozen-lockfile`),
+- runs as the unprivileged `node` user — never root,
+- binds `0.0.0.0` on `$PORT`,
+- handles `SIGTERM` itself and closes the listener before exiting,
+- keeps no state: no database, no volumes, no sessions. Any instance can serve
+  any request, so it scales horizontally with no coordination.
 
-## Quick start
-
-Default mode — the whole product on one port, exactly like `pnpm start`:
+## Option A — run it with Docker
 
 ```sh
-docker compose up -d --build
-curl -fsS http://localhost:3000/health
-# open http://localhost:3000
+docker compose up -d          # http://localhost:3000
 ```
 
-Pick a different host port without touching code:
+`compose.yml` is a convenience wrapper around the same `Dockerfile`: it adds
+the hardening flags a bare `docker run` would need spelled out (read-only root
+filesystem, all capabilities dropped, `no-new-privileges`). Publish on a
+different host port with `API_PORT=8080 docker compose up -d`.
+
+Without Compose:
 
 ```sh
-API_PORT=8080 docker compose up -d --build
+docker build -t configshell .
+docker run --rm -p 3000:3000 -e PUBLIC_BASE_URL=http://localhost:3000 configshell
 ```
 
-Bring the stack down:
+## Option B — deploy to a container platform
 
-```sh
-docker compose down
-# also remove the (empty) project network:
-docker compose down --remove-orphans
+Point the platform at this repository. Most detect the root `Dockerfile` with
+no configuration at all — Render, Railway, Fly and a plain VPS all do — and the
+only thing that usually needs setting is `PUBLIC_BASE_URL`.
+
+Platforms supply `$PORT` themselves; the server reads it. Do not hardcode one.
+
+### Vercel
+
+Vercel is the one exception to zero-config: it detects **`Dockerfile.vercel`**
+(or `Containerfile.vercel`) at the repository root and no other filename. So
+that file exists — as a **symlink to `Dockerfile`**:
+
+```
+Dockerfile.vercel -> Dockerfile
 ```
 
-## The three images
+Git stores it as a symlink (mode `120000`) and restores it on checkout, so
+Vercel builds the identical definition. There is no second Dockerfile to keep
+in sync, and nothing in the image is Vercel-specific.
 
-### `configshell` — the product, one container
+> If a future Vercel builder stops following the symlink, the documented
+> alternative is a `vercel.json` naming the canonical file, which keeps the
+> single-definition property:
+>
+> ```json
+> {
+>   "services": { "configshell": { "runtime": "container", "root": ".", "entrypoint": "Dockerfile" } },
+>   "rewrites": [{ "source": "/(.*)", "destination": { "service": "configshell" } }]
+> }
+> ```
 
-`Dockerfile.vercel` at the repository root, built by the default
-`compose.yml` **and** deployed as-is to Vercel — one image definition, so a
-container host and the hosted deployment cannot run different builds. The
-filename is the one Vercel detects; nothing in the image is Vercel-specific.
-A two-stage build:
+Vercel's container support ([Container Images](https://vercel.com/docs/functions/container-images))
+is in **beta** and gated per account; a deploy fails with a permissions error if
+the feature is not enabled for the team.
 
-1. **build** — `node:24.21-alpine`, corepack-prepares `pnpm@12.3.4` from the
-   `packageManager` field, `pnpm install --frozen-lockfile`, then `pnpm build`
-   (Vite) to produce `apps/web/dist`. Manifests and the lockfile are copied
-   first so dependency layers are cached until they actually change.
-2. **runtime** — fresh `node:24.21-alpine`, production-only filtered install
-   (`pnpm install --frozen-lockfile --prod --filter server...`), the built web
-   bundle copied in, non-root `USER node`, exec-form `CMD`.
+Two project settings are required, beyond `PUBLIC_BASE_URL`:
 
-Why a second full stage rather than slimming the first: the runtime excludes
-every dependency the tests, the linter and the bundler need, and never contains
-a write to the store. `tsx` stays in production dependencies because the server
-is TypeScript run under `tsx` with no build step — that is the repository's
-documented choice, so the image ships exactly the runtime the code was designed
-for.
+| Setting | Value | Why |
+| ------- | ----- | --- |
+| `PORT` | `3000` | Vercel routes to port **80** unless the project sets `PORT`. The image binds 3000 on purpose — binding a privileged port would mean granting this process a capability it must never hold. Without this, requests never reach the container. |
+| Deployment Protection | off for production | With Vercel Authentication enabled the deployment answers unauthenticated callers with an SSO challenge. An external MCP host is an unauthenticated, server-to-server caller with no browser and cannot pass it. |
 
-### `configshell-web` — optional nginx front
+## Configuration
 
-`docker/web.Dockerfile` + `docker/nginx.conf`. Only rolled out with
-`compose.web.yml` (reverse-proxy mode). It serves the identical `apps/web/dist`
-bundle and reverse-proxies `/api/*` and `/mcp` to the `configshell` backend on
-the internal compose network. nginx is used purely as deployment plumbing:
-no business logic, no command vocabulary, no resolver policy.
+Every variable has a working default; the container runs with none of them set.
 
-### `configshell-mcp` — the stdio MCP tool
+| Variable | Default | Meaning |
+| -------- | ------- | ------- |
+| `PUBLIC_BASE_URL` | `http://localhost:$PORT` | **The one that usually matters.** The public origin this deployment is reachable at. The public MCP URL is derived from it as `PUBLIC_BASE_URL + MCP_PATH`. Must be `https` unless it is a localhost origin. Nothing routes on it, so a wrong value misreports that URL rather than breaking the server. |
+| `PORT` | `3000` | Port the server binds. Hosting platforms set this themselves. |
+| `MCP_PATH` | `/mcp` | Where the MCP endpoint is mounted. Cannot collide with `/api` or `/health`. |
+| `NODE_ENV` | `production` in the image | `development` / `test` / `production`. |
+| `API_PORT` | `3000` | Docker Compose only: the *host* port the stack is published on. |
 
-`docker/mcp.Dockerfile`. The same `createConfigShellServer()` that the HTTP
-surface serves, bound to **stdio** — the transport an MCP host uses to launch a
-local tool. It has no port and does not belong to a compose network; a host
-would start it with `docker run -i` (see [MCP over stdio](#mcp-over-stdio)).
-It installs the tool's full dependency branch including dev dependencies,
-because the entry point is `tsx` — again, the existing runtime, packaged rather
-than changed.
+Changing the public domain is an environment change and nothing else. No domain
+appears anywhere in application source, and `PUBLIC_BASE_URL` is deliberately
+**not** defaulted from a platform variable such as `VERCEL_URL`: that value
+changes with every deployment, so a user who pasted it into an AI host would
+find their connector broken by the next push.
 
-## Compose: default mode (one container)
+There are **no secrets to configure** — no AI key, no database URL, no auth
+token. `.env` files are git-ignored and `.dockerignore` keeps them out of the
+build context.
 
-`compose.yml` defines a single service that is the whole product:
+## Verifying MCP after deploying
 
-- publishes `${API_PORT:-3000}:3000`,
-- sets `NODE_ENV=production` and passes `PORT`, `MCP_PATH`, `PUBLIC_BASE_URL`
-  through,
-- healthchecks `GET /health` with the container's own `node`,
-- runs non-root with `no-new-privileges`, all capabilities dropped and a
-  read-only root filesystem.
-
-The stack is stateless by construction — the catalog is compiled into the
-image, there is no database and no volume — so restart, `up -d` after a crash
-and `down` + `up` all return you to the identical product.
-
-## Compose: reverse-proxy mode (nginx front)
-
-For operators who want a dedicated web tier rather than Express serving the
-static bundle:
+An HTTP 200 from `/` proves nothing about MCP: the website, the API and the MCP
+endpoint are three surfaces of one process and only one speaks the protocol.
 
 ```sh
-docker compose -f compose.yml -f compose.web.yml up -d --build
-curl -fsS http://localhost:8080/api/health
-```
-
-In this mode:
-
-- `web` (nginx) is the only published service (`${WEB_PORT:-8080}:8080`); the
-  backend has **no host port** (`ports: !reset []`).
-- `web` starts only after the backend is healthy (`depends_on: condition:
-  service_healthy`).
-- nginx serves the SPA with a fallback to `index.html`, long-cached hashed
-  assets, and proxies `/api/*` plus `/mcp` to `server:3000` on the internal
-  network. The browser stays on one origin, so no CORS configuration —
-  identical to the default mode from the app's point of view.
-- `MCP_PATH` must match what nginx proxies: the shipped `nginx.conf` proxies
-  `/mcp`. Changing `MCP_PATH` means updating the nginx `location` block too —
-  it is deployment topology, not business logic.
-
-Set `PUBLIC_BASE_URL` to the public origin (https unless localhost) in this
-mode so the MCP URL the backend advertises is reachable.
-
-## Deploying to Vercel
-
-Vercel builds `Dockerfile.vercel` from the repository root and routes all
-traffic to the container — the *same* image Compose builds, so the hosted
-deployment is the product, not a variant of it. One deployment serves the
-website, the API and the remote MCP endpoint, because one Express process
-already serves all three.
-
-The container mechanism Vercel uses here is
-[Container Images](https://vercel.com/docs/functions/container-images), which
-is in **beta** and gated per account — a deploy fails with a permissions error
-if the feature is not enabled for the team.
-
-### Required project settings
-
-Two environment variables must be set on the Vercel project (Settings →
-Environment Variables), for the Production environment:
-
-| Variable | Value | Why it is required |
-| -------- | ----- | ------------------ |
-| `PORT` | `3000` | Vercel connects to port **80** unless the project sets `PORT`. The image binds 3000 deliberately — binding a privileged port would mean granting this process a capability it must never hold. Without this, requests never reach the container. |
-| `PUBLIC_BASE_URL` | the canonical https origin, e.g. `https://configshell.example` | Derives the public MCP URL the deployment advertises. Nothing routes on it, so a wrong value misreports a URL rather than breaking the server. |
-
-`MCP_PATH` is optional and defaults to `/mcp`; set it only to mount the
-endpoint elsewhere. `NODE_ENV` is already `production` in the image.
-
-**`PUBLIC_BASE_URL` is deliberately not defaulted from `VERCEL_URL`.** That
-value changes with every deployment, so a user who copied it into an AI host
-would find their connector broken by the next push. A canonical public URL is
-an operator decision.
-
-### Deployment protection
-
-A Vercel project with **Deployment Protection** (Vercel Authentication) enabled
-returns an SSO challenge to unauthenticated callers. An external MCP host is an
-unauthenticated, server-to-server caller with no browser, so it cannot answer
-that challenge: the endpoint must be reachable without it for Claude, ChatGPT
-or any other host to connect. Either disable protection for production, or put
-the canonical domain on an exempt custom domain.
-
-### After deploying
-
-Verify the MCP endpoint itself, not just that the site loads — an HTTP 200 from
-`/` says nothing about the protocol:
-
-```sh
-# initialize handshake (a real MCP request, not a liveness check)
 curl -sS -X POST "$PUBLIC_BASE_URL/mcp" \
   -H 'content-type: application/json' \
   -H 'accept: application/json, text/event-stream' \
@@ -213,165 +145,99 @@ curl -sS -X POST "$PUBLIC_BASE_URL/mcp" \
         "clientInfo":{"name":"probe","version":"0"}}}'
 ```
 
-The repository's own check is stronger and is what should be trusted: connect
-the **official MCP client** to the deployed URL and compare its answers with
-stdio's. See [`mcp.md`](mcp.md#verifying-a-remote-deployment).
+A working endpoint answers `serverInfo.name: "configshell"`. The response is an
+SSE frame (`event: message`) — that is the Streamable HTTP transport behaving
+correctly, not an error.
 
-## MCP over stdio
-
-The HTTP MCP surface needs nothing extra — it is served inside `configshell`
-at `/mcp` (or `MCP_PATH`). The stdio surface is a separate tool an MCP host
-launches as a subprocess:
-
-```sh
-docker build -f docker/mcp.Dockerfile -t configshell-mcp .
-docker run -i --rm configshell-mcp
-```
-
-It logs its readiness to stderr and keeps stdout exclusively for protocol
-messages. Tools are the same read-only, schema-strict surface the HTTP endpoint
-serves: nothing that executes commands, no arguments that carry commands, and
-the three capabilities the safety model withholds (`detect_system`,
-`check_installed`, `execute_setup`) stay unregistered.
-
-## Configuration
-
-All variables are optional; the defaults run the stack as-is. Values reach the
-container through Compose's `environment:` mapping, which reads your shell or a
-repo-root `.env` (copy of `.env.example`). The server itself reads
-`apps/server/.env` for non-Docker runs — `.env.example` there documents it.
-
-| Variable | Default | Meaning |
-| -------- | ------- | ------- |
-| `PORT` | `3000` | port the Express process binds inside the container (`0.0.0.0`) |
-| `NODE_ENV` | `production` | validated against `development`/`test`/`production` |
-| `MCP_PATH` | `/mcp` | HTTP MCP mount path; cannot collide with `/api` or `/health` |
-| `PUBLIC_BASE_URL` | `http://localhost:3000` | canonical public origin; only derives/display the MCP URL; https required unless localhost |
-| `API_PORT` | `3000` | *host-side* published port in default mode |
-| `WEB_PORT` | `8080` | *host-side* published port in reverse-proxy mode |
-
-Secrets policy is unchanged from the rest of the repository: there are none.
-No AI key, database URL, or auth token exists to configure, and `.env` files
-are git-ignored. `.env.example` carries placeholders only.
+The check worth trusting is the **official MCP client** against the deployed
+URL, compared with stdio. See
+[`mcp.md`](mcp.md#verifying-a-remote-deployment).
 
 ## Security model in the container
 
-The container enforces the repository's non-negotiable principles rather than
-adding new ones:
+The container enforces the repository's existing principles rather than adding
+new ones:
 
 - **Never in a position to execute.** The server generates installation
-  commands as *text* and must never run one; it runs as the unprivileged
-  `node` user, all capabilities are dropped, and `no-new-privileges` is set.
+  commands as *text* and must never run one. It runs as the unprivileged `node`
+  user, all capabilities are dropped, and `no-new-privileges` is set.
 - **No remote sudo.** Execution belongs to the future local agent
-  (`docs/agent.md`); nothing in any image invokes a package manager.
-- **No secrets in images.** No `.env` or key file can enter the build context
-  (`.dockerignore`), and there are no secrets to configure anyway.
-- **Input limits unchanged.** Express caps request bodies at 16 kB; the web
-  nginx config mirrors that.
-- **Blast radius on the host.** The stack publishes exactly one port
-  (default `3000`, or per-mode as above) and mounts no host directories. The
-  catalog is read-only data compiled into the image.
+  (`docs/agent.md`); nothing in the image invokes a package manager.
+- **No secrets in the image.** `.dockerignore` keeps `.env` and key files out of
+  the build context, and there are none to configure anyway.
+- **Bounded input.** Express caps request bodies at 16 kB.
+- **Small blast radius.** One published port, no host mounts. The catalog is
+  read-only data compiled into the image.
 
-The default server container also runs a read-only root filesystem. If an
-operator needs to relax that (it is a hardening toggle, not a supported
-feature), remove `read_only: true` from the service — the product does not
-depend on it.
+Compose also runs a read-only root filesystem. That is a hardening toggle, not
+a product requirement — remove `read_only: true` if an operator needs to.
 
-### Base image pinning and scanning
+### Base image
 
-The server image builds on `node:24.21-alpine` (pinned to a Node minor, not a
-floating `24` tag) so the vulnerability posture is reproducible instead of
-changing with every base-image push. Node 24 is the active LTS line and the
+`node:24.21-alpine`, pinned to a Node minor rather than a floating `24` tag so
+the vulnerability posture is reproducible. Node 24 is the active LTS and the
 version Vercel names as the migration target now that Node 20 is disabled in
-project settings from 2026-10-01; because the deployment is a container, this
-pin — not any platform default — is what the process actually runs. An
-`npx trivy`-style container scan of the built images
-reports only findings in the base image's **bundled `npm`** — `npm` ships inside
-the Node alpine base but no ConfigShell runtime ever invokes it (package management
-is pnpm via Corepack; the entry points are `pnpm`/`tsx`). The runtime
-dependency tree that a container actually loads is clean: no OS-level findings
-and none in the installed `.pnpm` store. The `configshell-web` (nginx + static
-bundle) image reports zero findings. When a Node minor with fixes is released,
-bump the `node:X.Y-alpine` pin in `Dockerfile.vercel` and `docker/*.Dockerfile` and rebuild; a future
-npm-free base (e.g. distroless) would remove the bundled-npm surface entirely.
+project settings from 2026-10-01; because this deploys as a container, the pin
+here — not any platform default — is what the process runs.
 
-## Validation matrix
+A `trivy`-style scan reports only findings in the base image's bundled `npm`,
+which no ConfigShell runtime invokes (package management is pnpm via Corepack;
+the entry points are `pnpm`/`tsx`). The dependency tree the container actually
+loads is clean. Bump the pin in `Dockerfile` when a Node minor with fixes lands.
 
-The container deployment is verified by exactly these commands on every
-material change (the `check` CI job does not run them — they need a Docker
-daemon, so they live here and in CI-on-schedule if GitHub Actions adds a Docker
-job later):
+## Validating a change
+
+The repository's own checks do not need Docker and run in CI:
 
 ```sh
-# 0 — the repository's own checks, unchanged, must stay green
 pnpm install --frozen-lockfile
-pnpm lint && pnpm typecheck && pnpm test && pnpm build
+pnpm check                     # lint → typecheck → test → build
+```
 
-# 1 — no host node_modules / .env leaks into any build context
-docker build --check -f Dockerfile.vercel .               # requires BuildKit
-docker compose config
+The container itself needs a daemon, so these are run by hand:
 
-# 2 — images build and inspect cleanly
-docker compose build --no-cache
-docker image inspect configshell:latest \
+```sh
+# 1 — the image builds, and builds through the Vercel symlink too
+docker build -t configshell .
+docker build -f Dockerfile.vercel -t configshell .    # same definition
+
+# 2 — it runs unprivileged with an exec-form entrypoint
+docker image inspect configshell \
   --format '{{.Config.User}} {{.Config.Cmd}} {{.Config.WorkingDir}}'
 
-# 3 — default mode: one container, whole product
+# 3 — the whole product answers on one port
 docker compose up -d
 curl -fsS http://localhost:3000/health
-curl -fsS http://localhost:3000/                            # SPA HTML
-curl -fsS 'http://localhost:3000/api/applications/git?distro=ubuntu'
-docker compose ps                                           # healthy
+curl -fsS http://localhost:3000/                                   # SPA HTML
+curl -fsS 'http://localhost:3000/api/applications/git?distro=Ubuntu'
 
 # 4 — a real setup plan through the published surface
+#     (distro values are capitalised exactly as the catalog spells them)
 curl -fsS -X POST http://localhost:3000/api/plan \
   -H 'content-type: application/json' \
-  -d '{"environment":{"distro":"ubuntu"},"applicationIds":["git"]}'
+  -d '{"environment":{"distro":"Ubuntu"},"applicationIds":["git"]}'
 
-# 5 — the MCP HTTP endpoint answers
+# 5 — MCP answers on the same port
 curl -fsS -X POST http://localhost:3000/mcp \
   -H 'content-type: application/json' \
   -H 'accept: application/json, text/event-stream' \
-  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"probe","version":"0"}}}'
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"probe","version":"0"}}}'
 
-# 6 — graceful restart preserves the product
-docker compose restart
-curl -fsS http://localhost:3000/health
+# 6 — $PORT is honoured, as a hosting platform would set it
+docker run --rm -p 8080:8080 -e PORT=8080 configshell &
+curl -fsS http://localhost:8080/health
 
 # 7 — teardown
 docker compose down
-
-# 8 — stdio MCP container
-docker build -f docker/mcp.Dockerfile -t configshell-mcp .
-printf '%s\n' \
-  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"probe","version":"0"}}}' \
-  '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
-  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
-  | docker run -i --rm configshell-mcp
-#   expect two JSON-RPC responses, the second listing the read-only tools
-
-# 9 — reverse-proxy mode
-docker compose -f compose.yml -f compose.web.yml up -d --build
-curl -fsS http://localhost:8080/api/health
-curl -fsS -X POST http://localhost:8080/api/plan \
-  -H 'content-type: application/json' \
-  -d '{"environment":{"distro":"ubuntu"},"applicationIds":["git"]}'
-docker compose -f compose.yml -f compose.web.yml down
-
-# 10 — optional security scan of the built images (trivy)
-trivy image --scanners vuln configshell:latest
-trivy image --scanners vuln configshell-web:latest
-trivy image --scanners vuln configshell-mcp:latest
 ```
 
-Checklist before a release: default mode up → healthy → plan generated →
-restart survives → down; stdio container handshake→`tools/list`; proxy mode
-web→`/health` and `/api/plan`; `docker image inspect` shows `User=node`,
-exec-form `Cmd`, non-empty `WorkingDir`.
+Stronger than any of the above, and the one to actually run before trusting a
+deployment: point the **MCP Inspector** or the official MCP client at
+`$PUBLIC_BASE_URL/mcp` — see [`mcp.md`](mcp.md#verifying-a-remote-deployment).
 
 ---
 
 See also: `README.md` (product overview), `docs/architecture.md` (the system
 this deploys), `docs/security-model.md` (why the container looks the way it
-does), `docs/mcp.md` (the MCP surfaces), `docs/development.md` (local, without
-Docker).
+does), `docs/mcp.md` (the MCP surfaces), `docs/development.md` (local
+development, which needs no Docker).

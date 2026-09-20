@@ -12,6 +12,48 @@ version is below `1.0.0`, the public surface may change in a minor release — s
 
 ## [Unreleased]
 
+### Changed
+
+- **One container definition for every platform.** `Dockerfile.vercel` is now the canonical
+  **`Dockerfile`** at the repository root — the filename Docker, Render, Railway, Fly and a
+  plain VPS detect with no configuration. Vercel detects only `Dockerfile.vercel`, so that
+  name survives as a **symlink** to `Dockerfile` (git mode `120000`), which keeps one build
+  definition rather than two to drift. Verified by building the image through the symlink.
+
+  Naming the canonical file after one platform was the wrong default: it made the generic
+  path the special case. Nothing about the image is Vercel-specific.
+
+- **`.env.example` reduced to variables that matter.** `PUBLIC_BASE_URL` is the one that
+  usually needs setting in production; `PORT` comes from the hosting platform, `MCP_PATH`
+  defaults to `/mcp`. `WEB_PORT` is gone with the nginx tier.
+
+- **`docs/deployment.md` rewritten** around two options — run it with Docker, or deploy the
+  repository to a container platform — instead of a three-image catalogue. Vercel is
+  documented as one supported platform, not a separate architecture.
+
+### Removed
+
+- **The nginx reverse-proxy tier** (`compose.web.yml`, `docker/web.Dockerfile`,
+  `docker/nginx.conf`). It was a second implementation of routing the Express app already
+  does, and it **hardcoded `location /mcp`** — so using it silently defeated `MCP_PATH`,
+  the variable the deployment is configured by. Every real deployment target provides its
+  own edge tier, so the overlay bought a duplicate of the routing table and a way to break
+  the MCP endpoint.
+
+- **The separate stdio-MCP image** (`docker/mcp.Dockerfile`). A second build definition for
+  a transport that is a local developer tool: it had already drifted to `node:22.23-alpine`
+  while the canonical image moved to 24, and it shipped dev dependencies. Local hosts run
+  `pnpm mcp`; remote hosts use `/mcp` over HTTP. The `docker/` directory is now empty and
+  gone.
+
+### Fixed
+
+- **`docs/deployment.md` validation commands could not have worked.** Every `/api/plan`
+  example sent `"distro":"ubuntu"`, which the catalog rejects — distribution names are
+  matched exactly (`"Ubuntu"`). The MCP handshake examples also pinned a stale
+  `protocolVersion`.
+
+
 ### Added
 
 - **The production image is deployable to Vercel.** `Dockerfile.vercel` at the repository

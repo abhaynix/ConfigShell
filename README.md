@@ -393,19 +393,23 @@ no CORS.
 Without a build the API still runs on its own and serves JSON only — useful for a CLI or MCP
 client that does not need the interface.
 
-## Run with Docker
+## Deploy
 
-Production Docker images and a Compose stack package the same product — one container
-serves the web app, the API and the MCP endpoint, exactly as `pnpm build && pnpm start` does:
+There is **one `Dockerfile`**, and one container serves the whole product — the web app,
+the API and the MCP endpoint — exactly as `pnpm build && pnpm start` does:
 
 ```sh
 docker compose up -d --build   # http://localhost:3000 (override host port: API_PORT=8080 ...)
 ```
 
-An optional nginx reverse-proxy front is provided for deployments that want a dedicated web
-tier; the MCP stdio tool is packaged separately for MCP hosts that launch it as a container.
-Everything — images, topologies, configuration, security, and the exact validation commands —
-is in [`docs/deployment.md`](docs/deployment.md).
+The same image runs anywhere a container runs. Render, Railway, Fly and a plain VPS detect
+the root `Dockerfile` with no configuration; Vercel detects `Dockerfile.vercel`, which is a
+symlink to it, so there is no second definition to keep in sync. Usually the only thing to
+set is `PUBLIC_BASE_URL` — the public MCP URL is derived from it as
+`PUBLIC_BASE_URL + /mcp`.
+
+Configuration, the platform-specific settings, the security model and the exact validation
+commands are in [`docs/deployment.md`](docs/deployment.md).
 
 ## Testing
 
