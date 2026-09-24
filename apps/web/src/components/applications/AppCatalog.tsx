@@ -123,15 +123,17 @@ export function AppCatalog({ selectedIds, onToggle, onOpenDetails }: AppCatalogP
     return counts;
   }, []);
 
-  // Compute matching counts if an active search query is present
+  // Compute matching counts if an active search query is present (single pass over matches)
   const queryCounts = useMemo(() => {
     const trimmed = query.trim();
     if (!trimmed) return null;
-    const counts: Record<string, number> = {
-      All: searchApplications({ query: trimmed }).length,
-    };
+    const matches = searchApplications({ query: trimmed });
+    const counts: Record<string, number> = { All: matches.length };
     for (const cat of CATEGORIES) {
-      counts[cat] = searchApplications({ query: trimmed, category: cat }).length;
+      counts[cat] = 0;
+    }
+    for (const app of matches) {
+      counts[app.category] = (counts[app.category] ?? 0) + 1;
     }
     return counts;
   }, [query]);
