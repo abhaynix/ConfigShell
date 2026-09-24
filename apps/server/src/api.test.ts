@@ -434,6 +434,17 @@ describe("errors", () => {
     const response = await fetch(`${baseUrl}/health`);
     assert.equal(response.headers.get("x-powered-by"), null);
   });
+
+  test("standard defensive HTTP security headers are set", async () => {
+    const response = await fetch(`${baseUrl}/health`);
+    assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+    assert.equal(response.headers.get("x-frame-options"), "DENY");
+    assert.equal(
+      response.headers.get("referrer-policy"),
+      "strict-origin-when-cross-origin",
+    );
+    assert.equal(response.headers.get("x-dns-prefetch-control"), "off");
+  });
 });
 
 // ------------------------------------------------------------------ logging

@@ -37,6 +37,7 @@ import { healthHandler } from "./controllers/health.controller.js";
 import { errorMiddleware } from "./middleware/error.middleware.js";
 import { notFoundMiddleware } from "./middleware/not-found.middleware.js";
 import { requestContextMiddleware } from "./middleware/request-context.middleware.js";
+import { securityHeadersMiddleware } from "./middleware/security.middleware.js";
 import { logger } from "./utils/logger.js";
 
 /**
@@ -75,6 +76,7 @@ export function createApp(options: Options = {}) {
   // sufficient and one less shape to validate against.
   app.set("query parser", "simple");
 
+  app.use(securityHeadersMiddleware);
   app.use(requestContextMiddleware);
 
   // The MCP endpoint is mounted BEFORE the JSON body parser on purpose: the
