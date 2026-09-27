@@ -1,0 +1,1 @@
+ConfigShell works out exactly what to install on your distro — 160 verified apps, 5 distributions, 4 package managers — and then refuses to run any of it. "executed": false is the feature, not a bug.

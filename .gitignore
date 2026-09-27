@@ -33,7 +33,6 @@ tmp/
 .env.test.local
 .env.production.local
 # Keep the checked-in template (matched by .env.* above, so re-include it)
-!.env.example
 
 # -----------------------------------------------------------------------------
 # Logs
