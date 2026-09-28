@@ -28,7 +28,7 @@
   "devDependencies": {
     "@configshell/test-utils": "workspace:*",
     "@modelcontextprotocol/client": "^2.0.0",
-    "@types/node": "^22.14.0",
+    "@types/node": "^26.6.2",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2"
   }
