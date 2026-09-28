@@ -15,6 +15,6 @@
     "@types/node": "^22.14.0",
     "server": "workspace:*",
     "tsx": "^4.21.0",
-    "typescript": "~5.8.2"
+    "typescript": "~6.0.3"
   }
 }
