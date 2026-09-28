@@ -15,6 +15,7 @@ import { PlanView } from '@/components/plan/PlanView';
 import { RoleSelector } from '@/components/roles/RoleSelector';
 import { SelectionBar } from '@/components/selection/SelectionBar';
 import { SelectionSummary } from '@/components/selection/SelectionSummary';
+import { StatusBar } from '@/components/layout/StatusBar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { useSetupPlan } from '@/hooks/useSetupPlan';
 import type { Application, Distro, Role } from '@configshell/catalog';
@@ -145,6 +146,56 @@ export default function App() {
     if (view === 'plan') planHeadingRef.current?.focus();
   }, [view]);
 
+  // Global keyboard shortcuts for expert users & accessibility
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const isInput =
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable);
+
+      // Ctrl+Enter / Cmd+Enter: Trigger Build Plan
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        if (view === 'build' && canContinue) {
+          e.preventDefault();
+          buildPlan();
+        }
+        return;
+      }
+
+      // Alt+C: Clear all selections
+      if (e.altKey && (e.key === 'c' || e.key === 'C')) {
+        e.preventDefault();
+        clearAll();
+        return;
+      }
+
+      // /: Quick-focus application search
+      if (e.key === '/' && !isInput && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const searchInput = document.getElementById('app-search') as HTMLInputElement | null;
+        if (searchInput) {
+          e.preventDefault();
+          searchInput.focus();
+        }
+        return;
+      }
+
+      // Escape: Back to selection when on plan view
+      if (e.key === 'Escape' && !isInput) {
+        if (view === 'plan') {
+          e.preventDefault();
+          setView('build');
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [view, canContinue, buildPlan, clearAll]);
+
   const mainRef = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -201,6 +252,7 @@ export default function App() {
       <TooltipProvider>
         <AppShell onOpenConnect={openConnect} connectActive>
           <ConnectView onBack={leaveConnect} />
+          <StatusBar view="connect" />
         </AppShell>
       </TooltipProvider>
     );
@@ -287,6 +339,8 @@ export default function App() {
             onContinue={buildPlan}
           />
         )}
+
+        <StatusBar view={view} />
 
         <AppDetailSheet
           app={detailApp}

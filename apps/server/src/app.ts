@@ -29,6 +29,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
 import type { Express, NextFunction, Request, Response } from "express";
+import helmet from "helmet";
 
 import { createMcpHttpHandler } from "@configshell/mcp";
 import { env } from "./config/env.js";
@@ -66,6 +67,8 @@ export interface Options {
 
 export function createApp(options: Options = {}) {
   const app = express();
+
+  app.use(helmet());
 
   // Do not advertise the framework. Cheap, and there is no reason to.
   app.disable("x-powered-by");

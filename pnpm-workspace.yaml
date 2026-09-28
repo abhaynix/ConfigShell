@@ -1,8 +1,0 @@
-packages:
-  - 'apps/*'
-  - 'packages/*'
-
-linkWorkspacePackages: true
-
-allowBuilds:
-  esbuild: true

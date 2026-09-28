@@ -2,7 +2,7 @@
   "name": "configshell",
   "version": "0.1.0",
   "private": true,
-  "description": "ConfigShell \u2014 open-source Linux software discovery and setup-plan generation",
+  "description": "ConfigShell — open-source Linux software discovery and setup-plan generation",
   "type": "module",
   "workspaces": [
     "apps/*",
@@ -11,11 +11,10 @@
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "pnpm@12.3.4",
   "scripts": {
-    "dev": "pnpm --parallel --filter web --filter server dev",
+    "dev": "npm run build --workspace=web && tsx apps/server/src/index.ts",
     "build": "npm run build --workspace=web",
-    "start": "npm run start --workspace=server",
+    "start": "tsx apps/server/src/index.ts",
     "lint": "eslint .",
     "typecheck": "npm run typecheck --workspace=web && npm run typecheck --workspace=@configshell/catalog && npm run typecheck --workspace=@configshell/installer && npm run typecheck --workspace=@configshell/test-utils && npm run typecheck --workspace=@configshell/mcp && npm run typecheck --workspace=server && npm run typecheck --workspace=@configshell/contract-tests",
     "test": "npm run test --workspace=@configshell/test-utils && npm run test --workspace=@configshell/catalog && npm run test --workspace=@configshell/installer && npm run test --workspace=@configshell/mcp && npm run test --workspace=server && npm run test --workspace=@configshell/contract-tests && npm run test --workspace=web",

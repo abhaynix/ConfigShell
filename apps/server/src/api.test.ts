@@ -434,6 +434,14 @@ describe("errors", () => {
     const response = await fetch(`${baseUrl}/health`);
     assert.equal(response.headers.get("x-powered-by"), null);
   });
+
+  test("security headers are present", async () => {
+    const response = await fetch(`${baseUrl}/health`);
+    assert.ok(response.headers.get("content-security-policy"), "missing content-security-policy");
+    assert.equal(response.headers.get("x-frame-options"), "SAMEORIGIN");
+    assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+    assert.ok(response.headers.get("strict-transport-security"), "missing strict-transport-security");
+  });
 });
 
 // ------------------------------------------------------------------ logging

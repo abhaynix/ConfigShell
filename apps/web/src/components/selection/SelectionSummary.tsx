@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Kbd } from '@/components/ui/kbd';
 import { APPLICATIONS } from '@configshell/catalog';
 import { SelectionList } from './SelectionList';
 import { gsap, useGSAP, prefersReducedMotion, MOTION_DURATIONS, MOTION_EASINGS } from '@/lib/motion';
@@ -100,10 +101,14 @@ export function SelectionSummary({
         <SelectionList selectedApps={selectedApps} onRemove={onRemove} />
 
         {selectedApps.length > 0 && (
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-end gap-1.5">
             <Button type="button" variant="ghost" size="xs" onClick={onClear} className="text-xs text-muted-foreground hover:text-foreground">
               Clear all
             </Button>
+            <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+              <Kbd title="Keyboard shortcut: Alt+C">Alt+C</Kbd>
+              <span>for Clear</span>
+            </span>
           </div>
         )}
 
@@ -120,31 +125,37 @@ export function SelectionSummary({
         {selectedApps.length > 0 && onContinue && (
           <>
             <Separator className="my-0.5" />
-            {canContinue ? (
-              <Button type="button" onClick={onContinue} className="build-plan-button w-full justify-center transition-colors">
-                <span>Generate setup plan</span>
-                <ArrowRight aria-hidden="true" className="ml-1 size-3.5" />
-              </Button>
-            ) : (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="block w-full">
-                    <Button
-                      type="button"
-                      aria-disabled="true"
-                      className="build-plan-button w-full justify-center cursor-not-allowed opacity-60 transition-opacity"
-                      onClick={(event) => event.preventDefault()}
-                    >
-                      <span>Generate setup plan</span>
-                      <ArrowRight aria-hidden="true" className="ml-1 size-3.5" />
-                    </Button>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>{blockedReason}</TooltipContent>
-              </Tooltip>
-            )}
+            <div className="flex flex-col gap-1.5">
+              {canContinue ? (
+                <Button type="button" onClick={onContinue} className="build-plan-button w-full justify-center transition-colors">
+                  <span>Generate setup plan</span>
+                  <ArrowRight aria-hidden="true" className="ml-1 size-3.5" />
+                </Button>
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="block w-full">
+                      <Button
+                        type="button"
+                        aria-disabled="true"
+                        className="build-plan-button w-full justify-center cursor-not-allowed opacity-60 transition-opacity"
+                        onClick={(event) => event.preventDefault()}
+                      >
+                        <span>Generate setup plan</span>
+                        <ArrowRight aria-hidden="true" className="ml-1 size-3.5" />
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>{blockedReason}</TooltipContent>
+                </Tooltip>
+              )}
+              <div className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
+                <Kbd title="Keyboard shortcut: Ctrl+Enter">Ctrl+Enter</Kbd>
+                <span>for Build</span>
+              </div>
+            </div>
             {!canContinue && blockedReason && (
-              <p className="mt-1.5 text-[11px] text-muted-foreground text-center">
+              <p className="mt-1 text-[11px] text-muted-foreground text-center">
                 {blockedReason}
               </p>
             )}

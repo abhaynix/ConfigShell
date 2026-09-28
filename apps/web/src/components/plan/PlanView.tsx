@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 import { Separator } from '@/components/ui/separator';
+import { Kbd } from '@/components/ui/kbd';
 import { useClipboard } from '@/hooks/useClipboard';
 import type { PlanStatus } from '@/hooks/useSetupPlan';
 import type { ApiRequestError, SetupPlan } from '@/lib/api';
@@ -79,9 +80,10 @@ export function PlanView({ status, plan, error, onBack, onRetry }: PlanViewProps
             </p>
           )}
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={onBack}>
+        <Button type="button" variant="outline" size="sm" onClick={onBack} className="gap-1.5">
           <ArrowLeft aria-hidden="true" />
-          Back to selection
+          <span>Back to selection</span>
+          <Kbd className="hidden sm:inline-flex text-[9px]">Esc</Kbd>
         </Button>
       </div>
 
@@ -267,13 +269,14 @@ function PlanBody({ plan }: { plan: SetupPlan }) {
             <h3 id="commands-heading" className="text-sm font-medium">
               Run these in your terminal, in order
             </h3>
-            <Button ref={copyBtnRef} type="button" variant="outline" size="sm" onClick={() => copyAll(script)}>
+            <Button ref={copyBtnRef} type="button" variant="outline" size="sm" onClick={() => copyAll(script)} className="gap-1.5">
               {copyAllState === 'copied' ? (
                 <Check aria-hidden="true" className={cn('copy-all-icon', OUTCOMES.installable.text)} />
               ) : (
                 <Copy aria-hidden="true" className="copy-all-icon" />
               )}
-              {copyAllState === 'copied' ? 'Copied' : 'Copy all'}
+              <span>{copyAllState === 'copied' ? 'Copied' : 'Copy all'}</span>
+              <Kbd className="hidden sm:inline-flex text-[9px]">Alt+Y</Kbd>
             </Button>
           </div>
 

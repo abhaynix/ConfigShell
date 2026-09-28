@@ -2,6 +2,7 @@ import { Check, ChevronDown, Sparkles, X } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Kbd } from '@/components/ui/kbd';
 import { cn } from '@/lib/utils';
 import { CATEGORY_ICON } from '@/components/applications/categoryIcon';
 import type { Category } from '@configshell/catalog';
@@ -62,10 +63,16 @@ export function RoleSelector({ appliedRoleId, onApply, onClear }: RoleSelectorPr
           What is this machine for?
         </h2>
         {appliedRoleId && (
-          <Button type="button" variant="ghost" size="sm" onClick={onClear}>
-            <X aria-hidden="true" />
-            Clear selection
-          </Button>
+          <div className="flex items-center gap-1.5">
+            <Button type="button" variant="ghost" size="sm" onClick={onClear}>
+              <X aria-hidden="true" />
+              Clear selection
+            </Button>
+            <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+              <Kbd title="Keyboard shortcut: Alt+C">Alt+C</Kbd>
+              <span>for Clear</span>
+            </span>
+          </div>
         )}
       </div>
 

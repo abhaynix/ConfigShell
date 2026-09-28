@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Kbd } from '@/components/ui/kbd';
 import { APPLICATIONS } from '@configshell/catalog';
 import { SelectionList } from './SelectionList';
 import { gsap, useGSAP, prefersReducedMotion, shouldSkipEntrance, MOTION_DURATIONS, MOTION_EASINGS } from '@/lib/motion';
@@ -116,39 +117,51 @@ export function SelectionBar({
               <div className="px-4 pb-4">
                 <SelectionList selectedApps={selectedApps} onRemove={onRemove} />
                 {count > 0 && (
-                  <Button type="button" variant="ghost" size="sm" className="mt-3" onClick={onClear}>
-                    Clear all
-                  </Button>
+                  <div className="mt-3 flex items-center justify-between">
+                    <Button type="button" variant="ghost" size="sm" onClick={onClear}>
+                      Clear all
+                    </Button>
+                    <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                      <Kbd title="Keyboard shortcut: Alt+C">Alt+C</Kbd>
+                      <span>for Clear</span>
+                    </span>
+                  </div>
                 )}
               </div>
             </SheetContent>
           </Sheet>
 
-          {canContinue ? (
-            <Button type="button" onClick={onContinue}>
-              <span className="sm:hidden">Generate plan</span>
-              <span className="hidden sm:inline">Generate setup plan</span>
-              <ArrowRight aria-hidden="true" />
-            </Button>
-          ) : (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                {/* Kept focusable and aria-disabled rather than `disabled`, so
-                    the reason is reachable by keyboard and screen reader. */}
-                <Button
-                  type="button"
-                  aria-disabled="true"
-                  className="cursor-not-allowed opacity-60"
-                  onClick={(event) => event.preventDefault()}
-                >
-                  <span className="sm:hidden">Generate plan</span>
-                  <span className="hidden sm:inline">Generate setup plan</span>
-                  <ArrowRight aria-hidden="true" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{blockedReason}</TooltipContent>
-            </Tooltip>
-          )}
+          <div className="flex items-center gap-2">
+            <span className="hidden md:inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+              <Kbd>Ctrl+Enter</Kbd>
+              <span>for Build</span>
+            </span>
+            {canContinue ? (
+              <Button type="button" onClick={onContinue}>
+                <span className="sm:hidden">Generate plan</span>
+                <span className="hidden sm:inline">Generate setup plan</span>
+                <ArrowRight aria-hidden="true" />
+              </Button>
+            ) : (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  {/* Kept focusable and aria-disabled rather than `disabled`, so
+                      the reason is reachable by keyboard and screen reader. */}
+                  <Button
+                    type="button"
+                    aria-disabled="true"
+                    className="cursor-not-allowed opacity-60"
+                    onClick={(event) => event.preventDefault()}
+                  >
+                    <span className="sm:hidden">Generate plan</span>
+                    <span className="hidden sm:inline">Generate setup plan</span>
+                    <ArrowRight aria-hidden="true" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{blockedReason}</TooltipContent>
+              </Tooltip>
+            )}
+          </div>
         </div>
       </PageContainer>
     </div>

@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Kbd } from '@/components/ui/kbd';
 import { cn } from '@/lib/utils';
 import {
   APPLICATIONS,
@@ -251,19 +252,38 @@ export function AppCatalog({ selectedIds, onToggle, onOpenDetails }: AppCatalogP
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                if (query) {
+                  setQuery('');
+                  e.stopPropagation();
+                } else {
+                  (e.target as HTMLElement).blur();
+                }
+              }
+            }}
             placeholder="Search applications (e.g., vscode, vlc, git, docker, web)..."
-            className="pl-8 pr-8"
+            className="pl-8 pr-24"
           />
+          {!query && (
+            <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1 text-[11px] text-muted-foreground" title="Press / to focus">
+              <Kbd>/</Kbd>
+              <span className="text-[10px]">for Search</span>
+            </div>
+          )}
           {query && (
-            <button
-              type="button"
-              id="clear-search-btn"
-              onClick={() => setQuery('')}
-              aria-label="Clear search text"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <X className="size-3.5" />
-            </button>
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+              <Kbd className="hidden sm:inline-flex text-[9px]">Esc</Kbd>
+              <button
+                type="button"
+                id="clear-search-btn"
+                onClick={() => setQuery('')}
+                aria-label="Clear search text"
+                className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="size-3.5" />
+              </button>
+            </div>
           )}
         </div>
       </div>
