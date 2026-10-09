@@ -59,49 +59,49 @@ const CATEGORY_ITEMS: readonly CategoryFilterItem[] = [
     id: 'General',
     label: 'General',
     icon: Laptop,
-    description: 'Everyday desktop essentials — browsing, email, media, communication, and utilities.',
+    description: 'Everyday desktop essentials: browsing, email, media, communication, and utilities.',
   },
   {
     id: 'Student',
     label: 'Student',
     icon: GraduationCap,
-    description: 'Study and coursework — note-taking, documents, research, PDFs, presentations, and collaboration.',
+    description: 'Study and coursework: note-taking, documents, research, PDFs, presentations, and collaboration.',
   },
   {
     id: 'Developer',
     label: 'Developer',
     icon: Code,
-    description: 'Software development essentials — code editors, Git, terminals, runtimes, databases, and developer utilities.',
+    description: 'Software development essentials: code editors, Git, terminals, runtimes, databases, and developer utilities.',
   },
   {
     id: 'Web Developer',
     label: 'Web Developer',
     icon: Globe,
-    description: 'Web development stack — browsers, Node.js, frontend tooling, API clients, databases, and web utilities.',
+    description: 'Web development stack: browsers, Node.js, frontend tooling, API clients, databases, and web utilities.',
   },
   {
     id: 'DevOps',
     label: 'DevOps',
     icon: Server,
-    description: 'Infrastructure and deployment — containers, Kubernetes, SSH, cloud CLIs, monitoring, and server tools.',
+    description: 'Infrastructure and deployment: containers, Kubernetes, SSH, cloud CLIs, monitoring, and server tools.',
   },
   {
     id: 'Data & AI',
     label: 'Data & AI',
     icon: Brain,
-    description: 'Data science and AI development — Python, Jupyter, ML tools, notebooks, model tooling, and data utilities.',
+    description: 'Data science and AI development: Python, Jupyter, ML tools, notebooks, model tooling, and data utilities.',
   },
   {
     id: 'Content Creator',
     label: 'Content Creator',
     icon: Video,
-    description: 'Video, audio, streaming, and content production — editors, recording tools, codecs, and media utilities.',
+    description: 'Video, audio, streaming, and content production: editors, recording tools, codecs, and media utilities.',
   },
   {
     id: 'Gaming',
     label: 'Gaming',
     icon: Gamepad2,
-    description: 'Gaming essentials — game clients, compatibility layers, performance tools, and controllers.',
+    description: 'Gaming essentials: game clients, compatibility layers, performance tools, and controllers.',
   },
 ] as const;
 
@@ -225,7 +225,7 @@ export function AppCatalog({ selectedIds, onToggle, onOpenDetails }: AppCatalogP
   return (
     <section ref={catalogRef} aria-labelledby="catalog-heading">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="catalog-heading" className="text-xs font-semibold tracking-wide text-muted-foreground">
+        <h2 id="catalog-heading" className="text-sm font-semibold text-foreground">
           Browse applications
         </h2>
         <span className="text-xs text-muted-foreground">
@@ -324,7 +324,7 @@ export function AppCatalog({ selectedIds, onToggle, onOpenDetails }: AppCatalogP
                   className={cn(
                     'group inline-flex h-8.5 shrink-0 items-center gap-2 rounded-lg border px-2.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 select-none cursor-pointer',
                     isSelected
-                      ? 'border-primary bg-primary text-primary-foreground shadow-xs font-semibold'
+                      ? 'border-primary bg-primary/10 text-primary font-semibold'
                       : 'border-border bg-card text-muted-foreground hover:border-foreground/25 hover:bg-muted hover:text-foreground',
                   )}
                 >
@@ -333,7 +333,7 @@ export function AppCatalog({ selectedIds, onToggle, onOpenDetails }: AppCatalogP
                     className={cn(
                       'flex size-5 shrink-0 items-center justify-center rounded transition-colors',
                       isSelected
-                        ? 'bg-primary-foreground/20 text-primary-foreground'
+                        ? 'bg-primary/15 text-primary'
                         : 'bg-muted text-foreground/80 group-hover:bg-foreground/10 group-hover:text-foreground',
                     )}
                   >
@@ -345,7 +345,7 @@ export function AppCatalog({ selectedIds, onToggle, onOpenDetails }: AppCatalogP
                     className={cn(
                       'ml-0.5 inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold transition-colors',
                       isSelected
-                        ? 'bg-primary-foreground/20 text-primary-foreground'
+                        ? 'bg-primary/15 text-primary'
                         : 'bg-muted text-muted-foreground group-hover:bg-foreground/10 group-hover:text-foreground',
                     )}
                   >

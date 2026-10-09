@@ -76,7 +76,7 @@ export function SelectionSummary({
   );
 
   return (
-    <Card ref={cardRef} className="hidden lg:block border-border shadow-xs">
+    <Card ref={cardRef} className="hidden lg:block border-border">
       <CardHeader className="flex-row items-center justify-between p-3.5 pb-2">
         <CardTitle className="text-sm font-semibold">Selected applications</CardTitle>
         {/*
@@ -163,7 +163,7 @@ export function SelectionSummary({
             {/* The standing promise, kept next to the button that is about to
                 produce commands — where it is actually load-bearing. */}
             <p className="text-[11px] leading-tight text-muted-foreground">
-              ConfigShell never installs anything itself — you get the commands and run
+              ConfigShell never installs anything itself. You get the commands and run
               them yourself.
             </p>
           </>

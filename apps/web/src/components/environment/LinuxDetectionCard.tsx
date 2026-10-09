@@ -66,7 +66,7 @@ export function LinuxDetectionCard() {
     return (
       <div
         ref={cardRef}
-        className="flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/5 px-2.5 py-1.5 text-xs text-foreground"
+        className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 text-xs text-foreground"
       >
         <Laptop className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
         <span aria-live="polite" className="font-medium">
@@ -76,7 +76,7 @@ export function LinuxDetectionCard() {
           Browser signal
         </Badge>
         <span aria-hidden="true" className="hidden text-muted-foreground sm:inline">
-          — running on Linux
+          running on Linux
         </span>
         <Button
           type="button"

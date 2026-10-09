@@ -71,7 +71,7 @@ export function AppCard({ app, selected, onToggle, onOpenDetails }: AppCardProps
          * one. `relative` is for the checkbox's enlarged hit area, not layout.
          */
         'group relative grid cursor-pointer grid-rows-[auto_1fr_auto] gap-2 rounded-lg border p-3 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-1 has-[:focus-visible]:ring-offset-background select-none',
-        selected ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-border bg-card hover:border-foreground/25 hover:bg-muted/30',
+        selected ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-foreground/25 hover:bg-muted/30',
       )}
     >
       <div className="flex items-start justify-between gap-2">
@@ -79,7 +79,7 @@ export function AppCard({ app, selected, onToggle, onOpenDetails }: AppCardProps
           aria-hidden="true"
           className={cn(
             'app-icon-badge flex size-7.5 shrink-0 items-center justify-center rounded-md transition-colors',
-            selected ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground',
+            selected ? 'bg-primary/10 text-primary' : 'bg-muted text-foreground',
           )}
         >
           <Icon className="size-3.5" />
@@ -128,8 +128,8 @@ export function AppCard({ app, selected, onToggle, onOpenDetails }: AppCardProps
         <Badge variant="outline" className="h-4.5 px-1.5 text-[10px] font-normal">{app.category}</Badge>
         {app.featured && (
           <Badge
-            variant="secondary"
-            className="gap-1 h-4.5 px-1.5 border-amber-500/30 bg-amber-500/10 text-amber-700 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300 font-medium text-[10px]"
+            variant="outline"
+            className="gap-1 h-4.5 px-1.5 border-amber-500/30 text-amber-700 dark:border-amber-400/30 dark:text-amber-300 font-medium text-[10px]"
           >
             <Star aria-hidden="true" className="size-2.5 fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" />
             Featured
@@ -137,8 +137,8 @@ export function AppCard({ app, selected, onToggle, onOpenDetails }: AppCardProps
         )}
         {!app.featured && app.popularity !== undefined && app.popularity >= 90 && (
           <Badge
-            variant="secondary"
-            className="gap-1 h-4.5 px-1.5 border-amber-500/30 bg-amber-500/10 text-amber-700 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300 font-medium text-[10px]"
+            variant="outline"
+            className="gap-1 h-4.5 px-1.5 border-amber-500/30 text-amber-700 dark:border-amber-400/30 dark:text-amber-300 font-medium text-[10px]"
           >
             <Star aria-hidden="true" className="size-2.5 fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" />
             High Rated

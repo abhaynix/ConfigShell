@@ -71,7 +71,7 @@ export function PlanView({ status, plan, error, onBack, onRetry }: PlanViewProps
     <section ref={containerRef} aria-labelledby="plan-heading">
       <div className="plan-header-block flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 id="plan-heading" className="text-xl font-semibold tracking-tight">
+          <h2 id="plan-heading" className="text-2xl font-medium tracking-tight sm:text-3xl">
             Your setup plan
           </h2>
           {plan && (
@@ -281,8 +281,8 @@ function PlanBody({ plan }: { plan: SetupPlan }) {
           </div>
 
           <p className="mt-1 text-xs text-muted-foreground">
-            ConfigShell does not run these for you. Read each one before you run it —
-            commands marked “Runs as root” change your system.
+            ConfigShell does not run these for you. Read each one before you run it.
+            Commands marked “Runs as root” change your system.
           </p>
 
           <ol className="mt-3 flex flex-col gap-3">
@@ -318,7 +318,7 @@ function PlanBody({ plan }: { plan: SetupPlan }) {
             <ShieldAlert aria-hidden="true" />
             <AlertTitle>Important</AlertTitle>
             <AlertDescription>
-              Steps marked “Runs as root” change your system — the flag is the resolver&apos;s
+              Steps marked “Runs as root” change your system. The flag is the resolver&apos;s
               signal that a command needs elevated privileges. ConfigShell never runs a command
               for you; read each one and execute it yourself in your own terminal.
             </AlertDescription>
@@ -350,7 +350,7 @@ function PlanBody({ plan }: { plan: SetupPlan }) {
         <span>
           {commands.length > 0 ? (
             <>
-              Every command above is built from verified catalog data — ConfigShell never
+              Every command above is built from verified catalog data. ConfigShell never
               assembles one from anything you typed. Nothing on this page can execute a
               command; running them is your own deliberate act in your own terminal.
             </>
@@ -505,7 +505,7 @@ function ResolutionTable({ resolutions }: { resolutions: SetupPlan['resolutions'
                 {resolution.applicationName}
               </span>
               <span role="cell" className="hidden truncate font-mono text-xs text-muted-foreground sm:block">
-                {resolution.source ? `${resolution.source.method} · ${resolution.source.identifier}` : '—'}
+                {resolution.source ? `${resolution.source.method} · ${resolution.source.identifier}` : 'None'}
               </span>
               <span role="cell" className={cn('flex items-center justify-end gap-1.5 text-xs whitespace-nowrap', text)}>
                 <Icon aria-hidden="true" className="size-3.5 shrink-0" />
@@ -527,7 +527,7 @@ function VerificationNote() {
       <AlertDescription>
         The last commands check that each application landed on your{' '}
         <code className="font-mono text-xs">PATH</code>. A line of output means it is
-        installed; no output means it is not. ConfigShell cannot check this for you — it has
+        installed; no output means it is not. ConfigShell cannot check this for you. It has
         no access to your machine.
       </AlertDescription>
     </Alert>

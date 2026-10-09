@@ -91,14 +91,14 @@ export function ConnectPage({ connection, error, loading, onBack }: ConnectPageP
       <div className="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-3 pt-6">
           <div>
-            <h1 className="flex items-center gap-2 text-lg font-semibold tracking-tight sm:text-xl">
+            <h1 className="flex items-center gap-2 text-2xl font-medium tracking-tight sm:text-3xl">
               <Plug aria-hidden="true" className="size-5 shrink-0 text-primary" />
               Connect ConfigShell to your AI
             </h1>
             <p className="mt-1 max-w-xl text-sm text-muted-foreground">
               Give your AI assistant this one URL and it can search ConfigShell's verified
               Linux catalogue, check what works on your distribution, and build you a setup
-              plan — while you stay the one who runs anything.
+              plan, while you stay the one who runs anything.
             </p>
           </div>
           <Button type="button" variant="outline" size="sm" onClick={onBack}>
@@ -139,7 +139,7 @@ function McpUrlCard({ connection }: { connection: McpConnection }) {
   const { state, copy } = useClipboard();
 
   return (
-    <Card className="border-primary/30">
+    <Card className="border-border">
       <CardHeader>
         <CardTitle className="text-sm">Your ConfigShell MCP URL</CardTitle>
         <p className="text-xs text-muted-foreground">
@@ -176,7 +176,7 @@ function McpUrlCard({ connection }: { connection: McpConnection }) {
 
         {state === 'failed' && (
           <p className="mt-2 text-xs text-destructive">
-            Couldn't copy automatically — select the URL above instead.
+            Couldn't copy automatically. Select the URL above instead.
           </p>
         )}
 
@@ -251,7 +251,7 @@ const HOSTS = [
       'Add a server of type "HTTP" (Streamable HTTP).',
       'Use the URL above as the endpoint.',
     ],
-    note: 'Any client that speaks Streamable HTTP works — nothing here is client-specific.',
+    note: 'Any client that speaks Streamable HTTP works. Nothing here is client-specific.',
   },
 ];
 
@@ -304,7 +304,7 @@ function WhatToAsk() {
       </h2>
       <p className="mt-1 text-xs text-muted-foreground">
         Talk to your assistant normally. It decides when to call ConfigShell, and it explains
-        the answers in its own words — ConfigShell supplies the facts, not the conversation.
+        the answers in its own words. ConfigShell supplies the facts, not the conversation.
       </p>
       <ul className="mt-3 flex flex-col gap-2">
         {EXAMPLE_PROMPTS.map((prompt) => (
@@ -390,7 +390,7 @@ function SafetyNote() {
             ConfigShell returns install commands as <em>text</em>, for you to read and run
             yourself. The endpoint is read-only: it cannot execute a command, detect your
             system, see what you already have installed, or change anything. Every command
-            comes from the verified catalogue — your assistant is told never to edit one or
+            comes from the verified catalogue. Your assistant is told never to edit one or
             substitute a package name of its own.
           </p>
         </div>

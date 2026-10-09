@@ -1,7 +1,8 @@
 import { Github, Plug } from 'lucide-react';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { PageContainer } from '@/components/layout/PageContainer';
+import { cn } from '@/lib/utils';
 import { ThemeToggle } from './ThemeToggle';
 import { gsap, useGSAP, shouldSkipEntrance, MOTION_DURATIONS, MOTION_EASINGS } from '@/lib/motion';
 
@@ -14,6 +15,14 @@ interface SiteHeaderProps {
 
 export function SiteHeader({ onOpenConnect, connectActive }: SiteHeaderProps) {
   const headerRef = useRef<HTMLElement>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useGSAP(
     () => {
@@ -49,7 +58,15 @@ export function SiteHeader({ onOpenConnect, connectActive }: SiteHeaderProps) {
   );
 
   return (
-    <header ref={headerRef} className="sticky top-0 z-30 w-full border-b border-border bg-card/40 backdrop-blur-xs">
+    <header
+      ref={headerRef}
+      className={cn(
+        'sticky top-0 z-30 w-full border-b transition-colors duration-200 motion-reduce:transition-none',
+        scrolled
+          ? 'border-border bg-background/80 backdrop-blur-md'
+          : 'border-transparent bg-transparent',
+      )}
+    >
       {/*
         Three fixed roles: brand, context, actions. A grid rather than
         `justify-between` so the middle track is the one that absorbs the

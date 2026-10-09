@@ -42,6 +42,15 @@ version is below `1.0.0`, the public surface may change in a minor release — s
   canonical root `Dockerfile` via `services.configshell.entrypoint`. One build definition,
   and the root `Dockerfile` is now the only container file in the repository.
 
+- **A UI consistency pass across `apps/web`.** Selection states now use a restrained brand
+  tint with a single border instead of solid green fills and doubled rings (application
+  cards, distribution and OS selectors, role presets, source rows); the sticky header is
+  transparent at the top and gains its border and backdrop blur only once scrolled; page
+  titles follow one scale (`text-xl`/`text-2xl`, medium weight); the status bar and selector
+  legends drop the all-caps treatment; and user-facing copy uses plain punctuation instead of
+  em dashes. Green remains the only accent, both themes keep working, and no behaviour, API
+  or plan output changed.
+
 ### Removed
 
 - **`docs/design.md`** — 264 lines of design tokens for "a dark, data-dense React component

@@ -98,13 +98,13 @@
      * --layout-gap for the space between them.
      *
      * --layout-scroll-offset is the vertical space the header, page intro and
-     * gutters take above the catalog's own scroll region on desktop. It is a
-     * measured value, not a guess — see AppCatalog.
+     * gutters take above the catalog's own scroll region on desktop. It tracks
+     * the page intro's responsive title size, so it moves with that scale.
      */
     --layout-max-width: 80rem;
     --layout-gutter: 1rem;
     --layout-gap: 0.875rem;
-    --layout-scroll-offset: 21.5rem;
+    --layout-scroll-offset: 22.5rem;
     --radius: 0.625rem;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);

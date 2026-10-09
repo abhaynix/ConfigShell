@@ -58,7 +58,7 @@ export function DistroSelector({ selected, onSelect }: DistroSelectorProps) {
 
   return (
     <fieldset ref={containerRef}>
-      <legend className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+      <legend className="text-sm font-medium text-foreground">
         Distribution
       </legend>
 
@@ -80,7 +80,7 @@ export function DistroSelector({ selected, onSelect }: DistroSelectorProps) {
               className={cn(
                 'relative flex cursor-pointer flex-col justify-between gap-1 rounded-lg border px-2.5 py-1.5 text-xs transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-1 has-[:focus-visible]:ring-offset-background select-none',
                 active
-                  ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                  ? 'border-primary bg-primary/5'
                   : 'border-border bg-card hover:border-foreground/25 hover:bg-muted/30',
               )}
             >

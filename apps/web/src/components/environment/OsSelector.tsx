@@ -12,14 +12,14 @@ import { cn } from '@/lib/utils';
  */
 const OPERATING_SYSTEMS = [
   { id: 'linux', name: 'Linux', supported: true, note: 'APT · DNF · pacman · Flatpak · Snap' },
-  { id: 'macos', name: 'macOS', supported: false, note: 'Homebrew — planned' },
-  { id: 'windows', name: 'Windows', supported: false, note: 'WinGet · Scoop — planned' },
+  { id: 'macos', name: 'macOS', supported: false, note: 'Homebrew, planned' },
+  { id: 'windows', name: 'Windows', supported: false, note: 'WinGet · Scoop, planned' },
 ] as const;
 
 export function OsSelector() {
   return (
     <fieldset>
-      <legend className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+      <legend className="text-sm font-medium text-foreground">
         Operating system
       </legend>
 
@@ -31,7 +31,7 @@ export function OsSelector() {
             className={cn(
               'flex flex-col justify-between gap-1 rounded-lg border px-2.5 py-1.5 text-xs transition-colors',
               os.supported
-                ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                ? 'border-primary bg-primary/5'
                 : 'border-border bg-muted/30 opacity-75',
             )}
           >

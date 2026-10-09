@@ -131,7 +131,7 @@ export default function App() {
   const canContinue = distro !== null && selectedIds.size > 0;
   const blockedReason =
     distro === null
-      ? 'Choose your distribution first — commands depend on it.'
+      ? 'Choose your distribution first. Commands depend on it.'
       : 'Select at least one application.';
 
   const buildPlan = useCallback(() => {

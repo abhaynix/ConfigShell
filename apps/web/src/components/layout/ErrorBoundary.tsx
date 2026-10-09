@@ -50,7 +50,7 @@ export class ErrorBoundary extends Component<Props, State> {
         </h1>
         <p style={{ margin: '0 0 1rem' }}>
           ConfigShell hit an error while rendering. Nothing was installed and nothing on your
-          system was changed — this app only ever displays commands for you to run yourself.
+          system was changed. This app only ever displays commands for you to run yourself.
         </p>
         <p style={{ margin: '0 0 1rem' }}>
           Reloading usually clears it. The details are in your browser console.

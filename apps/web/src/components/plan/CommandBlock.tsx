@@ -55,10 +55,10 @@ export function CommandBlock({ command, privileged, summary, note }: CommandBloc
   return (
     <div
       className={cn(
-        'rounded-lg border bg-card',
-        // Privileged is not an error, so it does not borrow the destructive
-        // colour — a failed request and a root command must not look alike.
-        privileged ? OUTCOMES.privileged.border : 'border-border',
+        // Neutral frame in every case. Privileged is not an error, so it does
+        // not borrow the destructive colour, and it is not a status the card
+        // border should shout about: the badge below carries the warning.
+        'rounded-lg border border-border bg-card',
       )}
     >
       {(summary || privileged) && (
@@ -116,7 +116,7 @@ export function CommandBlock({ command, privileged, summary, note }: CommandBloc
 
       {state === 'failed' && (
         <p className="px-3 pb-2 text-xs text-destructive">
-          Couldn't copy automatically — select the text above instead.
+          Couldn't copy automatically. Select the text above instead.
         </p>
       )}
 

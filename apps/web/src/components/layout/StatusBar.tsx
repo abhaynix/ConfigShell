@@ -16,7 +16,7 @@ export function StatusBar({ view = 'build' }: StatusBarProps) {
     >
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-y-2 gap-x-4">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]">
-          <span className="font-semibold text-foreground/70 uppercase tracking-wider text-[10px]">Shortcuts</span>
+          <span className="text-[10px] font-semibold text-muted-foreground">Shortcuts</span>
           {view === 'build' ? (
             <>
               <span className="inline-flex items-center gap-1.5">

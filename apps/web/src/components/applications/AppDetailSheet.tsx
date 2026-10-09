@@ -194,7 +194,7 @@ export function AppDetailSheet({
                 {app.installation.length === 0 ? (
                   <p className="mt-3 rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground">
                     No installation source has been verified for this application yet. That
-                    means nothing has been checked — not that it cannot be installed.
+                    means nothing has been checked, not that it cannot be installed.
                   </p>
                 ) : (
                   <ul className="mt-3 flex flex-col gap-2">
@@ -266,7 +266,7 @@ function SourceRow({
         'rounded-lg border p-3',
         eligible === false ? 'border-border bg-muted/30 opacity-60' : 'border-border bg-card',
         eligible === true && 'border-primary/40',
-        chosen && 'border-primary ring-1 ring-primary',
+        chosen && 'border-primary bg-primary/5',
       )}
     >
       <div className="flex items-start justify-between gap-2">
@@ -300,7 +300,7 @@ function SourceRow({
         <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
           <ShieldAlert aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
           <span>
-            {eligible ? 'Usable here — ' : 'Not used here — '}
+            {eligible ? 'Usable here: ' : 'Not used here: '}
             {considered.note}.
           </span>
         </p>

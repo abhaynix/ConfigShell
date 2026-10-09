@@ -58,7 +58,7 @@ export function RoleSelector({ appliedRoleId, onApply, onClear }: RoleSelectorPr
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2
           id="role-heading"
-          className="text-xs font-semibold tracking-wide text-muted-foreground"
+          className="text-sm font-semibold text-foreground"
         >
           What is this machine for?
         </h2>
@@ -77,7 +77,7 @@ export function RoleSelector({ appliedRoleId, onApply, onClear }: RoleSelectorPr
       </div>
 
       <p className="mt-1.5 max-w-prose text-sm text-muted-foreground">
-        Optional. A preset adds a curated set of applications to your selection — you can
+        Optional. A preset adds a curated set of applications to your selection. You can
         change anything afterwards, and you can skip this and browse instead.
       </p>
 
@@ -96,7 +96,7 @@ export function RoleSelector({ appliedRoleId, onApply, onClear }: RoleSelectorPr
               className={cn(
                 'flex flex-col justify-between gap-1.5 rounded-lg border p-2.5 transition-colors',
                 applied
-                  ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                  ? 'border-primary bg-primary/5'
                   : 'border-border bg-card hover:border-foreground/20',
               )}
             >
@@ -107,7 +107,7 @@ export function RoleSelector({ appliedRoleId, onApply, onClear }: RoleSelectorPr
                       aria-hidden="true"
                       className={cn(
                         'flex size-5 shrink-0 items-center justify-center rounded-md transition-colors',
-                        applied ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground',
+                        applied ? 'bg-primary/10 text-primary' : 'bg-muted text-foreground',
                       )}
                     >
                       <RoleIcon className="size-3" />
@@ -130,7 +130,7 @@ export function RoleSelector({ appliedRoleId, onApply, onClear }: RoleSelectorPr
                 <Button
                   type="button"
                   size="xs"
-                  variant={applied ? 'outline' : 'default'}
+                  variant={applied ? 'secondary' : 'outline'}
                   aria-label={
                     applied
                       ? `Apply the ${role.name} preset again`

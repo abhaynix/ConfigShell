@@ -13,7 +13,7 @@ export function Kbd({ className, children, ...props }: KbdProps) {
   return (
     <kbd
       className={cn(
-        'pointer-events-none inline-flex h-4 min-w-4 select-none items-center justify-center rounded border border-border/80 bg-muted/60 px-1 font-mono text-[10px] font-medium text-muted-foreground shadow-2xs transition-colors',
+        'pointer-events-none inline-flex h-4 min-w-4 select-none items-center justify-center rounded border border-border/80 bg-muted/60 px-1 font-mono text-[10px] font-medium text-muted-foreground transition-colors',
         className,
       )}
       aria-hidden="true"
