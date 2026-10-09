@@ -1,21 +1,29 @@
-import { Github, Plug } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { PageContainer } from '@/components/layout/PageContainer';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { useClipboard } from '@/hooks/useClipboard';
+import type { NavRoute } from '@/App';
 import { cn } from '@/lib/utils';
-import { ThemeToggle } from './ThemeToggle';
-import { gsap, useGSAP, shouldSkipEntrance, MOTION_DURATIONS, MOTION_EASINGS } from '@/lib/motion';
 
 interface SiteHeaderProps {
-  /** Navigate to the connect page. */
+  activeRoute: NavRoute;
+  onNavigate: (route: NavRoute) => void;
   onOpenConnect: () => void;
-  /** True while that page is showing, so the link can mark itself current. */
   connectActive?: boolean;
 }
 
-export function SiteHeader({ onOpenConnect, connectActive }: SiteHeaderProps) {
+const NAV_ITEMS: { route: NavRoute; label: string }[] = [
+  { route: 'app-catalog',       label: 'App Catalog' },
+  { route: 'os-and-distro',     label: 'OS & Distro' },
+  { route: 'role-matrix',       label: 'Role Matrix' },
+  { route: 'plan-and-generate', label: 'Plan & Generate' },
+  { route: 'cli-detection',     label: 'CLI Detection' },
+  { route: 'docs',              label: 'Docs' },
+];
+
+export function SiteHeader({ activeRoute, onNavigate, connectActive }: SiteHeaderProps) {
   const headerRef = useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { state: clipState, copy } = useClipboard();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 4);
@@ -24,117 +32,188 @@ export function SiteHeader({ onOpenConnect, connectActive }: SiteHeaderProps) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useGSAP(
-    () => {
-      if (shouldSkipEntrance()) return;
+  const handleNavClick = useCallback((e: React.MouseEvent, route: NavRoute) => {
+    e.preventDefault();
+    setMobileMenuOpen(false);
+    onNavigate(route);
+  }, [onNavigate]);
 
-      gsap.fromTo(
-        '.header-brand',
-        { opacity: 0, x: -8 },
-        {
-          opacity: 1,
-          x: 0,
-          duration: MOTION_DURATIONS.normal,
-          ease: MOTION_EASINGS.subtle,
-          clearProps: 'transform',
-        },
-      );
-
-      gsap.fromTo(
-        '.header-action-item',
-        { opacity: 0, y: -4 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: MOTION_DURATIONS.normal,
-          stagger: 0.04,
-          delay: 0.05,
-          ease: MOTION_EASINGS.subtle,
-          clearProps: 'transform',
-        },
-      );
-    },
-    { scope: headerRef },
-  );
+  const isActive = (route: NavRoute) => {
+    if (connectActive) return route === 'cli-detection';
+    return route === activeRoute;
+  };
 
   return (
-    <header
-      ref={headerRef}
-      className={cn(
-        'sticky top-0 z-30 w-full border-b transition-colors duration-200 motion-reduce:transition-none',
-        scrolled
-          ? 'border-border bg-background/80 backdrop-blur-md'
-          : 'border-transparent bg-transparent',
-      )}
-    >
-      {/*
-        Three fixed roles: brand, context, actions. A grid rather than
-        `justify-between` so the middle track is the one that absorbs the
-        free space (and collapses first on a phone) — the brand and the
-        actions keep their own intrinsic width at every size.
-      */}
-      <PageContainer className="grid grid-cols-[auto_1fr_auto] items-center gap-3 py-2.5">
-        <div className="header-brand flex items-center gap-2.5">
-          <span
-            aria-hidden="true"
-            className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground"
-          >
-            C
-          </span>
-          <span className="text-sm font-semibold tracking-tight">ConfigShell</span>
-        </div>
-
-        <p className="header-action-item hidden min-w-0 truncate text-xs text-muted-foreground sm:block">
-          Discover Linux software. Nothing installs without your say.
-        </p>
-
-        <div className="col-start-3 flex items-center gap-1">
-          {/*
-            A real link, not a button: the connect page has an address, so it
-            must be middle-clickable, shareable and openable in a new tab. The
-            click handler routes in-app; the href is what makes it a link.
-          */}
-          <div className="header-action-item">
-            <Button
-              variant={connectActive ? 'secondary' : 'ghost'}
-              size="sm"
-              asChild
-              {...(connectActive ? { 'aria-current': 'page' as const } : {})}
+    <>
+      <header
+        ref={headerRef}
+        className={cn(
+          'fixed top-0 left-0 right-0 z-50 border-b transition-colors duration-200',
+          scrolled
+            ? 'bg-surface-subtle/90 backdrop-blur-md border-border-hairline'
+            : 'bg-surface-subtle/90 backdrop-blur-md border-border-hairline',
+        )}
+      >
+        <div className="max-w-7xl mx-auto h-16 px-4 md:px-6 flex items-center justify-between gap-4">
+          {/* Left: Logo + Daemon pill + Nav */}
+          <div className="flex min-w-0 shrink-0 items-center gap-3 2xl:gap-6">
+            {/* Logo */}
+            <a
+              href="/"
+              onClick={(e) => { e.preventDefault(); onNavigate('app-catalog'); }}
+              className="flex shrink-0 items-center gap-2 group focus-visible:outline-none"
+              aria-label="ConfigShell home"
             >
-              <a
-                href="/connect"
-                onClick={(event) => {
-                  // Let the browser handle modified clicks (new tab, new
-                  // window, download) exactly as it would any other link.
-                  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-                  if (event.button !== 0) return;
-                  event.preventDefault();
-                  onOpenConnect();
-                }}
-              >
-                <Plug aria-hidden="true" />
-                <span className="hidden sm:inline">Connect AI</span>
-                <span className="sr-only sm:hidden">Connect ConfigShell to your AI</span>
-              </a>
-            </Button>
+              <div className="w-8 h-8 rounded-lg bg-surface-container-high border border-border-hairline flex items-center justify-center text-primary group-hover:border-primary-container transition-colors">
+                <span className="material-symbols-outlined text-[18px]">terminal</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-headline-sm text-text-primary tracking-tight">ConfigShell</span>
+                <span className="hidden sm:inline text-label-code-sm text-secondary bg-surface-card border border-border-hairline px-1.5 py-0.5 rounded-full">v2.4</span>
+              </div>
+            </a>
+
+            {/* Daemon Connected pill — 2xl only */}
+            <div className="hidden 2xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-card border border-border-hairline">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-container" />
+              </span>
+              <span className="text-label-code-sm text-text-secondary">Daemon Connected</span>
+            </div>
+
+            {/* Desktop nav pills */}
+            <nav
+              className="hidden 2xl:flex min-w-0 items-center gap-1.5 p-1 rounded-full bg-surface-subtle border border-border-hairline"
+              aria-label="Main navigation"
+            >
+              {NAV_ITEMS.map(({ route, label }) => (
+                <a
+                  key={route}
+                  href={route === 'cli-detection' ? '/connect' : '/'}
+                  aria-current={isActive(route) ? 'page' : undefined}
+                  onClick={(e) => handleNavClick(e, route)}
+                  className={cn(
+                    'px-3 py-1 rounded-full whitespace-nowrap text-body-sm transition-colors',
+                    isActive(route)
+                      ? 'bg-surface-card text-text-primary border border-border-hover'
+                      : 'text-on-surface-variant hover:text-text-primary border border-transparent',
+                  )}
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
           </div>
-          <div className="header-action-item">
-            <Button type="button" variant="ghost" size="icon" asChild>
-              <a
-                href="https://github.com/AbhiDevepl/configshell"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="View source on GitHub"
+
+          {/* Right: Search + CLI copy + GitHub + Theme + Avatar */}
+          <div className="flex shrink-0 items-center gap-2">
+            {/* Search button */}
+            <button
+              type="button"
+              onClick={() => {
+                const el = document.getElementById('app-search') as HTMLInputElement | null;
+                el?.focus();
+              }}
+              className="hidden lg:flex min-w-0 items-center gap-2 h-9 px-3 rounded-lg bg-surface-card border border-border-hairline hover:border-border-hover text-text-muted hover:text-text-secondary transition-colors focus-visible:outline-none focus-visible:border-border-focus"
+              aria-label="Search config (⌘K)"
+            >
+              <span className="material-symbols-outlined text-[16px]">search</span>
+              <span className="text-body-sm">Search config...</span>
+              <kbd className="text-label-code-sm px-1.5 py-0.5 rounded bg-surface-container-high border border-border-hairline text-text-secondary">⌘K</kbd>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => document.getElementById('app-search')?.focus()}
+              className="flex lg:hidden w-9 h-9 items-center justify-center rounded-lg bg-surface-card border border-border-hairline text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+              aria-label="Search config"
+            >
+              <span className="material-symbols-outlined text-[18px]">search</span>
+            </button>
+
+            {/* npx copy pill */}
+            <div className="hidden md:flex items-center h-9 px-3 rounded-full bg-surface-card border border-border-hairline text-text-secondary hover:border-border-hover group transition-colors">
+              <span className="text-label-code-sm text-primary mr-1.5">$</span>
+              <code className="text-label-code-sm text-text-primary mr-2">npx configshell@latest</code>
+              <button
+                type="button"
+                aria-label="Copy CLI command"
+                onClick={() => copy('npx configshell@latest')}
+                className="text-text-muted group-hover:text-text-primary transition-colors flex items-center"
               >
-                <Github />
-              </a>
-            </Button>
-          </div>
-          <div className="header-action-item">
-            <ThemeToggle />
+                <span className="material-symbols-outlined text-[15px]">
+                  {clipState === 'copied' ? 'check' : 'content_copy'}
+                </span>
+              </button>
+            </div>
+
+            {/* GitHub */}
+            <a
+              href="https://github.com/AbhiDevepl/configshell"
+              target="_blank"
+              rel="noreferrer"
+              className="hidden lg:flex items-center gap-1.5 h-9 px-3 rounded-lg bg-surface-card border border-border-hairline hover:border-border-hover transition-colors text-text-secondary hover:text-text-primary"
+              aria-label="View source on GitHub"
+            >
+              <span className="material-symbols-outlined text-[18px]">code</span>
+              <span className="text-body-sm">GitHub</span>
+              <span className="text-label-code-sm px-1.5 py-0.5 rounded-full bg-surface-container-high text-primary border border-border-hairline">★ 4.8k</span>
+            </a>
+
+            {/* Theme button (decorative — dark only) */}
+            <button
+              type="button"
+              aria-label="Color scheme: dark (fixed)"
+              className="w-9 h-9 rounded-lg bg-surface-card border border-border-hairline hover:border-border-hover text-text-secondary hover:text-text-primary flex items-center justify-center transition-colors"
+            >
+              <span className="material-symbols-outlined text-[18px]">dark_mode</span>
+            </button>
+
+            {/* Avatar */}
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-on-primary text-[18px]">person</span>
+            </div>
+
+            {/* Mobile hamburger */}
+            <button
+              type="button"
+              className="xl:hidden w-9 h-9 rounded-lg bg-surface-card border border-border-hairline flex items-center justify-center text-text-secondary"
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
+              onClick={() => setMobileMenuOpen((o) => !o)}
+            >
+              <span className="material-symbols-outlined text-[20px]">
+                {mobileMenuOpen ? 'close' : 'menu'}
+              </span>
+            </button>
           </div>
         </div>
-      </PageContainer>
-    </header>
+
+        {/* Mobile nav dropdown */}
+        {mobileMenuOpen && (
+          <div className="xl:hidden border-t border-border-hairline bg-surface-subtle">
+            <nav className="max-w-7xl mx-auto px-6 py-3 flex flex-col gap-1" aria-label="Mobile navigation">
+              {NAV_ITEMS.map(({ route, label }) => (
+                <a
+                  key={route}
+                  href={route === 'cli-detection' ? '/connect' : '/'}
+                  aria-current={isActive(route) ? 'page' : undefined}
+                  onClick={(e) => handleNavClick(e, route)}
+                  className={cn(
+                    'px-4 py-2.5 rounded-lg text-body-sm transition-colors',
+                    isActive(route)
+                      ? 'bg-surface-card text-text-primary'
+                      : 'text-text-secondary hover:text-text-primary hover:bg-surface-card',
+                  )}
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
+          </div>
+        )}
+      </header>
+    </>
   );
 }

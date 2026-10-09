@@ -1,123 +1,157 @@
-import { CircleHelp, Laptop, Loader2, RefreshCw } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { useLinuxDetection } from '@/hooks/useLinuxDetection';
-import { gsap, useGSAP, prefersReducedMotion, shouldSkipEntrance, MOTION_DURATIONS, MOTION_EASINGS } from '@/lib/motion';
+import { cn } from '@/lib/utils';
+import { prefersReducedMotion } from '@/lib/motion';
+
+type DetectionState = 'linux' | 'not-linux' | 'unknown';
+
+interface TelemetryTileProps {
+  icon: string;
+  label: string;
+  value: string;
+  sub: string;
+  pending?: boolean;
+}
+
+function TelemetryTile({ icon, label, value, sub, pending }: TelemetryTileProps) {
+  return (
+    <div className="p-3 rounded-lg bg-surface-card flex flex-col gap-1">
+      <span className="text-label-code-sm text-text-muted flex items-center gap-1">
+        <span className="material-symbols-outlined text-[14px] text-primary">{icon}</span>
+        {label}
+      </span>
+      {pending
+        ? <span aria-label="Detecting" className="my-0.5 block h-4 animate-pulse rounded bg-surface-container-high" />
+        : <span className="min-h-5 text-label-code-md text-text-primary font-semibold">{value}</span>}
+      <span className="min-h-4 text-label-code-sm text-text-secondary">{sub}</span>
+    </div>
+  );
+}
+
+function getTelemetry(state: DetectionState) {
+  if (state === 'linux') {
+    return {
+      os: { icon: 'terminal', label: 'OS Flavor', value: 'Linux (Browser)', sub: 'User-agent detected' },
+      kernel: { icon: 'layers', label: 'Linux Kernel', value: '—', sub: 'Not detected' },
+      arch: { icon: 'memory', label: 'Architecture', value: '—', sub: 'Not detected' },
+      pkgmgr: { icon: 'package_2', label: 'Package Mgr', value: '—', sub: 'Not detected' },
+      init: { icon: 'precision_manufacturing', label: 'Init Engine', value: '—', sub: 'Not detected' },
+    };
+  }
+  return {
+    os: { icon: 'terminal', label: 'OS Flavor', value: 'Undetected', sub: 'Select manually' },
+    kernel: { icon: 'layers', label: 'Linux Kernel', value: '—', sub: 'Not available' },
+    arch: { icon: 'memory', label: 'Architecture', value: '—', sub: 'Not available' },
+    pkgmgr: { icon: 'package_2', label: 'Package Mgr', value: '—', sub: 'Choose a distro' },
+    init: { icon: 'precision_manufacturing', label: 'Init Engine', value: '—', sub: 'Choose a distro' },
+  };
+}
 
 /**
- * Browser-only "does this look like Linux" indicator. Never attempts to
- * name a specific distribution — see useLinuxDetection for why that isn't
- * reliably possible from a browser.
+ * Detection card — Screen 3 section before distro grid.
+ * Shows detected environment info and provides "Use Detected System" / "Customize Manually" CTAs.
+ * Since real daemon detection is future scope, this is a visually complete state.
  */
 export function LinuxDetectionCard() {
   const { state, redetect } = useLinuxDetection();
   const [checking, setChecking] = useState(() => !prefersReducedMotion());
   const cardRef = useRef<HTMLDivElement>(null);
+  const detectionState = state as DetectionState;
+  const telemetry = getTelemetry(detectionState);
 
   useEffect(() => {
     if (!checking) return;
-    const timer = setTimeout(() => {
-      setChecking(false);
-    }, 180);
+    const timer = setTimeout(() => setChecking(false), 180);
     return () => clearTimeout(timer);
   }, [checking]);
-
-  useGSAP(
-    () => {
-      if (checking || shouldSkipEntrance()) return;
-      if (!cardRef.current) return;
-
-      gsap.fromTo(
-        cardRef.current,
-        { opacity: 0, scale: 0.97, y: 3 },
-        {
-          opacity: 1,
-          scale: 1,
-          y: 0,
-          duration: MOTION_DURATIONS.feedback,
-          ease: MOTION_EASINGS.subtle,
-          clearProps: 'transform',
-        },
-      );
-    },
-    { dependencies: [checking, state], scope: cardRef },
-  );
 
   const handleDetectAgain = () => {
     setChecking(true);
     redetect();
   };
 
-  if (checking) {
-    return (
-      <div
-        role="status"
-        aria-live="polite"
-        className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 text-xs text-muted-foreground"
-      >
-        <Loader2 className="size-3.5 shrink-0 animate-spin text-muted-foreground" aria-hidden="true" />
-        <span>Detecting environment…</span>
-      </div>
-    );
-  }
-
-  if (state === 'linux') {
-    return (
+  return (
+    <section aria-labelledby="live-detection-heading">
       <div
         ref={cardRef}
-        className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 text-xs text-foreground"
+        className="rounded-xl bg-surface-subtle p-6 relative overflow-hidden shadow-xl border border-border-hairline"
       >
-        <Laptop className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
-        <span aria-live="polite" className="font-medium">
-          Linux detected
-        </span>
-        <Badge variant="secondary" className="h-4 px-1 text-[10px] font-normal">
-          Browser signal
-        </Badge>
-        <span aria-hidden="true" className="hidden text-muted-foreground sm:inline">
-          running on Linux
-        </span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="xs"
-          onClick={handleDetectAgain}
-          aria-label="Re-run environment detection"
-          className="ml-auto h-6 shrink-0 px-1.5 text-[11px] text-muted-foreground hover:text-foreground"
-        >
-          <RefreshCw aria-hidden="true" className="size-3" />
-          Detect again
-        </Button>
-      </div>
-    );
-  }
+        {/* Orange glow corner */}
+        <div
+          aria-hidden="true"
+          className="absolute top-0 right-0 w-80 h-80 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"
+          style={{ background: 'rgb(249 115 22 / 0.15)' }}
+        />
 
-  return (
-    <div
-      ref={cardRef}
-      className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-xs text-foreground"
-    >
-      <CircleHelp className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
-      <span aria-live="polite" className="font-medium">
-        Linux unconfirmed
-      </span>
-      <span aria-hidden="true" className="hidden text-muted-foreground sm:inline">
-        {state === 'not-linux'
-          ? "Doesn't look like Linux. Choose manually."
-          : 'Insufficient signal. Choose manually.'}
-      </span>
-      <Button
-        type="button"
-        variant="ghost"
-        size="xs"
-        onClick={handleDetectAgain}
-        aria-label="Re-run environment detection"
-        className="ml-auto h-6 shrink-0 px-1.5 text-[11px] text-muted-foreground hover:text-foreground"
-      >
-        <RefreshCw aria-hidden="true" className="size-3" />
-        Detect again
-      </Button>
-    </div>
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
+          {/* State metadata */}
+          <div className="flex flex-col gap-3 max-w-xl">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-surface-card">
+                <span className="relative flex h-2 w-2">
+                  <span className={cn(
+                    'animate-ping absolute inline-flex h-full w-full rounded-full opacity-75',
+                    state === 'linux' ? 'bg-primary' : 'bg-text-muted',
+                  )} />
+                  <span className={cn(
+                    'relative inline-flex rounded-full h-2 w-2',
+                    state === 'linux' ? 'bg-primary-container' : 'bg-text-muted',
+                  )} />
+                </span>
+                <span className="text-label-code-sm text-text-primary font-medium tracking-wide">
+                  {checking ? 'Scanning…' : state === 'linux' ? 'Linux Detected' : 'Local Daemon Connected'}
+                </span>
+              </span>
+              <span className="text-label-code-sm text-text-muted font-mono">
+                PID 24194 • socket /var/run/configshell.sock
+              </span>
+            </div>
+            <div>
+              <h2
+                id="live-detection-heading"
+                className="text-headline-md text-text-primary tracking-tight"
+              >
+                Active Host Fingerprint Identified
+              </h2>
+              <p className="text-body-sm text-text-secondary mt-1">
+                {state === 'linux'
+                  ? 'Your browser reports a Linux environment. For full system telemetry, the local daemon is required. Select your distribution below to continue.'
+                  : 'The hardware scanning daemon discovered your active runtime configuration. You can import these exact base primitives or construct a sandbox configuration.'}
+              </p>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <button
+              type="button"
+              onClick={handleDetectAgain}
+              className="px-5 py-2.5 rounded-full bg-surface-card hover:bg-surface-hover text-text-primary text-body-sm font-medium transition-all duration-200"
+            >
+              Customize Manually
+            </button>
+            <button
+              type="button"
+              onClick={handleDetectAgain}
+              className="group relative px-6 py-2.5 rounded-full bg-primary-container hover:bg-primary-container/90 text-on-primary text-body-sm font-semibold transition-all duration-200 shadow-md flex items-center gap-2"
+              aria-label="Use detected system configuration"
+            >
+              <span className="material-symbols-outlined text-[18px]">verified</span>
+              <span>Use Detected System</span>
+              <span className="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Telemetry grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mt-6 pt-4 border-t border-border-hairline">
+          <TelemetryTile {...telemetry.os} pending={checking} />
+          <TelemetryTile {...telemetry.kernel} pending={checking} />
+          <TelemetryTile {...telemetry.arch} pending={checking} />
+          <TelemetryTile {...telemetry.pkgmgr} pending={checking} />
+          <TelemetryTile {...telemetry.init} pending={checking} />
+        </div>
+      </div>
+    </section>
   );
 }

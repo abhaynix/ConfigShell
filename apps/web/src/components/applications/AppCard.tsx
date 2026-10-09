@@ -1,12 +1,6 @@
-import { Info, Star } from 'lucide-react';
-import { useRef } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import type { Application } from '@configshell/catalog';
 import { CATEGORY_ICON } from './categoryIcon';
-import { gsap, useGSAP, prefersReducedMotion, MOTION_DURATIONS, MOTION_EASINGS } from '@/lib/motion';
 
 interface AppCardProps {
   app: Application;
@@ -15,139 +9,115 @@ interface AppCardProps {
   onOpenDetails: (app: Application) => void;
 }
 
+/**
+ * App catalog card — matching Screen 1 design.
+ * 40px icon tile, name, "Category · version" in mono,
+ * star rating, tag chips, description, toggle button.
+ */
 export function AppCard({ app, selected, onToggle, onOpenDetails }: AppCardProps) {
   const Icon = CATEGORY_ICON[app.category];
-  const inputId = `app-${app.id}`;
-  const cardRef = useRef<HTMLLabelElement>(null);
-  const prevSelectedRef = useRef(selected);
-
-  useGSAP(
-    () => {
-      if (prefersReducedMotion() || prevSelectedRef.current === selected) {
-        prevSelectedRef.current = selected;
-        return;
-      }
-      prevSelectedRef.current = selected;
-
-      if (!cardRef.current) return;
-
-      if (selected) {
-        gsap.fromTo(
-          cardRef.current,
-          { scale: 0.985 },
-          {
-            scale: 1,
-            duration: MOTION_DURATIONS.micro,
-            ease: MOTION_EASINGS.subtle,
-            clearProps: 'transform',
-          },
-        );
-      } else {
-        gsap.fromTo(
-          cardRef.current,
-          { scale: 1.01 },
-          {
-            scale: 1,
-            duration: MOTION_DURATIONS.micro,
-            ease: MOTION_EASINGS.subtle,
-            clearProps: 'transform',
-          },
-        );
-      }
-    },
-    { dependencies: [selected], scope: cardRef },
-  );
+  const hiddenSourceCount = Math.max(app.installation.length - 3, 0);
 
   return (
-    <label
-      ref={cardRef}
-      htmlFor={inputId}
+    <article
       className={cn(
-        /*
-         * Three named rows — header, text, metadata — so the parts line up
-         * across the row of cards rather than each card distributing its own
-         * leftover space. `1fr` on the text row is what pins the badges to the
-         * bottom edge when one description is two lines and its neighbour's is
-         * one. `relative` is for the checkbox's enlarged hit area, not layout.
-         */
-        'group relative grid cursor-pointer grid-rows-[auto_1fr_auto] gap-2 rounded-lg border p-3 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-1 has-[:focus-visible]:ring-offset-background select-none',
-        selected ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-foreground/25 hover:bg-muted/30',
+        'group relative flex h-full min-w-0 flex-col gap-3 p-4 rounded-xl transition-all duration-200 cursor-pointer [content-visibility:auto] [contain-intrinsic-size:auto_17rem]',
+        selected
+          ? 'bg-surface-card ring-2 ring-primary-container'
+          : 'bg-surface-subtle hover:bg-surface-card',
       )}
+      aria-label={`${app.name}${selected ? ', in plan' : ''}`}
     >
+      {/* Card header */}
       <div className="flex items-start justify-between gap-2">
-        <span
-          aria-hidden="true"
+        {/* Icon tile */}
+        <div
           className={cn(
-            'app-icon-badge flex size-7.5 shrink-0 items-center justify-center rounded-md transition-colors',
-            selected ? 'bg-primary/10 text-primary' : 'bg-muted text-foreground',
+            'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors',
+            selected ? 'bg-primary-container/20 text-primary' : 'bg-surface-container text-text-secondary group-hover:text-primary',
           )}
         >
-          <Icon className="size-3.5" />
-        </span>
-        <span className="flex shrink-0 items-center gap-1.5">
-          {/*
-            Inside the label on purpose, so it stays within the card's hit area
-            and tab order. preventDefault stops the click from also toggling the
-            label's checkbox — without it, opening details would select the app.
-          */}
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            aria-label={`Details for ${app.name}`}
-            className="size-7 text-muted-foreground hover:text-foreground"
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              onOpenDetails(app);
-            }}
-          >
-            <Info aria-hidden="true" className="size-3.5" />
-          </Button>
-          {/*
-            The box stays 16px so the card's visual rhythm is unchanged, but
-            the pseudo-element extends the *hit* area to 32x32. WCAG 2.5.8
-            wants 24x24 minimum and the bare checkbox was 16x16.
-          */}
-          <Checkbox
-            id={inputId}
-            checked={selected}
-            onCheckedChange={() => onToggle(app.id)}
-            aria-label={`Select ${app.name}`}
-            className="after:absolute after:-inset-2 after:content-['']"
-          />
+          <Icon className="w-5 h-5" />
+        </div>
+
+        {/* Detail button */}
+        <button
+          type="button"
+          aria-label={`Details for ${app.name}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenDetails(app);
+          }}
+          className="opacity-0 group-hover:opacity-100 w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-text-muted hover:text-text-primary transition-all"
+        >
+          <span className="material-symbols-outlined text-[15px]">info</span>
+        </button>
+      </div>
+
+      {/* Name + meta */}
+      <div className="flex min-w-0 flex-col gap-0.5 flex-1">
+        <span className="truncate text-body-sm font-medium text-text-primary leading-tight" title={app.name}>{app.name}</span>
+        <span className="text-label-code-sm text-text-muted">
+          {app.category}
+          {app.featured && ' · ★ Featured'}
         </span>
       </div>
 
-      <div className="min-w-0">
-        <p className="text-xs sm:text-sm font-medium leading-tight">{app.name}</p>
-        <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground line-clamp-2">{app.description}</p>
-      </div>
+      {/* Description */}
+      <p className="min-h-8 text-label-code-sm text-text-secondary line-clamp-2 leading-relaxed">
+        {app.description}
+      </p>
 
-      <div className="flex flex-wrap items-center gap-1">
-        <Badge variant="outline" className="h-4.5 px-1.5 text-[10px] font-normal">{app.category}</Badge>
-        {app.featured && (
-          <Badge
-            variant="outline"
-            className="gap-1 h-4.5 px-1.5 border-amber-500/30 text-amber-700 dark:border-amber-400/30 dark:text-amber-300 font-medium text-[10px]"
+      {/* Tag chips */}
+      <div className="flex flex-wrap gap-1.5">
+        {app.installation.slice(0, 3).map((src) => (
+          <span
+            key={src.method + src.identifier}
+            className="px-1.5 py-0.5 rounded text-label-code-sm bg-surface-container text-text-muted border border-border-hairline"
           >
-            <Star aria-hidden="true" className="size-2.5 fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" />
-            Featured
-          </Badge>
-        )}
-        {!app.featured && app.popularity !== undefined && app.popularity >= 90 && (
-          <Badge
-            variant="outline"
-            className="gap-1 h-4.5 px-1.5 border-amber-500/30 text-amber-700 dark:border-amber-400/30 dark:text-amber-300 font-medium text-[10px]"
-          >
-            <Star aria-hidden="true" className="size-2.5 fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" />
-            High Rated
-          </Badge>
+            {src.method}
+          </span>
+        ))}
+        {hiddenSourceCount > 0 && (
+          <span className="px-1.5 py-0.5 rounded text-label-code-sm bg-surface-container text-text-muted border border-border-hairline">
+            +{hiddenSourceCount}
+          </span>
         )}
         {app.installation.length === 0 && (
-          <Badge variant="secondary" className="h-4.5 px-1.5 text-[10px]">No verified source</Badge>
+          <span className="px-1.5 py-0.5 rounded text-label-code-sm bg-surface-container text-error border border-error/20">
+            no verified source
+          </span>
         )}
       </div>
-    </label>
+
+      {/* Footer: hint + toggle */}
+      <div className="flex items-center justify-between gap-2 pt-1 border-t border-border-hairline mt-auto">
+        <span className="text-label-code-sm text-text-muted truncate">
+          {app.installation[0]?.method === 'flatpak' ? 'Flatpak Ready' :
+           app.installation[0]?.method === 'snap' ? 'Snap Package' :
+           app.installation[0]?.method === 'apt' ? 'APT / DEB' :
+           app.installation[0]?.method === 'dnf' ? 'DNF / RPM' :
+           app.installation[0]?.method === 'pacman' ? 'Pacman / AUR' : 'Ansible Role Ready'}
+        </span>
+
+        <button
+          type="button"
+          aria-pressed={selected}
+          aria-label={selected ? `Remove ${app.name} from plan` : `Add ${app.name} to plan`}
+          onClick={() => onToggle(app.id)}
+          className={cn(
+            'flex items-center gap-1 px-3 py-1 rounded-full text-label-code-sm font-medium transition-all duration-150 shrink-0',
+            selected
+              ? 'bg-primary-container text-on-primary hover:bg-primary-container/80'
+              : 'bg-surface-container text-text-secondary hover:text-text-primary hover:bg-surface-hover border border-border-hairline',
+          )}
+        >
+          <span className="material-symbols-outlined text-[13px]">
+            {selected ? 'check' : 'add'}
+          </span>
+          {selected ? 'In Plan' : 'Add to Plan'}
+        </button>
+      </div>
+    </article>
   );
 }

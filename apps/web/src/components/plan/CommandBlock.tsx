@@ -1,127 +1,120 @@
-import { Check, Copy, X } from 'lucide-react';
 import { useRef } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { useClipboard } from '@/hooks/useClipboard';
-import { OUTCOMES } from '@/components/plan/outcomes';
 import { cn } from '@/lib/utils';
-import { gsap, useGSAP, prefersReducedMotion, MOTION_DURATIONS, MOTION_EASINGS } from '@/lib/motion';
+import type { PlanCommand } from '@/lib/api';
 
-interface CommandBlockProps {
+interface CommandBlockSingleProps {
   command: string;
   privileged: boolean;
   summary?: string;
-  /** A precondition the user must satisfy themselves, e.g. the Flathub remote. */
   note?: string;
+  commands?: never;
 }
 
+interface CommandBlockMultiProps {
+  commands: PlanCommand[];
+  command?: never;
+  privileged?: never;
+  summary?: never;
+  note?: never;
+}
+
+type CommandBlockProps = CommandBlockSingleProps | CommandBlockMultiProps;
+
 /**
- * One command, shown in full before it can be copied.
+ * Renders one command or an array of plan commands.
  *
- * The command text is always visible — never truncated behind a copy button,
- * never hidden behind "copy all". A user is being asked to run this on their
- * own machine, sometimes as root, and cannot consent to something they have not
- * read.
+ * When `commands` (array) is supplied, renders a numbered line table with
+ * syntax-style coloring. When `command` (string) is supplied, renders the
+ * original single-command card.
  *
- * Rendered as plain text in a `<code>` element. Nothing here executes anything:
- * the browser has no mechanism to, and the page never tries.
+ * Commands are always shown in full — never truncated — because the user is
+ * being asked to run them on their own machine. Nothing here executes anything.
  */
-export function CommandBlock({ command, privileged, summary, note }: CommandBlockProps) {
+export function CommandBlock(props: CommandBlockProps) {
+  if (props.commands) {
+    return <MultiCommandBlock commands={props.commands} />;
+  }
+  return (
+    <SingleCommandBlock
+      command={props.command!}
+      privileged={props.privileged!}
+      summary={props.summary}
+      note={props.note}
+    />
+  );
+}
+
+function MultiCommandBlock({ commands }: { commands: PlanCommand[] }) {
+  return (
+    <div className="font-mono text-label-code-md space-y-1">
+      {commands.map((cmd, i) => (
+        <div key={i} className="flex items-start gap-3 group">
+          <span className="text-text-muted w-6 text-right shrink-0 select-none">{i + 1}</span>
+          <span className={cn(
+            'flex-1 break-all',
+            cmd.privileged ? 'text-secondary' : 'text-text-primary',
+          )}>
+            {cmd.command}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SingleCommandBlock({
+  command,
+  privileged,
+  summary,
+  note,
+}: {
+  command: string;
+  privileged: boolean;
+  summary?: string;
+  note?: string;
+}) {
   const { state, copy } = useClipboard();
-  const PrivilegedIcon = OUTCOMES.privileged.Icon;
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  useGSAP(
-    () => {
-      if (prefersReducedMotion() || state !== 'copied' || !buttonRef.current) return;
-      const icon = buttonRef.current.querySelector('.copy-feedback-icon');
-      if (icon) {
-        gsap.fromTo(
-          icon,
-          { scale: 0.6, opacity: 0 },
-          {
-            scale: 1,
-            opacity: 1,
-            duration: MOTION_DURATIONS.micro,
-            ease: MOTION_EASINGS.subtle,
-            clearProps: 'transform,opacity',
-          },
-        );
-      }
-    },
-    { dependencies: [state], scope: buttonRef },
-  );
-
   return (
-    <div
-      className={cn(
-        // Neutral frame in every case. Privileged is not an error, so it does
-        // not borrow the destructive colour, and it is not a status the card
-        // border should shout about: the badge below carries the warning.
-        'rounded-lg border border-border bg-card',
-      )}
-    >
+    <div className="rounded-xl border border-border-hairline bg-surface-card">
       {(summary || privileged) && (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-3 py-2">
-          {summary && <p className="text-xs text-muted-foreground">{summary}</p>}
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border-hairline px-4 py-2.5">
+          {summary && <p className="text-label-code-sm text-text-secondary">{summary}</p>}
           {privileged && (
-            <Badge
-              variant="outline"
-              className={cn('shrink-0', OUTCOMES.privileged.text, OUTCOMES.privileged.border)}
-            >
-              <PrivilegedIcon aria-hidden="true" className="size-3" />
-              {OUTCOMES.privileged.label}
-            </Badge>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary/10 text-secondary border border-secondary/20 text-label-code-sm">
+              <span className="material-symbols-outlined text-[13px]">shield</span>
+              Runs as root
+            </span>
           )}
         </div>
       )}
 
-      <div className="flex items-start gap-2 p-3">
-        {/*
-          `overflow-wrap: anywhere`, not `break-all`: a package identifier must
-          wrap as a unit. `break-all` split `org.mozilla.firefox` after its
-          first character on a narrow screen, which misrepresents the thing the
-          user is about to run.
-        */}
-        <code className="min-w-0 flex-1 font-mono text-xs leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere] select-all">
+      <div className="flex items-start gap-3 p-4">
+        <span className="text-primary text-label-code-md shrink-0 select-none">$</span>
+        <code className="min-w-0 flex-1 font-mono text-label-code-md text-text-primary leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere] select-all">
           {command}
         </code>
-
-        <Button
+        <button
           ref={buttonRef}
           type="button"
-          variant="ghost"
-          size="icon-sm"
-          // Comfortable thumb target on a phone, where this is the primary
-          // action; back to the compact icon size once there is a pointer.
-          className="size-11 shrink-0 sm:size-8"
           onClick={() => copy(command)}
-          aria-label={`Copy command: ${command}`}
+          aria-label={`Copy: ${command}`}
+          className="shrink-0 w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-hover flex items-center justify-center text-text-muted hover:text-text-primary transition-colors"
         >
-          {state === 'copied' ? (
-            <Check aria-hidden="true" className={cn('copy-feedback-icon', OUTCOMES.installable.text)} />
-          ) : state === 'failed' ? (
-            <X aria-hidden="true" className="text-destructive" />
-          ) : (
-            <Copy aria-hidden="true" />
-          )}
-        </Button>
+          <span className="material-symbols-outlined text-[16px]">
+            {state === 'copied' ? 'check' : 'content_copy'}
+          </span>
+        </button>
       </div>
 
-      {/* Announced to screen readers; the icon alone is not enough. */}
       <span aria-live="polite" className="sr-only">
         {state === 'copied' ? 'Command copied to clipboard' : ''}
-        {state === 'failed' ? 'Could not copy. Select the command text to copy it manually.' : ''}
       </span>
 
-      {state === 'failed' && (
-        <p className="px-3 pb-2 text-xs text-destructive">
-          Couldn't copy automatically. Select the text above instead.
-        </p>
-      )}
-
       {note && (
-        <p className="border-t border-border px-3 py-2 text-xs text-muted-foreground">{note}</p>
+        <p className="border-t border-border-hairline px-4 py-2.5 text-label-code-sm text-text-muted">{note}</p>
       )}
     </div>
   );

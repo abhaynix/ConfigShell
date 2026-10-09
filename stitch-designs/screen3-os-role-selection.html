@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>ConfigShell</title><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"surface-container-low":"#1c1b1d","inverse-surface":"#e5e1e4","on-primary":"#552100","text-secondary":"#A1A1AA","inverse-primary":"#9d4300","tertiary":"#c6c5cf","secondary-fixed-dim":"#ffb95f","text-primary":"#FAFAFA","on-secondary-container":"#5b3800","outline":"#a78b7d","tertiary-fixed":"#e3e1ec","on-background":"#e5e1e4","primary":"#ffb690","on-error-container":"#ffdad6","surface-container-highest":"#353437","on-surface":"#e5e1e4","on-tertiary-fixed-variant":"#46464e","surface-hover":"#27272A","on-secondary-fixed-variant":"#653e00","surface-bright":"#39393b","border-focus":"#F97316","outline-variant":"#584237","surface-subtle":"#121215","surface-container-lowest":"#0e0e10","tertiary-fixed-dim":"#c6c5cf","background":"#131315","secondary-container":"#ee9800","on-primary-fixed-variant":"#783200","on-secondary-fixed":"#2a1700","secondary":"#ffb95f","tertiary-container":"#9a99a3","border-hairline":"#27272A","surface-dim":"#131315","glow-orange":"#F9731626","surface-container":"#201f22","on-secondary":"#472a00","inverse-on-surface":"#313032","glow-amber":"#F59E0B1A","on-tertiary-container":"#313139","surface-tint":"#ffb690","error-container":"#93000a","surface-base":"#09090B","text-muted":"#71717A","surface":"#131315","on-primary-fixed":"#341100","surface-card":"#18181B","on-surface-variant":"#e0c0b1","on-tertiary-fixed":"#1a1b22","secondary-fixed":"#ffddb8","surface-container-high":"#2a2a2c","border-hover":"#3F3F46","primary-fixed":"#ffdbca","error":"#ffb4ab","primary-fixed-dim":"#ffb690","on-error":"#690005","surface-variant":"#353437","primary-container":"#f97316","on-tertiary":"#2f3038","on-primary-container":"#582200"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"margin":"1rem","space-2xl":"4rem","space-md":"1rem","space-sm":"0.5rem","gutter-desktop":"1.5rem","margin-desktop":"4rem","space-lg":"1.5rem","margin-tablet":"2rem","gutter":"1rem","space-xl":"2.5rem","space-xs":"0.25rem"},"fontFamily":{"label-code-sm":["JetBrains Mono"],"label-code-md":["JetBrains Mono"],"headline-xl":["Geist"],"body-sm":["Geist"],"body-md":["Geist"],"headline-lg":["Geist"],"headline-xl-mobile":["Geist"],"badge-label":["Geist"],"body-lg":["Geist"],"headline-md":["Geist"],"headline-sm":["Geist"],"headline-lg-mobile":["Geist"]},"fontSize":{"label-code-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"500"}],"label-code-md":["13px",{"lineHeight":"20px","fontWeight":"500"}],"headline-xl":["56px",{"lineHeight":"64px","letterSpacing":"-0.04em","fontWeight":"700"}],"body-sm":["13px",{"lineHeight":"20px","fontWeight":"400"}],"body-md":["15px",{"lineHeight":"24px","fontWeight":"400"}],"headline-lg":["40px",{"lineHeight":"48px","letterSpacing":"-0.03em","fontWeight":"600"}],"headline-xl-mobile":["36px",{"lineHeight":"44px","letterSpacing":"-0.03em","fontWeight":"700"}],"badge-label":["12px",{"lineHeight":"16px","fontWeight":"500"}],"body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}],"headline-md":["24px",{"lineHeight":"32px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-sm":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-lg-mobile":["28px",{"lineHeight":"36px","letterSpacing":"-0.02em","fontWeight":"600"}]}}}};</script></head><body class="bg-surface-base font-body-md text-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-subtle/90 backdrop-blur-md border-b border-border-hairline"><div class="max-w-7xl mx-auto h-16 px-gutter-desktop flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-lg"><a class="flex items-center gap-space-sm group focus:outline-none" data-path="app-catalog" href="#"><div class="w-8 h-8 rounded-lg bg-surface-container-high border border-border-hairline flex items-center justify-center text-primary group-hover:border-primary-container transition-colors"><span class="material-symbols-outlined text-[18px]">terminal</span></div><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm text-text-primary tracking-tight">ConfigShell</span><span class="font-label-code-sm text-label-code-sm text-secondary bg-surface-card border border-border-hairline px-1.5 py-0.5 rounded-full">v2.4</span></div></a><div class="hidden 2xl:flex items-center gap-space-xs px-2.5 py-1 rounded-full bg-surface-card border border-border-hairline"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-primary-container"></span></span><span class="font-label-code-sm text-label-code-sm text-text-secondary">Daemon Connected</span></div><nav class="hidden xl:flex items-center gap-1.5 p-1 rounded-full bg-surface-subtle border border-border-hairline" data-active-classes="bg-surface-card text-text-primary border-border-hover"><a class="px-3 py-1 rounded-full font-body-sm text-body-sm text-on-surface-variant hover:text-text-primary transition-colors border border-transparent" data-path="app-catalog" href="#">App Catalog</a><a class="px-3 py-1 rounded-full font-body-sm text-body-sm text-on-surface-variant hover:text-text-primary transition-colors border border-transparent" data-path="os-and-distro" href="#">OS &amp; Distro</a><a class="px-3 py-1 rounded-full font-body-sm text-body-sm text-on-surface-variant hover:text-text-primary transition-colors border border-transparent" data-path="role-matrix" href="#">Role Matrix</a><a class="px-3 py-1 rounded-full font-body-sm text-body-sm text-on-surface-variant hover:text-text-primary transition-colors border border-transparent" data-path="plan-and-generate" href="#">Plan &amp; Generate</a><a class="px-3 py-1 rounded-full font-body-sm text-body-sm text-on-surface-variant hover:text-text-primary transition-colors border border-transparent" data-path="cli-detection" href="#">CLI Detection</a><a class="px-3 py-1 rounded-full font-body-sm text-body-sm text-on-surface-variant hover:text-text-primary transition-colors border border-transparent" data-path="docs" href="#">Docs</a></nav></div><div class="flex items-center gap-space-sm"><button class="hidden md:flex items-center gap-space-sm h-9 px-3 rounded-lg bg-surface-card border border-border-hairline hover:border-border-hover text-text-muted hover:text-text-secondary transition-colors focus:outline-none focus:border-border-focus" type="button"><span class="material-symbols-outlined text-[16px]">search</span><span class="font-body-sm text-body-sm">Search config...</span><kbd class="font-label-code-sm text-label-code-sm px-1.5 py-0.5 rounded bg-surface-container-high border border-border-hairline text-text-secondary">⌘K</kbd></button><div class="hidden sm:flex items-center h-9 px-3 rounded-full bg-surface-card border border-border-hairline text-text-secondary hover:border-border-hover group transition-colors"><span class="font-label-code-sm text-label-code-sm text-primary mr-1.5">$</span><code class="font-label-code-sm text-label-code-sm text-text-primary mr-2">npx configshell@latest</code><button aria-label="Copy CLI command" class="text-text-muted group-hover:text-text-primary transition-colors flex items-center" type="button"><span class="material-symbols-outlined text-[15px]">content_copy</span></button></div><a class="hidden lg:flex items-center gap-1.5 h-9 px-3 rounded-lg bg-surface-card border border-border-hairline hover:border-border-hover transition-colors text-text-secondary hover:text-text-primary" href="https://github.com" rel="noreferrer" target="_blank"><span class="material-symbols-outlined text-[18px]">code</span><span class="font-body-sm text-body-sm">GitHub</span><span class="font-label-code-sm text-label-code-sm px-1.5 py-0.5 rounded-full bg-surface-container-high text-primary border border-border-hairline">★ 4.8k</span></a><button aria-label="Toggle color scheme" class="w-9 h-9 rounded-lg bg-surface-card border border-border-hairline hover:border-border-hover text-text-secondary hover:text-text-primary flex items-center justify-center transition-colors" type="button"><span class="material-symbols-outlined text-[18px]">dark_mode</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface-base min-h-screen"><div class="flex flex-col w-full relative">
+<!-- Ambient Atmospheric Backdrops -->
+<div class="pointer-events-none absolute -top-12 left-1/2 -translate-x-1/2 w-[1000px] h-[340px] bg-gradient-to-b from-primary-container/10 via-glow-amber to-transparent blur-3xl opacity-60 rounded-full"></div>
+<!-- Page Content Container -->
+<div class="max-w-7xl mx-auto w-full px-gutter-desktop py-space-xl flex flex-col gap-space-2xl relative z-10">
+<!-- Top Step Ribbon & Editorial Section Header -->
+<header class="flex flex-col gap-space-md">
+<div class="flex flex-wrap items-center justify-between gap-space-md">
+<div class="inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-surface-container-high">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span>
+<span class="font-label-code-sm text-label-code-sm text-primary tracking-wide uppercase">Step 01 of 03 : Architecture Engine</span>
+<span class="text-text-muted mx-1">•</span>
+<span class="font-label-code-sm text-label-code-sm text-text-secondary">Host Target ID #9042</span>
+</div>
+<div class="hidden sm:flex items-center gap-space-sm font-label-code-sm text-label-code-sm text-text-muted">
+<span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[15px] text-secondary">memory</span> Bare-metal / Virtualized</span>
+<span>•</span>
+<span class="text-text-secondary">Profiles Synced 4s ago</span>
+</div>
+</div>
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-lg">
+<div class="space-y-space-xs max-w-3xl">
+<h1 class="font-headline-xl text-headline-xl text-text-primary tracking-tight">Target Environment &amp; Server Role Matrix</h1>
+<p class="font-body-lg text-body-lg text-text-secondary">
+            Configure system targets for automated ChaiCode playbook orchestration. Synchronize machine specs or synthesize custom cloud and homelab architectures.
+          </p>
+</div>
+<!-- Live System Metric Sparkline Widget -->
+<div class="flex items-center gap-space-md p-space-sm rounded-xl bg-surface-subtle shadow-md">
+<div class="flex flex-col">
+<span class="font-label-code-sm text-label-code-sm text-text-muted">Cluster Readiness</span>
+<span class="font-headline-sm text-headline-sm text-text-primary font-bold">99.98<span class="text-primary text-body-sm font-normal">%</span></span>
+</div>
+<svg class="w-24 h-8 text-primary" fill="none" viewbox="0 0 96 32">
+<path d="M0 24L16 18L32 26L48 10L64 16L80 4L96 12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M0 24L16 18L32 26L48 10L64 16L80 4L96 12V32H0Z" fill="currentColor" fill-opacity="0.12"></path>
+</svg>
+</div>
+</div>
+</header>
+<!-- SECTION 1: Live Linux Detection Card (LinuxDetectionCard.tsx) -->
+<section aria-labelledby="live-detection-heading" class="relative">
+<div class="rounded-xl bg-surface-subtle p-space-lg relative overflow-hidden shadow-xl">
+<!-- Accent Glow Corner -->
+<div class="absolute top-0 right-0 w-80 h-80 bg-glow-orange rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
+<div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg relative z-10">
+<!-- State Metadata -->
+<div class="flex flex-col gap-space-sm max-w-xl">
+<div class="flex flex-wrap items-center gap-space-sm">
+<span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-surface-card">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary-container"></span>
+</span>
+<span class="font-label-code-sm text-label-code-sm text-text-primary font-medium tracking-wide">Local Daemon Connected</span>
+</span>
+<span class="font-label-code-sm text-label-code-sm text-text-muted font-mono">PID 24194 • socket /var/run/configshell.sock</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-text-primary tracking-tight" id="live-detection-heading">Active Host Fingerprint Identified</h2>
+<p class="font-body-sm text-body-sm text-text-secondary mt-1">
+                The hardware scanning daemon discovered your active runtime configuration. You can import these exact base primitives or construct a sandbox configuration.
+              </p>
+</div>
+</div>
+<!-- Quick Action Buttons -->
+<div class="flex flex-wrap items-center gap-space-sm shrink-0">
+<button class="px-5 py-2.5 rounded-full bg-surface-card hover:bg-surface-hover text-text-primary font-body-sm text-body-sm font-medium transition-all duration-200" id="btn-customize-toggle" type="button">
+              Customize Manually
+            </button>
+<button class="group relative px-6 py-2.5 rounded-full bg-primary-container hover:bg-primary-container/90 text-on-primary font-body-sm text-body-sm font-semibold transition-all duration-200 shadow-md flex items-center gap-2" id="btn-use-detected" type="button">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>Use Detected System</span>
+<span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Telemetry Matrix Grid -->
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-space-sm mt-space-lg pt-space-md">
+<div class="p-space-sm rounded-lg bg-surface-card flex flex-col gap-1">
+<span class="font-label-code-sm text-label-code-sm text-text-muted flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary">terminal</span> OS Flavor
+            </span>
+<span class="font-label-code-md text-label-code-md text-text-primary font-semibold">Ubuntu 24.04 LTS</span>
+<span class="font-label-code-sm text-label-code-sm text-text-secondary">Noble Numbat</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-card flex flex-col gap-1">
+<span class="font-label-code-sm text-label-code-sm text-text-muted flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary">layers</span> Linux Kernel
+            </span>
+<span class="font-label-code-md text-label-code-md text-text-primary font-semibold">6.8.0-31-generic</span>
+<span class="font-label-code-sm text-label-code-sm text-text-secondary">SMP PREEMPT_DYNAMIC</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-card flex flex-col gap-1">
+<span class="font-label-code-sm text-label-code-sm text-text-muted flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary">memory</span> Architecture
+            </span>
+<span class="font-label-code-md text-label-code-md text-text-primary font-semibold">x86_64</span>
+<span class="font-label-code-sm text-label-code-sm text-text-secondary">AVX-512 Support</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-card flex flex-col gap-1">
+<span class="font-label-code-sm text-label-code-sm text-text-muted flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary">package_2</span> Package Mgr
+            </span>
+<span class="font-label-code-md text-label-code-md text-text-primary font-semibold">APT (v2.7.14)</span>
+<span class="font-label-code-sm text-label-code-sm text-text-secondary">dpkg multi-arch</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-card flex flex-col gap-1 col-span-2 sm:col-span-1">
+<span class="font-label-code-sm text-label-code-sm text-text-muted flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary">precision_manufacturing</span> Init Engine
+            </span>
+<span class="font-label-code-md text-label-code-md text-text-primary font-semibold">systemd v255</span>
+<span class="font-label-code-sm text-label-code-sm text-text-secondary">cgroups v2 active</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 2: Operating System & Distribution Matrix (DistroSelector.tsx) -->
+<section aria-labelledby="distro-heading" class="flex flex-col gap-space-md">
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-space-xs">
+<div>
+<span class="font-label-code-sm text-label-code-sm text-primary uppercase tracking-widest font-semibold">01 // TARGET OPERATING SYSTEM</span>
+<h2 class="font-headline-lg text-headline-lg text-text-primary" id="distro-heading">Distribution Family</h2>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary max-w-md">
+          ChaiCode cross-compiles scripts into native packages (.deb, .rpm, pacman, apk) and systemd daemon hooks.
+        </p>
+</div>
+<!-- Distro Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-md" id="distro-grid">
+<!-- Distro Card: Ubuntu (Selected Default) -->
+<div class="distro-card relative group p-space-lg rounded-xl bg-surface-card cursor-pointer transition-all duration-300 shadow-xl ring-2 ring-primary-container" data-distro="Ubuntu" tabindex="0">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary-container group-hover:scale-105 transition-transform">
+<!-- Distro Monogram Icon -->
+<span class="font-headline-sm text-headline-sm font-bold">Ub</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-text-primary">Ubuntu</h3>
+<span class="font-label-code-sm text-label-code-sm text-secondary">Canonical LTS &amp; Edge</span>
+</div>
+</div>
+<span class="badge-active flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-container text-on-primary font-label-code-sm text-label-code-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">check</span> ACTIVE
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary mt-space-sm">
+            Optimal for hybrid cloud infrastructure, broad hardware compatibility, and primary enterprise staging.
+          </p>
+<div class="mt-space-md space-y-1.5">
+<label class="font-label-code-sm text-label-code-sm text-text-muted">Target Release Channel</label>
+<div class="grid grid-cols-3 gap-1.5 distro-version-group">
+<button class="px-2 py-1 rounded bg-surface-container text-text-primary font-label-code-sm text-label-code-sm text-center font-medium bg-primary-container text-on-primary" type="button">24.04 LTS</button>
+<button class="px-2 py-1 rounded bg-surface-container text-text-secondary hover:text-text-primary font-label-code-sm text-label-code-sm text-center" type="button">22.04 LTS</button>
+<button class="px-2 py-1 rounded bg-surface-container text-text-secondary hover:text-text-primary font-label-code-sm text-label-code-sm text-center" type="button">20.04 LTS</button>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-text-muted font-label-code-sm text-label-code-sm">
+<span>Core: APT / DEB</span>
+<span class="text-text-secondary">Cloud-Init Ready</span>
+</div>
+</div>
+<!-- Distro Card: Debian -->
+<div class="distro-card relative group p-space-lg rounded-xl bg-surface-subtle hover:bg-surface-card cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl" data-distro="Debian" tabindex="0">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-text-primary group-hover:scale-105 transition-transform">
+<span class="font-headline-sm text-headline-sm font-bold text-error">Db</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-text-primary">Debian</h3>
+<span class="font-label-code-sm text-label-code-sm text-text-muted">The Universal Operating System</span>
+</div>
+</div>
+<span class="badge-active hidden items-center gap-1 px-2 py-0.5 rounded-full bg-primary-container text-on-primary font-label-code-sm text-label-code-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">check</span> ACTIVE
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary mt-space-sm">
+            Battle-tested rock-solid stability. Unmatched dependability for mission-critical databases and root routers.
+          </p>
+<div class="mt-space-md space-y-1.5">
+<label class="font-label-code-sm text-label-code-sm text-text-muted">Target Release Channel</label>
+<div class="grid grid-cols-2 gap-1.5 distro-version-group">
+<button class="px-2 py-1 rounded bg-surface-container text-text-primary font-label-code-sm text-label-code-sm text-center" type="button">12 (Bookworm)</button>
+<button class="px-2 py-1 rounded bg-surface-container text-text-secondary hover:text-text-primary font-label-code-sm text-label-code-sm text-center" type="button">11 (Bullseye)</button>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-text-muted font-label-code-sm text-label-code-sm">
+<span>Core: DPKG / APT</span>
+<span class="text-text-secondary">Zero Telemetry</span>
+</div>
+</div>
+<!-- Distro Card: Fedora -->
+<div class="distro-card relative group p-space-lg rounded-xl bg-surface-subtle hover:bg-surface-card cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl" data-distro="Fedora" tabindex="0">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-secondary group-hover:scale-105 transition-transform">
+<span class="font-headline-sm text-headline-sm font-bold">Fd</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-text-primary">Fedora</h3>
+<span class="font-label-code-sm text-label-code-sm text-text-muted">Modern Red Hat Upstream</span>
+</div>
+</div>
+<span class="badge-active hidden items-center gap-1 px-2 py-0.5 rounded-full bg-primary-container text-on-primary font-label-code-sm text-label-code-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">check</span> ACTIVE
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary mt-space-sm">
+            Latest Linux advancements, Podman rootless integration by default, and contemporary kernel features.
+          </p>
+<div class="mt-space-md space-y-1.5">
+<label class="font-label-code-sm text-label-code-sm text-text-muted">Target Release Channel</label>
+<div class="grid grid-cols-3 gap-1.5 distro-version-group">
+<button class="px-2 py-1 rounded bg-surface-container text-text-primary font-label-code-sm text-label-code-sm text-center" type="button">v40</button>
+<button class="px-2 py-1 rounded bg-surface-container text-text-secondary hover:text-text-primary font-label-code-sm text-label-code-sm text-center" type="button">v39</button>
+<button class="px-2 py-1 rounded bg-surface-container text-text-secondary hover:text-text-primary font-label-code-sm text-label-code-sm text-center" type="button">Server Ed.</button>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-text-muted font-label-code-sm text-label-code-sm">
+<span>Core: DNF / RPM</span>
+<span class="text-text-secondary">SELinux Enforcing</span>
+</div>
+</div>
+<!-- Distro Card: Arch Linux -->
+<div class="distro-card relative group p-space-lg rounded-xl bg-surface-subtle hover:bg-surface-card cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl" data-distro="Arch Linux" tabindex="0">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+<span class="font-headline-sm text-headline-sm font-bold">Ar</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-text-primary">Arch Linux</h3>
+<span class="font-label-code-sm text-label-code-sm text-text-muted">Bleeding Edge Rolling</span>
+</div>
+</div>
+<span class="badge-active hidden items-center gap-1 px-2 py-0.5 rounded-full bg-primary-container text-on-primary font-label-code-sm text-label-code-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">check</span> ACTIVE
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary mt-space-sm">
+            Maximal package availability via AUR. Complete granular customization for workstations &amp; hypervisors.
+          </p>
+<div class="mt-space-md space-y-1.5">
+<label class="font-label-code-sm text-label-code-sm text-text-muted">Target Release Channel</label>
+<div class="grid grid-cols-2 gap-1.5 distro-version-group">
+<button class="px-2 py-1 rounded bg-surface-container text-text-primary font-label-code-sm text-label-code-sm text-center" type="button">Rolling Release</button>
+<button class="px-2 py-1 rounded bg-surface-container text-text-secondary hover:text-text-primary font-label-code-sm text-label-code-sm text-center" type="button">Zen Kernel</button>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-text-muted font-label-code-sm text-label-code-sm">
+<span>Core: pacman + paru/yay</span>
+<span class="text-text-secondary">Simplicity First</span>
+</div>
+</div>
+<!-- Distro Card: Rocky Linux / RHEL -->
+<div class="distro-card relative group p-space-lg rounded-xl bg-surface-subtle hover:bg-surface-card cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl" data-distro="Rocky Linux / RHEL" tabindex="0">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-text-secondary group-hover:scale-105 transition-transform">
+<span class="font-headline-sm text-headline-sm font-bold">Rk</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-text-primary">Rocky Linux / RHEL</h3>
+<span class="font-label-code-sm text-label-code-sm text-text-muted">100% Bug-for-Bug Compatible</span>
+</div>
+</div>
+<span class="badge-active hidden items-center gap-1 px-2 py-0.5 rounded-full bg-primary-container text-on-primary font-label-code-sm text-label-code-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">check</span> ACTIVE
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary mt-space-sm">
+            Enterprise Linux grade compliance, 10-year support cycles, and hardened production reliability.
+          </p>
+<div class="mt-space-md space-y-1.5">
+<label class="font-label-code-sm text-label-code-sm text-text-muted">Target Release Channel</label>
+<div class="grid grid-cols-2 gap-1.5 distro-version-group">
+<button class="px-2 py-1 rounded bg-surface-container text-text-primary font-label-code-sm text-label-code-sm text-center" type="button">EL 9.4 (Blue Onyx)</button>
+<button class="px-2 py-1 rounded bg-surface-container text-text-secondary hover:text-text-primary font-label-code-sm text-label-code-sm text-center" type="button">EL 8.9 (Green Obsidian)</button>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-text-muted font-label-code-sm text-label-code-sm">
+<span>Core: DNF / RPM</span>
+<span class="text-text-secondary">FIPS-140 Ready</span>
+</div>
+</div>
+<!-- Distro Card: Alpine Linux -->
+<div class="distro-card relative group p-space-lg rounded-xl bg-surface-subtle hover:bg-surface-card cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl" data-distro="Alpine Linux" tabindex="0">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-tertiary-fixed group-hover:scale-105 transition-transform">
+<span class="font-headline-sm text-headline-sm font-bold">Al</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-text-primary">Alpine Linux</h3>
+<span class="font-label-code-sm text-label-code-sm text-text-muted">Musl &amp; Busybox Ultralight</span>
+</div>
+</div>
+<span class="badge-active hidden items-center gap-1 px-2 py-0.5 rounded-full bg-primary-container text-on-primary font-label-code-sm text-label-code-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">check</span> ACTIVE
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary mt-space-sm">
+            Small footprint (~5MB base), security-oriented container and edge hardware host.
+          </p>
+<div class="mt-space-md space-y-1.5">
+<label class="font-label-code-sm text-label-code-sm text-text-muted">Target Release Channel</label>
+<div class="grid grid-cols-2 gap-1.5 distro-version-group">
+<button class="px-2 py-1 rounded bg-surface-container text-text-primary font-label-code-sm text-label-code-sm text-center" type="button">3.20 (Current)</button>
+<button class="px-2 py-1 rounded bg-surface-container text-text-secondary hover:text-text-primary font-label-code-sm text-label-code-sm text-center" type="button">3.19 (LTS)</button>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-text-muted font-label-code-sm text-label-code-sm">
+<span>Core: APK / musl</span>
+<span class="text-text-secondary">RAM Disk Boot</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 3: Server Role Presets (RoleSelector.tsx) -->
+<section aria-labelledby="roles-heading" class="flex flex-col gap-space-md">
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-space-xs">
+<div>
+<span class="font-label-code-sm text-label-code-sm text-primary uppercase tracking-widest font-semibold">02 // ROLE &amp; PLAYBOOK BUNDLES</span>
+<h2 class="font-headline-lg text-headline-lg text-text-primary" id="roles-heading">Server Archetype Presets</h2>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary max-w-md">
+          Selecting an archetype injects pre-audited configuration recipes, firewall rules, and runtime dependencies.
+        </p>
+</div>
+<!-- Bento Cards Grid for Roles -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-space-md" id="roles-grid">
+<!-- Role 1: Full-Stack Web Server (Selected Default - Wide Bento Item) -->
+<div class="role-card lg:col-span-7 p-space-lg rounded-xl bg-surface-card cursor-pointer transition-all duration-300 shadow-xl ring-2 ring-primary-container relative group" data-count="5" data-role="Full-Stack Web Server" tabindex="0">
+<div class="flex items-start justify-between">
+<div class="space-y-1">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[20px] text-primary-container">dns</span>
+<span class="font-label-code-sm text-label-code-sm text-primary uppercase font-bold tracking-wider">Archetype A1</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-text-primary">Full-Stack Web Server</h3>
+</div>
+<span class="role-badge flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-container text-on-primary font-label-code-sm text-label-code-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> PRESET LOADED
+            </span>
+</div>
+<p class="font-body-md text-body-md text-text-secondary mt-space-sm max-w-xl">
+            Complete production application deployment harness with automatic TLS via Caddy/Nginx, process supervisors, isolated container execution, and memory caching layers.
+          </p>
+<div class="mt-space-lg flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded-full bg-surface-container font-label-code-sm text-label-code-sm text-text-primary flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Nginx / Caddy v2
+            </span>
+<span class="px-2.5 py-1 rounded-full bg-surface-container font-label-code-sm text-label-code-sm text-text-primary flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Node.js v22 LTS
+            </span>
+<span class="px-2.5 py-1 rounded-full bg-surface-container font-label-code-sm text-label-code-sm text-text-primary flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Docker Engine CE
+            </span>
+<span class="px-2.5 py-1 rounded-full bg-surface-container font-label-code-sm text-label-code-sm text-text-primary flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Redis 7.2
+            </span>
+<span class="px-2.5 py-1 rounded-full bg-surface-container font-label-code-sm text-label-code-sm text-text-primary flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> PostgreSQL 16
+            </span>
+</div>
+<div class="mt-space-lg pt-space-sm flex items-center justify-between text-text-muted font-label-code-sm text-label-code-sm">
+<span>Ports: 80, 443, 5432 (Local), 6379</span>
+<span class="text-text-primary">5 Core Packages Pre-configured</span>
+</div>
+</div>
+<!-- Role 2: Kubernetes / Container Host -->
+<div class="role-card lg:col-span-5 p-space-lg rounded-xl bg-surface-subtle hover:bg-surface-card cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl relative group" data-count="5" data-role="Kubernetes / Container Host" tabindex="0">
+<div class="flex items-start justify-between">
+<div class="space-y-1">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[20px] text-secondary">hub</span>
+<span class="font-label-code-sm text-label-code-sm text-text-muted uppercase font-bold tracking-wider">Archetype B2</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-text-primary">Kubernetes / Container Host</h3>
+</div>
+<span class="role-badge hidden items-center gap-1 px-2.5 py-1 rounded-full bg-primary-container text-on-primary font-label-code-sm text-label-code-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> PRESET LOADED
+            </span>
+</div>
+<p class="font-body-md text-body-md text-text-secondary mt-space-sm">
+            Optimized cloud-native node initialized for container scheduling, Cilium eBPF network meshes, and lightweight k3s clustering.
+          </p>
+<div class="mt-space-lg flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded-full bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Docker CE</span>
+<span class="px-2.5 py-1 rounded-full bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">containerd.io</span>
+<span class="px-2.5 py-1 rounded-full bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">k3s cluster</span>
+<span class="px-2.5 py-1 rounded-full bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Helm 3</span>
+<span class="px-2.5 py-1 rounded-full bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Cilium eBPF</span>
+</div>
+<div class="mt-space-lg pt-space-sm flex items-center justify-between text-text-muted font-label-code-sm text-label-code-sm">
+<span>Kernel: Cgroups v2 &amp; iptables</span>
+<span class="text-text-secondary">Cloud-Native Stack</span>
+</div>
+</div>
+<!-- Role 3: Developer Workstation -->
+<div class="role-card lg:col-span-4 p-space-lg rounded-xl bg-surface-subtle hover:bg-surface-card cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl relative group" data-count="7" data-role="Developer Workstation" tabindex="0">
+<div class="flex items-start justify-between">
+<div class="space-y-1">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">terminal</span>
+<span class="font-label-code-sm text-label-code-sm text-text-muted uppercase font-bold tracking-wider">Archetype C1</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-text-primary">Developer Workstation</h3>
+</div>
+<span class="role-badge hidden items-center gap-1 px-2.5 py-1 rounded-full bg-primary-container text-on-primary font-label-code-sm text-label-code-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> PRESET LOADED
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary mt-space-sm">
+            Rich terminal-centric environment curated for speed, CLI toolchains, language compilers, and dotfile managers.
+          </p>
+<div class="mt-space-md flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Neovim</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Zsh + Starship</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Tmux</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Git CLI</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Rust (rustup)</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Go 1.22</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Python 3.12</span>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-text-muted font-label-code-sm text-label-code-sm">
+<span>CLI Productivity</span>
+<span class="text-text-secondary">7 Tools</span>
+</div>
+</div>
+<!-- Role 4: Secure Bastion & Gateway -->
+<div class="role-card lg:col-span-4 p-space-lg rounded-xl bg-surface-subtle hover:bg-surface-card cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl relative group" data-count="5" data-role="Secure Bastion &amp; Gateway" tabindex="0">
+<div class="flex items-start justify-between">
+<div class="space-y-1">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[20px] text-error">security</span>
+<span class="font-label-code-sm text-label-code-sm text-text-muted uppercase font-bold tracking-wider">Archetype D4</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-text-primary">Secure Bastion &amp; Gateway</h3>
+</div>
+<span class="role-badge hidden items-center gap-1 px-2.5 py-1 rounded-full bg-primary-container text-on-primary font-label-code-sm text-label-code-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> PRESET LOADED
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary mt-space-sm">
+            Paranoid security posture with VPN mesh tunneling, zero-trust port knocking, and brute-force mitigation daemons.
+          </p>
+<div class="mt-space-md flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Tailscale</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">WireGuard</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Fail2ban</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">UFW Hardened</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">SSH Keys Only</span>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-text-muted font-label-code-sm text-label-code-sm">
+<span>Zero-Trust Bastion</span>
+<span class="text-text-secondary">Root Shell Locked</span>
+</div>
+</div>
+<!-- Role 5: Homelab & Media Stack -->
+<div class="role-card lg:col-span-4 p-space-lg rounded-xl bg-surface-subtle hover:bg-surface-card cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl relative group" data-count="4" data-role="Homelab &amp; Media Stack" tabindex="0">
+<div class="flex items-start justify-between">
+<div class="space-y-1">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[20px] text-secondary">devices</span>
+<span class="font-label-code-sm text-label-code-sm text-text-muted uppercase font-bold tracking-wider">Archetype E5</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-text-primary">Homelab &amp; Media Stack</h3>
+</div>
+<span class="role-badge hidden items-center gap-1 px-2.5 py-1 rounded-full bg-primary-container text-on-primary font-label-code-sm text-label-code-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> PRESET LOADED
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary mt-space-sm">
+            Self-hosted personal cloud stack for local storage, media streaming, web UI management, and SMB file sharing.
+          </p>
+<div class="mt-space-md flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Portainer CE</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Jellyfin Media</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Nextcloud Hub</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-code-sm text-label-code-sm text-text-primary">Samba / NFS</span>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-text-muted font-label-code-sm text-label-code-sm">
+<span>Hardware Transcode: VA-API</span>
+<span class="text-text-secondary">Self-Hosted</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Visual Architecture Diagram Card -->
+<section class="rounded-xl bg-surface-subtle p-space-lg shadow-md flex flex-col md:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[22px]">account_tree</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-text-primary">Dependency Execution Topology</h4>
+<p class="font-body-sm text-body-sm text-text-secondary">Generates deterministic idempotent Ansible plays &amp; direct shell orchestrations.</p>
+</div>
+</div>
+<div class="flex items-center gap-space-sm font-label-code-sm text-label-code-sm text-text-muted">
+<span class="px-2 py-1 rounded bg-surface-card">0 Circular Links</span>
+<span>→</span>
+<span class="px-2 py-1 rounded bg-surface-card text-primary font-semibold">100% Deterministic</span>
+</div>
+</section>
+<!-- Spacer to clear sticky stepper bar -->
+<div class="h-20"></div>
+</div>
+<!-- Bottom Sticky Stepper Bar -->
+<div class="sticky bottom-0 left-0 right-0 z-40 bg-surface-subtle/95 backdrop-blur-md shadow-2xl py-space-sm px-gutter-desktop">
+<div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-space-sm">
+<!-- Current Selections Summary -->
+<div class="flex flex-wrap items-center gap-space-sm font-label-code-sm text-label-code-sm">
+<div class="flex items-center gap-1.5 text-text-primary">
+<span class="material-symbols-outlined text-[16px] text-primary">laptop_chromebook</span>
+<span>Target:</span>
+<span class="font-bold text-text-primary bg-surface-card px-2 py-0.5 rounded" id="summary-target">Ubuntu 24.04 LTS</span>
+</div>
+<span class="text-text-muted hidden sm:inline">•</span>
+<div class="flex items-center gap-1.5 text-text-primary">
+<span class="material-symbols-outlined text-[16px] text-secondary">category</span>
+<span>Role:</span>
+<span class="font-bold text-text-primary bg-surface-card px-2 py-0.5 rounded" id="summary-role">Full-Stack Web Server</span>
+<span class="text-text-muted hidden md:inline" id="summary-packages">(5 packages pre-configured)</span>
+</div>
+</div>
+<!-- Stepper Action Buttons -->
+<div class="flex items-center gap-space-sm shrink-0">
+<button class="px-4 py-2 rounded-full bg-surface-card hover:bg-surface-hover text-text-secondary hover:text-text-primary font-body-sm text-body-sm font-medium transition-colors" type="button">
+          Reset Selection
+        </button>
+<a class="px-6 py-2 rounded-full bg-text-primary hover:bg-text-primary/95 text-surface-base font-body-sm text-body-sm font-semibold transition-all duration-200 flex items-center gap-2 group shadow-lg" data-path="app-catalog" href="#">
+<span>Proceed to App Selection</span>
+<span class="material-symbols-outlined text-[18px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Inline Micro-Interaction Script for Distro and Role State Selection -->
+<script>
+    (function initSelectionEngine() {
+      let currentDistro = 'Ubuntu';
+      let currentVersion = '24.04 LTS';
+      let currentRole = 'Full-Stack Web Server';
+      let currentPackageCount = '5';
+
+      const targetLabel = document.getElementById('summary-target');
+      const roleLabel = document.getElementById('summary-role');
+      const packageLabel = document.getElementById('summary-packages');
+
+      function updateSummary() {
+        if (targetLabel) targetLabel.textContent = `${currentDistro} ${currentVersion}`.trim();
+        if (roleLabel) roleLabel.textContent = currentRole;
+        if (packageLabel) packageLabel.textContent = `(${currentPackageCount} packages pre-configured)`;
+      }
+
+      // Distro Cards Interaction
+      const distroCards = document.querySelectorAll('.distro-card');
+      distroCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+          // If clicking version pill
+          const versionBtn = e.target.closest('button');
+          if (versionBtn) {
+            const versionGroup = card.querySelectorAll('.distro-version-group button');
+            versionGroup.forEach(btn => {
+              btn.classList.remove('bg-primary-container', 'text-on-primary');
+              btn.classList.add('text-text-secondary');
+            });
+            versionBtn.classList.add('bg-primary-container', 'text-on-primary');
+            versionBtn.classList.remove('text-text-secondary');
+            currentVersion = versionBtn.textContent.trim();
+          } else {
+            const activeVer = card.querySelector('.distro-version-group button.bg-primary-container') || card.querySelector('.distro-version-group button');
+            currentVersion = activeVer ? activeVer.textContent.trim() : '';
+          }
+
+          distroCards.forEach(c => {
+            c.classList.remove('bg-surface-card', 'ring-2', 'ring-primary-container');
+            c.classList.add('bg-surface-subtle');
+            const badge = c.querySelector('.badge-active');
+            if (badge) {
+              badge.classList.remove('flex');
+              badge.classList.add('hidden');
+            }
+          });
+
+          card.classList.remove('bg-surface-subtle');
+          card.classList.add('bg-surface-card', 'ring-2', 'ring-primary-container');
+          const myBadge = card.querySelector('.badge-active');
+          if (myBadge) {
+            myBadge.classList.remove('hidden');
+            myBadge.classList.add('flex');
+          }
+
+          currentDistro = card.getAttribute('data-distro') || 'Ubuntu';
+          updateSummary();
+        });
+      });
+
+      // Role Bento Cards Interaction
+      const roleCards = document.querySelectorAll('.role-card');
+      roleCards.forEach(card => {
+        card.addEventListener('click', () => {
+          roleCards.forEach(c => {
+            c.classList.remove('bg-surface-card', 'ring-2', 'ring-primary-container');
+            c.classList.add('bg-surface-subtle');
+            const badge = c.querySelector('.role-badge');
+            if (badge) {
+              badge.classList.remove('flex');
+              badge.classList.add('hidden');
+            }
+          });
+
+          card.classList.remove('bg-surface-subtle');
+          card.classList.add('bg-surface-card', 'ring-2', 'ring-primary-container');
+          const myBadge = card.querySelector('.role-badge');
+          if (myBadge) {
+            myBadge.classList.remove('hidden');
+            myBadge.classList.add('flex');
+          }
+
+          currentRole = card.getAttribute('data-role') || 'Full-Stack Web Server';
+          currentPackageCount = card.getAttribute('data-count') || '5';
+          updateSummary();
+        });
+      });
+
+      // "Use Detected System" button fast selector
+      const useDetectedBtn = document.getElementById('btn-use-detected');
+      if (useDetectedBtn) {
+        useDetectedBtn.addEventListener('click', () => {
+          currentDistro = 'Ubuntu';
+          currentVersion = '24.04 LTS';
+          const ubuntuCard = document.querySelector('[data-distro="Ubuntu"]');
+          if (ubuntuCard) ubuntuCard.click();
+          useDetectedBtn.classList.add('scale-95');
+          setTimeout(() => useDetectedBtn.classList.remove('scale-95'), 150);
+        });
+      }
+    })();
+  </script>
+</div></main><footer class="w-full bg-surface-subtle border-t border-border-hairline py-space-xl"><div class="max-w-7xl mx-auto px-gutter-desktop"><div class="grid grid-cols-1 md:grid-cols-4 gap-space-xl pb-space-lg border-b border-border-hairline"><div class="space-y-space-sm"><div class="flex items-center gap-space-xs"><div class="w-6 h-6 rounded bg-surface-container-high border border-border-hairline flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[14px]">terminal</span></div><span class="font-headline-sm text-headline-sm text-text-primary">ConfigShell</span></div><p class="font-body-sm text-body-sm text-text-secondary">Declarative Linux configuration &amp; workstation provisioning engineered with precision ChaiCode UI primitives.</p></div><div class="space-y-space-xs"><h4 class="font-label-code-md text-label-code-md text-text-primary">Platforms</h4><ul class="space-y-1.5 font-body-sm text-body-sm text-text-secondary"><li><a class="hover:text-text-primary transition-colors" data-path="os-and-distro" href="#">Arch Linux / Manjaro</a></li><li><a class="hover:text-text-primary transition-colors" data-path="os-and-distro" href="#">Ubuntu &amp; Debian</a></li><li><a class="hover:text-text-primary transition-colors" data-path="os-and-distro" href="#">Fedora &amp; Silverblue</a></li><li><a class="hover:text-text-primary transition-colors" data-path="os-and-distro" href="#">NixOS Flakes</a></li></ul></div><div class="space-y-space-xs"><h4 class="font-label-code-md text-label-code-md text-text-primary">Ecosystem</h4><ul class="space-y-1.5 font-body-sm text-body-sm text-text-secondary"><li><a class="hover:text-text-primary transition-colors" data-path="app-catalog" href="#">Curated Packages</a></li><li><a class="hover:text-text-primary transition-colors" data-path="role-matrix" href="#">DevOps Archetypes</a></li><li><a class="hover:text-text-primary transition-colors" data-path="plan-and-generate" href="#">Ansible / Shell Output</a></li><li><a class="hover:text-text-primary transition-colors" data-path="cli-detection" href="#">Hardware Profiler</a></li></ul></div><div class="space-y-space-xs"><h4 class="font-label-code-md text-label-code-md text-text-primary">Network State</h4><div class="p-space-sm rounded-lg bg-surface-card border border-border-hairline space-y-1"><div class="flex items-center justify-between font-label-code-sm text-label-code-sm"><span class="text-text-secondary">Local Daemon</span><span class="text-primary">127.0.0.1:4821</span></div><div class="flex items-center justify-between font-label-code-sm text-label-code-sm"><span class="text-text-secondary">Sync Channel</span><span class="text-text-primary">Healthy</span></div></div></div></div><div class="pt-space-md flex flex-col sm:flex-row items-center justify-between gap-space-sm font-label-code-sm text-label-code-sm text-text-muted"><div>© 2025 ChaiCode Systems. Built for automated workstation crafting.</div><div class="flex items-center gap-space-md"><a class="hover:text-text-secondary transition-colors" data-path="docs" href="#">Specs</a><a class="hover:text-text-secondary transition-colors" data-path="docs" href="#">Telemetry Privacy</a><a class="hover:text-text-secondary transition-colors" data-path="docs" href="#">MIT License</a></div></div></div></footer></body></html>

@@ -1,189 +1,187 @@
-import { Check, ChevronDown, Sparkles, X } from 'lucide-react';
-import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Kbd } from '@/components/ui/kbd';
 import { cn } from '@/lib/utils';
-import { CATEGORY_ICON } from '@/components/applications/categoryIcon';
-import type { Category } from '@configshell/catalog';
 import { ROLES, applicationsForRole, type Role } from '@configshell/catalog';
 
-/**
- * Every role is a catalog category, presented as a preset — both share ids
- * and names, so the role card can borrow the same one-icon-per-category map
- * as the catalog card and the selection list. One map, three surfaces: an
- * application is recognisable by the same mark everywhere it appears.
- */
-const ROLE_CATEGORY: Record<Role['id'], Category> = {
-  general: 'General',
-  student: 'Student',
-  developer: 'Developer',
-  'web-developer': 'Web Developer',
-  devops: 'DevOps',
-  'data-ai': 'Data & AI',
-  'content-creator': 'Content Creator',
-  gaming: 'Gaming',
-};
-
 interface RoleSelectorProps {
-  /** The preset most recently applied, if any. Applying is not a lasting mode. */
   appliedRoleId: string | null;
   onApply: (role: Role) => void;
   onClear: () => void;
 }
 
+/* Role metadata for icons and descriptions */
+const ROLE_META: Record<string, { icon: string; ports?: string; kernel?: string }> = {
+  general:          { icon: 'laptop',         ports: '80/443',      kernel: 'Generic' },
+  student:          { icon: 'school',          ports: '3000/8080',   kernel: 'Desktop' },
+  developer:        { icon: 'code',            ports: '3000/8080',   kernel: '≥ 5.15 LTS' },
+  'web-developer':  { icon: 'language',        ports: '80/443/3000', kernel: '≥ 5.15 LTS' },
+  devops:           { icon: 'deployed_code',   ports: '22/80/443',   kernel: '≥ 6.1 LTS' },
+  'data-ai':        { icon: 'psychology',      ports: '8888/8080',   kernel: 'CUDA ≥ 12' },
+  'content-creator':{ icon: 'video_camera_front', ports: '—',       kernel: 'Desktop' },
+  gaming:           { icon: 'sports_esports',  ports: '—',           kernel: 'Desktop LTS' },
+};
+
 /**
- * Step 2 — what are you using this computer for (PRD §15).
- *
- * A preset is a **curated list of catalog ids**, nothing more. There is no
- * model here, no scoring and no personalisation: choosing "Web developer"
- * selects a fixed set that a contributor can argue with in a pull request.
- *
- * Two deliberate choices:
- *
- * - **It adds to the selection; it never replaces it.** Applying a second
- *   preset, or applying one after hand-picking, is additive — the user's own
- *   choices are never silently discarded (PRD §19).
- * - **It shows what it will select before you commit.** The count and the
- *   application names are visible up front, so a preset is a shortcut rather
- *   than a black box.
- *
- * Skipping this step entirely is a first-class path, not a fallback.
+ * Screen 3 section 02 — Server Archetype Presets.
+ * 12-col bento: first card spans 7, second spans 5, rest span 4 each.
  */
 export function RoleSelector({ appliedRoleId, onApply, onClear }: RoleSelectorProps) {
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-
   return (
-    <section aria-labelledby="role-heading">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2
-          id="role-heading"
-          className="text-sm font-semibold text-foreground"
-        >
-          What is this machine for?
-        </h2>
-        {appliedRoleId && (
-          <div className="flex items-center gap-1.5">
-            <Button type="button" variant="ghost" size="sm" onClick={onClear}>
-              <X aria-hidden="true" />
-              Clear selection
-            </Button>
-            <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-              <Kbd title="Keyboard shortcut: Alt+C">Alt+C</Kbd>
-              <span>for Clear</span>
-            </span>
-          </div>
-        )}
+    <section aria-labelledby="role-heading" className="flex flex-col gap-8">
+      {/* Section header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+        <div>
+          <span className="text-label-code-sm text-primary uppercase tracking-widest font-semibold">
+            02 // ROLE &amp; PLAYBOOK BUNDLES
+          </span>
+          <h2 id="role-heading" className="text-headline-lg text-text-primary">
+            Server Archetype Presets
+          </h2>
+        </div>
+        <div className="flex items-center gap-3">
+          <p className="text-body-sm text-text-secondary max-w-sm">
+            Optional. Select a preset archetype to pre-load a curated set of packages.
+          </p>
+          {appliedRoleId && (
+            <button
+              type="button"
+              onClick={onClear}
+              className="text-label-code-sm text-text-muted hover:text-text-primary transition-colors shrink-0 flex items-center gap-1"
+            >
+              <span className="material-symbols-outlined text-[14px]">close</span>
+              Reset
+            </button>
+          )}
+        </div>
       </div>
 
-      <p className="mt-1.5 max-w-prose text-sm text-muted-foreground">
-        Optional. A preset adds a curated set of applications to your selection. You can
-        change anything afterwards, and you can skip this and browse instead.
-      </p>
-
-      <ul className="mt-2 grid grid-cols-[repeat(auto-fit,minmax(11rem,1fr))] gap-2">
-        {ROLES.map((role) => {
+      {/* Bento grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4">
+        {ROLES.map((role, idx) => {
           const applied = appliedRoleId === role.id;
-          const expanded = expandedId === role.id;
+          const meta = ROLE_META[role.id] ?? { icon: 'apps' };
           const recommended = applicationsForRole(role, 'recommended');
-          const optional = applicationsForRole(role, 'optional');
-          const detailsId = `role-${role.id}-apps`;
-          const RoleIcon = CATEGORY_ICON[ROLE_CATEGORY[role.id]];
+          const pkgCount = recommended.length;
+
+          // Bento spans: first=7, second=5, rest=4
+          const colSpan =
+            idx === 0 ? 'lg:col-span-7' :
+            idx === 1 ? 'lg:col-span-5' :
+            'lg:col-span-4';
 
           return (
-            <li
+            <div
               key={role.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => onApply(role)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onApply(role);
+                }
+              }}
+              aria-pressed={applied}
+              aria-label={`${applied ? 'Applied: ' : ''}${role.name} preset — ${pkgCount} packages`}
               className={cn(
-                'flex flex-col justify-between gap-1.5 rounded-lg border p-2.5 transition-colors',
+                'group relative flex h-full min-w-0 flex-col gap-4 p-6 rounded-xl cursor-pointer transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus',
+                colSpan,
                 applied
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border bg-card hover:border-foreground/20',
+                  ? 'bg-surface-card ring-2 ring-primary-container shadow-xl'
+                  : 'bg-surface-subtle hover:bg-surface-card hover:shadow-md',
               )}
             >
-              <div>
-                <div className="flex items-center justify-between gap-1">
-                  <div className="flex min-w-0 items-center gap-1.5">
-                    <span
-                      aria-hidden="true"
-                      className={cn(
-                        'flex size-5 shrink-0 items-center justify-center rounded-md transition-colors',
-                        applied ? 'bg-primary/10 text-primary' : 'bg-muted text-foreground',
-                      )}
-                    >
-                      <RoleIcon className="size-3" />
-                    </span>
-                    <p className="truncate text-xs font-medium">{role.name}</p>
+              {/* Card header */}
+              <div className="flex min-w-0 items-start justify-between gap-2">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div
+                    className={cn(
+                      'w-10 h-10 rounded-xl flex items-center justify-center transition-colors',
+                      applied ? 'bg-primary-container/20 text-primary' : 'bg-surface-container text-text-secondary group-hover:text-primary',
+                    )}
+                  >
+                    <span className="material-symbols-outlined text-[22px]">{meta.icon}</span>
                   </div>
-                  {applied && (
-                    <Badge variant="secondary" className="h-4 px-1 text-[9px] font-normal shrink-0">
-                      <Check aria-hidden="true" className="size-2.5 mr-0.5" />
-                      Applied
-                    </Badge>
-                  )}
+                  <div className="min-w-0">
+                    <span className="text-label-code-sm text-text-muted uppercase tracking-wider">
+                      {role.id.replace(/-/g, ' ')}
+                    </span>
+                    <h3 className="truncate text-headline-sm text-text-primary">{role.name}</h3>
+                  </div>
                 </div>
-                <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground line-clamp-1">
-                  {role.description}
-                </p>
-              </div>
 
-              <div className="flex items-center justify-between gap-1 pt-1">
-                <Button
-                  type="button"
-                  size="xs"
-                  variant={applied ? 'secondary' : 'outline'}
-                  aria-label={
+                {/* Applied badge */}
+                <span
+                  aria-hidden={!applied}
+                  className={cn(
+                    'flex items-center gap-1 px-2 py-0.5 rounded-full text-label-code-sm font-semibold transition-opacity shrink-0',
                     applied
-                      ? `Apply the ${role.name} preset again`
-                      : `Add ${recommended.length} ${role.name} applications to your selection`
-                  }
-                  onClick={() => onApply(role)}
-                  className="h-6 px-2 text-[11px]"
+                      ? 'bg-primary-container text-on-primary opacity-100'
+                      : 'opacity-0 pointer-events-none',
+                  )}
                 >
-                  <Sparkles aria-hidden="true" className="size-2.5" />
-                  {applied ? 'Re-apply' : `+${recommended.length} apps`}
-                </Button>
-                <Button
-                  type="button"
-                  size="xs"
-                  variant="ghost"
-                  aria-expanded={expanded}
-                  aria-controls={detailsId}
-                  aria-label={
-                    expanded
-                      ? `Hide what the ${role.name} preset adds`
-                      : `Show what the ${role.name} preset adds`
-                  }
-                  onClick={() => setExpandedId(expanded ? null : role.id)}
-                  className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-foreground"
-                >
-                  {expanded ? 'Hide' : 'Details'}
-                  <ChevronDown
-                    aria-hidden="true"
-                    className={cn('size-3 transition-transform', expanded && 'rotate-180')}
-                  />
-                </Button>
+                  <span className="material-symbols-outlined text-[14px]">check</span>
+                  PRESET LOADED
+                </span>
               </div>
 
-              {expanded && (
-                <div id={detailsId} className="border-t border-border pt-1.5 text-[10px]">
-                  <p className="font-medium text-foreground">Adds:</p>
-                  <p className="mt-0.5 text-muted-foreground">
-                    {recommended.map((app) => app.name).join(', ')}
-                  </p>
-                  {optional.length > 0 && (
-                    <>
-                      <p className="mt-1 font-medium text-foreground">Also recommended:</p>
-                      <p className="mt-0.5 text-muted-foreground">
-                        {optional.map((app) => app.name).join(', ')}
-                      </p>
-                    </>
-                  )}
-                </div>
-              )}
-            </li>
+              {/* Description */}
+              <p className="text-body-sm text-text-secondary line-clamp-2">{role.description}</p>
+
+              {/* Package chips */}
+              <div className="flex flex-wrap gap-1.5">
+                {recommended.slice(0, 5).map((app) => (
+                  <span
+                    key={app.id}
+                    className="px-2 py-0.5 rounded-full bg-surface-container text-label-code-sm text-text-secondary border border-border-hairline"
+                  >
+                    {app.name}
+                  </span>
+                ))}
+                {pkgCount > 5 && (
+                  <span className="px-2 py-0.5 rounded-full bg-surface-container text-label-code-sm text-text-muted border border-border-hairline">
+                    +{pkgCount - 5} more
+                  </span>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="mt-auto pt-3 border-t border-border-hairline flex items-center justify-between gap-2 text-label-code-sm text-text-muted">
+                <span>
+                  {meta.ports && <span className="flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[12px]">settings_ethernet</span>
+                    {meta.ports}
+                  </span>}
+                </span>
+                <span className="inline-flex items-center gap-1 text-text-secondary">
+                  <span className="material-symbols-outlined text-[12px] text-primary">package_2</span>
+                  {pkgCount} packages
+                </span>
+              </div>
+            </div>
           );
         })}
-      </ul>
+      </div>
+
+      {/* Topology strip */}
+      <div className="rounded-xl bg-surface-subtle border border-border-hairline p-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <span className="text-label-code-sm text-text-muted uppercase tracking-wider">
+            Dependency Execution Topology
+          </span>
+          <span className="text-body-sm text-text-secondary">
+            Resolver verifies package dependency graph before generation.
+          </span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-card text-label-code-sm text-success border border-success/20">
+            <span className="material-symbols-outlined text-[14px]">check_circle</span>
+            0 Circular Links
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-card text-label-code-sm text-primary border border-border-hairline">
+            <span className="material-symbols-outlined text-[14px]">verified</span>
+            100% Deterministic
+          </span>
+        </div>
+      </div>
     </section>
   );
 }

@@ -25,6 +25,7 @@ These end up in `apps/web/dist` and are therefore distributed to users of a depl
 | `tw-animate-css` | MIT | animation utilities imported by `src/index.css` |
 | `shadcn` | MIT | `shadcn/tailwind.css` is imported by `src/index.css` |
 | `@fontsource-variable/geist` | **OFL-1.1** | see "Fonts" below |
+| `@fontsource-variable/material-symbols-outlined` | **OFL-1.1** | self-hosted icon font; see "Fonts" below |
 | `express` | MIT | the API server in `apps/server`; also serves the built web app |
 | `@modelcontextprotocol/server` | MIT | the official MCP TypeScript SDK (v2), used by `packages/mcp` |
 | `@modelcontextprotocol/node` | MIT | the official MCP TypeScript SDK (v2), used by `packages/mcp` |
@@ -44,6 +45,7 @@ Not shipped to users, but part of the repository's toolchain.
 | `eslint-plugin-react-hooks` | MIT |
 | `globals` | MIT |
 | `tsx` | MIT |
+| `playwright` | Apache-2.0 | layout QA screenshots and browser checks |
 | `@modelcontextprotocol/client` | MIT |
 | `dotenv` | BSD-2-Clause |
 | `@types/node`, `@types/react`, `@types/react-dom`, `@types/express` | MIT (DefinitelyTyped) |
@@ -73,6 +75,11 @@ the font files. The `.woff2` files are emitted into `apps/web/dist/assets/` by t
 The full license text ships inside the package at
 `node_modules/@fontsource-variable/geist/LICENSE`.
 
+**Material Symbols Outlined Variable**, via `@fontsource-variable/material-symbols-outlined`,
+is licensed under the [SIL Open Font License 1.1](https://openfontlicense.org). Its license
+and copyright notice ship inside the package at
+`node_modules/@fontsource-variable/material-symbols-outlined/LICENSE`.
+
 ## Icons
 
 **Lucide** (`lucide-react`) is ISC-licensed and is itself a fork of
@@ -80,10 +87,10 @@ The full license text ships inside the package at
 Bemis). Both licenses require their copyright and permission notice to be preserved; the
 notices ship inside the installed package.
 
-No other icon sets, illustrations, or images are used. `apps/web/public/` contains no
-images: two unreferenced scaffold images of unclear provenance were removed rather than
-published (they remain in the git history — see `SECURITY.md` on why deleting a file does
-not remove it from history).
+No other icon sets are used. `apps/web/public/` contains only the self-hosted favicon;
+two unreferenced scaffold images of unclear provenance were removed rather than published
+(they remain in the git history — see `SECURITY.md` on why deleting a file does not remove
+it from history).
 
 ## Code derived from other projects
 

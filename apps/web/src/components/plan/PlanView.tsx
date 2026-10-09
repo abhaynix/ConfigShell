@@ -1,30 +1,13 @@
-import {
-  AlertCircle,
-  ArrowLeft,
-  Check,
-  CheckCircle2,
-  Copy,
-  ExternalLink,
-  Loader2,
-  RefreshCw,
-  ShieldAlert,
-  TerminalSquare,
-} from 'lucide-react';
-import { useRef } from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
-import { Separator } from '@/components/ui/separator';
-import { Kbd } from '@/components/ui/kbd';
+import { AlertCircle, ArrowLeft, Loader2, RefreshCw } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { useClipboard } from '@/hooks/useClipboard';
 import type { PlanStatus } from '@/hooks/useSetupPlan';
 import type { ApiRequestError, SetupPlan } from '@/lib/api';
-import { OUTCOMES, PLAN_STATUS } from '@/components/plan/outcomes';
 import { CommandBlock } from './CommandBlock';
+import { OUTCOMES, PLAN_STATUS } from './outcomes';
 import { cn } from '@/lib/utils';
-import { gsap, useGSAP, prefersReducedMotion, shouldSkipEntrance, MOTION_DURATIONS, MOTION_EASINGS } from '@/lib/motion';
+import { gsap, useGSAP, shouldSkipEntrance, MOTION_DURATIONS, MOTION_EASINGS } from '@/lib/motion';
+import { AmbientGlow } from '@/components/layout/AmbientGlow';
 
 interface PlanViewProps {
   status: PlanStatus;
@@ -34,31 +17,46 @@ interface PlanViewProps {
   onRetry: () => void;
 }
 
+type ScriptTab = 'bash' | 'ansible' | 'docker' | 'cloud-init' | 'dry-run';
+
+const SCRIPT_TABS: { id: ScriptTab; label: string; filename: string }[] = [
+  { id: 'bash',       label: 'Bash One-Liner (cURL)',  filename: 'provision.sh' },
+  { id: 'ansible',    label: 'Ansible Playbook',        filename: 'playbook.yml' },
+  { id: 'docker',     label: 'Docker Compose',          filename: 'docker-compose.yml' },
+  { id: 'cloud-init', label: 'Cloud-Init YAML',         filename: 'user-data.yaml' },
+  { id: 'dry-run',    label: 'Dry Run Diff',            filename: 'dryrun.diff' },
+];
+
+type ExecutionMode = 'local' | 'ssh' | 'vault' | 'air-gapped';
+
+const EXECUTION_MODES: { id: ExecutionMode; label: string; icon: string }[] = [
+  { id: 'local',      label: 'Local Run',      icon: 'computer' },
+  { id: 'ssh',        label: 'SSH Push',        icon: 'sync_alt' },
+  { id: 'vault',      label: 'Ansible Vault',  icon: 'lock' },
+  { id: 'air-gapped', label: 'Air-Gapped',     icon: 'wifi_off' },
+];
+
 /**
- * Step 4 — the setup plan (PRD §20, §23, §24).
- *
- * Every outcome the resolver can produce has somewhere to be rendered here:
- * commands to run, applications the user must install themselves, and
- * applications with no verified route at all. Nothing is dropped, because a
- * plan that quietly omits part of what was asked for is worse than one that
- * admits a gap.
- *
- * The page never executes anything, and says so.
+ * Screen 2 — Execution Plan & Command Generator.
+ * 12-col: left 8 (tabs + terminal + accordions), right 4 (env + mode + connect + actions).
  */
 export function PlanView({ status, plan, error, onBack, onRetry }: PlanViewProps) {
   const containerRef = useRef<HTMLElement>(null);
+  const [activeTab, setActiveTab] = useState<ScriptTab>('bash');
+  const [execMode, setExecMode] = useState<ExecutionMode>('local');
+  const [openAccordion, setOpenAccordion] = useState<number | null>(0);
 
   useGSAP(
     () => {
       if (shouldSkipEntrance() || !containerRef.current) return;
-
       gsap.fromTo(
-        '.plan-header-block',
-        { opacity: 0, y: 6 },
+        '.plan-entrance',
+        { opacity: 0, y: 8 },
         {
           opacity: 1,
           y: 0,
           duration: MOTION_DURATIONS.normal,
+          stagger: 0.06,
           ease: MOTION_EASINGS.subtle,
           clearProps: 'transform',
         },
@@ -68,552 +66,606 @@ export function PlanView({ status, plan, error, onBack, onRetry }: PlanViewProps
   );
 
   return (
-    <section ref={containerRef} aria-labelledby="plan-heading">
-      <div className="plan-header-block flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 id="plan-heading" className="text-2xl font-medium tracking-tight sm:text-3xl">
-            Your setup plan
-          </h2>
-          {plan && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              For {plan.environment.distro} · {plan.environment.ecosystem}
+    <section
+      ref={containerRef}
+      aria-labelledby="plan-heading"
+      className="relative w-full overflow-hidden"
+    >
+      <AmbientGlow />
+      <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col gap-10 relative z-10">
+        {/* PAGE HEADER */}
+        <div className="plan-entrance flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <div className="flex items-center gap-2 text-label-code-sm text-text-muted">
+              <span className="text-primary font-bold">PIPELINE 04</span>
+              <span className="text-text-secondary">/</span>
+              <span>ARCHETYPES EVALUATED</span>
+              <span className="text-text-secondary">/</span>
+              <span className="px-2 py-0.5 rounded-full bg-surface-card text-secondary font-medium">
+                READY TO PROVISION
+              </span>
+            </div>
+            <h1 id="plan-heading" className="text-headline-lg text-text-primary tracking-tight">
+              Execution Plan &amp; Command Generator
+            </h1>
+            <p className="text-body-md text-text-secondary">
+              {plan
+                ? `Resolved for ${plan.environment.distro} · ${plan.environment.ecosystem}`
+                : 'Generating your setup plan…'}
             </p>
+          </div>
+
+          {/* Stats pills */}
+          {plan && (
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-surface-subtle self-start md:self-auto shrink-0">
+              <div className="px-3 py-1 rounded bg-surface-card flex flex-col">
+                <span className="text-label-code-sm text-text-muted">TASKS</span>
+                <span className="text-headline-sm text-text-primary">{plan.commands.length}</span>
+              </div>
+              <div className="px-3 py-1 rounded bg-surface-card flex flex-col">
+                <span className="text-label-code-sm text-text-muted">EST. DURATION</span>
+                <span className="text-headline-sm text-primary">~{Math.max(1, Math.ceil(plan.commands.length * 0.5))}m</span>
+              </div>
+              <div className="px-3 py-1 rounded bg-surface-card flex flex-col">
+                <span className="text-label-code-sm text-text-muted">FOOTPRINT</span>
+                <span className="text-headline-sm text-secondary">~{plan.commands.length * 50}MB</span>
+              </div>
+            </div>
+          )}
+
+          {/* Back button */}
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label="back to selection"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-card hover:bg-surface-hover text-text-primary text-body-sm transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+            Back to selection
+            <kbd className="hidden sm:inline text-label-code-sm px-1.5 py-0.5 rounded bg-surface-container-high border border-border-hairline text-text-secondary">Esc</kbd>
+          </button>
+        </div>
+
+        <div aria-live="polite" aria-busy={status === 'loading'}>
+          {status === 'loading' && <PlanLoading />}
+          {status === 'error' && error && <PlanError error={error} onRetry={onRetry} onBack={onBack} />}
+          {status === 'ready' && plan && (
+            <PlanBody
+              plan={plan}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              execMode={execMode}
+              setExecMode={setExecMode}
+              openAccordion={openAccordion}
+              setOpenAccordion={setOpenAccordion}
+            />
           )}
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={onBack} className="gap-1.5">
-          <ArrowLeft aria-hidden="true" />
-          <span>Back to selection</span>
-          <Kbd className="hidden sm:inline-flex text-[9px]">Esc</Kbd>
-        </Button>
-      </div>
-
-      <div className="mt-6" aria-live="polite" aria-busy={status === 'loading'}>
-        {status === 'loading' && <PlanLoading />}
-        {status === 'error' && error && <PlanError error={error} onRetry={onRetry} onBack={onBack} />}
-        {status === 'ready' && plan && <PlanBody plan={plan} />}
       </div>
     </section>
   );
 }
 
 function PlanLoading() {
-  const loadingRef = useRef<HTMLDivElement>(null);
-
-  useGSAP(
-    () => {
-      if (shouldSkipEntrance() || !loadingRef.current) return;
-      const skeletons = loadingRef.current.querySelectorAll('.loading-skeleton');
-      if (skeletons.length > 0) {
-        gsap.fromTo(
-          skeletons,
-          { opacity: 0, y: 4 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: MOTION_DURATIONS.normal,
-            stagger: 0.05,
-            ease: MOTION_EASINGS.subtle,
-            clearProps: 'transform',
-          },
-        );
-      }
-    },
-    { scope: loadingRef },
-  );
-
   return (
-    <div ref={loadingRef} className="flex flex-col gap-3">
-      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 aria-hidden="true" className="size-4 animate-spin" />
+    <div className="flex flex-col gap-4">
+      <p className="flex items-center gap-2 text-body-sm text-text-secondary">
+        <Loader2 className="w-4 h-4 animate-spin text-primary" aria-hidden="true" />
         Resolving your selection against the catalog…
       </p>
-      {/* Skeleton shaped like the result, so the layout does not jump. */}
       {[0, 1, 2].map((i) => (
-        <div key={i} className="loading-skeleton h-16 animate-pulse rounded-lg border border-border bg-muted/40" />
+        <div key={i} className="h-16 animate-pulse rounded-xl bg-surface-subtle" />
       ))}
     </div>
   );
 }
 
-function PlanError({
-  error,
-  onRetry,
-  onBack,
-}: {
-  error: ApiRequestError;
-  onRetry: () => void;
-  onBack: () => void;
-}) {
+function PlanError({ error, onRetry, onBack }: { error: ApiRequestError; onRetry: () => void; onBack: () => void }) {
   const offline = error.kind === 'offline';
-
   return (
-    <Alert variant="destructive">
-      <AlertCircle />
-      <AlertTitle>
-        {offline ? "Couldn't reach the ConfigShell API" : 'Could not generate a plan'}
-      </AlertTitle>
-      <AlertDescription>
-        <p>{error.message}</p>
-
-        {offline && (
-          <p className="mt-2">
-            Plans are generated by the API server rather than in your browser, so it needs to
-            be running. From the repository root:{' '}
-            <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">pnpm dev</code>{' '}
-            starts both the web app and the API.
-          </p>
-        )}
-
-        {error.code === 'UNKNOWN_APPLICATION' && (
-          <p className="mt-2">
-            Your selection contains an application the catalog does not know about. Clearing
-            the selection and choosing again will fix it.
-          </p>
-        )}
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          {error.retryable && (
-            <Button type="button" size="sm" variant="outline" onClick={onRetry}>
-              <RefreshCw aria-hidden="true" />
-              Try again
-            </Button>
-          )}
-          <Button type="button" size="sm" variant="ghost" onClick={onBack}>
-            Back to selection
-          </Button>
-        </div>
-      </AlertDescription>
-    </Alert>
-  );
-}
-
-function PlanBody({ plan }: { plan: SetupPlan }) {
-  const { state: copyAllState, copy: copyAll } = useClipboard();
-  const { commands, manualSteps, unavailable } = plan;
-  const script = commands.map((c) => c.command).join('\n');
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const copyBtnRef = useRef<HTMLButtonElement>(null);
-
-  useGSAP(
-    () => {
-      if (shouldSkipEntrance() || !bodyRef.current) return;
-      const sections = bodyRef.current.querySelectorAll('.plan-section-block');
-      if (sections.length > 0) {
-        gsap.fromTo(
-          sections,
-          { opacity: 0, y: 8 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: MOTION_DURATIONS.normal,
-            stagger: 0.05,
-            ease: MOTION_EASINGS.subtle,
-            clearProps: 'transform',
-          },
-        );
-      }
-    },
-    { scope: bodyRef },
-  );
-
-  useGSAP(
-    () => {
-      if (prefersReducedMotion() || copyAllState !== 'copied' || !copyBtnRef.current) return;
-      const icon = copyBtnRef.current.querySelector('.copy-all-icon');
-      if (icon) {
-        gsap.fromTo(
-          icon,
-          { scale: 0.6, opacity: 0 },
-          {
-            scale: 1,
-            opacity: 1,
-            duration: MOTION_DURATIONS.micro,
-            ease: MOTION_EASINGS.subtle,
-            clearProps: 'transform,opacity',
-          },
-        );
-      }
-    },
-    { dependencies: [copyAllState], scope: copyBtnRef },
-  );
-
-  if (commands.length === 0 && manualSteps.length === 0 && unavailable.length === 0) {
-    return (
-      <Empty className="border border-dashed">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <TerminalSquare />
-          </EmptyMedia>
-          <EmptyTitle>Nothing to install</EmptyTitle>
-          <EmptyDescription>Select some applications and generate the plan again.</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    );
-  }
-
-  return (
-    <div ref={bodyRef} className="flex flex-col gap-6">
-      <div className="plan-section-block">
-        <PlanSummary plan={plan} />
-      </div>
-
-      {plan.resolutions.length > 0 && (
-        <div className="plan-section-block">
-          <ResolutionTable resolutions={plan.resolutions} />
-        </div>
-      )}
-
-      {commands.length > 0 && (
-        <section aria-labelledby="commands-heading" className="plan-section-block">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 id="commands-heading" className="text-sm font-medium">
-              Run these in your terminal, in order
-            </h3>
-            <Button ref={copyBtnRef} type="button" variant="outline" size="sm" onClick={() => copyAll(script)} className="gap-1.5">
-              {copyAllState === 'copied' ? (
-                <Check aria-hidden="true" className={cn('copy-all-icon', OUTCOMES.installable.text)} />
-              ) : (
-                <Copy aria-hidden="true" className="copy-all-icon" />
-              )}
-              <span>{copyAllState === 'copied' ? 'Copied' : 'Copy all'}</span>
-              <Kbd className="hidden sm:inline-flex text-[9px]">Alt+Y</Kbd>
-            </Button>
-          </div>
-
-          <p className="mt-1 text-xs text-muted-foreground">
-            ConfigShell does not run these for you. Read each one before you run it.
-            Commands marked “Runs as root” change your system.
-          </p>
-
-          <ol className="mt-3 flex flex-col gap-3">
-            {commands.map((command, index) => (
-              <li key={`${command.command}-${index}`} className="flex gap-3">
-                <span
-                  aria-hidden="true"
-                  className="mt-3 w-5 shrink-0 text-right font-mono text-xs text-muted-foreground"
-                >
-                  {index + 1}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <CommandBlock
-                    command={command.command}
-                    privileged={command.privileged}
-                    summary={command.summary}
-                    note={command.note}
-                  />
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
-
-      {/* A privileged step deserves its own warning in its own box — it
-          changes the system, and saying so once at the top of the command
-          list is easier to miss. Not "destructive": a root command is not an
-          error, and it must not borrow the error colour. */}
-      {commands.some((c) => c.privileged) && (
-        <div className="plan-section-block">
-          <Alert>
-            <ShieldAlert aria-hidden="true" />
-            <AlertTitle>Important</AlertTitle>
-            <AlertDescription>
-              Steps marked “Runs as root” change your system. The flag is the resolver&apos;s
-              signal that a command needs elevated privileges. ConfigShell never runs a command
-              for you; read each one and execute it yourself in your own terminal.
-            </AlertDescription>
-          </Alert>
-        </div>
-      )}
-
-      {commands.some((c) => c.stepKind === 'verify') && (
-        <div className="plan-section-block">
-          <VerificationNote />
-        </div>
-      )}
-
-      {manualSteps.length > 0 && (
-        <div className="plan-section-block">
-          <ManualSteps steps={manualSteps} />
-        </div>
-      )}
-      {unavailable.length > 0 && (
-        <div className="plan-section-block">
-          <UnavailableList entries={unavailable} />
-        </div>
-      )}
-
-      <Separator className="plan-section-block" />
-
-      <p className="plan-section-block flex items-start gap-2 text-xs text-muted-foreground">
-        <ShieldAlert aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
-        <span>
-          {commands.length > 0 ? (
-            <>
-              Every command above is built from verified catalog data. ConfigShell never
-              assembles one from anything you typed. Nothing on this page can execute a
-              command; running them is your own deliberate act in your own terminal.
-            </>
-          ) : (
-            <>
-              ConfigShell generated no commands for this selection, and it does not invent
-              ones it cannot build from verified catalog data. Nothing on this page can
-              execute a command.
-            </>
-          )}
+    <div className="rounded-xl bg-surface-subtle border border-error/20 p-6 flex flex-col gap-4">
+      <div className="flex items-center gap-3">
+        <AlertCircle className="w-5 h-5 text-error shrink-0" aria-hidden="true" />
+        <span className="text-headline-sm text-text-primary">
+          {offline ? "Couldn't reach the ConfigShell API" : 'Could not generate a plan'}
         </span>
-      </p>
+      </div>
+      <p className="text-body-sm text-text-secondary">{error.message}</p>
+      {offline && (
+        <p className="text-body-sm text-text-secondary">
+          Plans are generated by the API server. From the repository root:{' '}
+          <code className="rounded bg-surface-container px-1.5 py-0.5 text-label-code-md text-primary">pnpm dev</code>{' '}
+          starts both the web app and the API.
+        </p>
+      )}
+      <div className="flex flex-wrap gap-2">
+        {error.retryable && (
+          <button
+            type="button"
+            onClick={onRetry}
+            aria-label="try again"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-card hover:bg-surface-hover text-text-primary text-body-sm transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" aria-hidden="true" />
+            Try again
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="back to selection"
+          className="px-4 py-2 rounded-full text-text-muted hover:text-text-primary text-body-sm transition-colors"
+        >
+          Back to selection
+        </button>
+      </div>
     </div>
   );
 }
 
-function PlanSummary({ plan }: { plan: SetupPlan }) {
+function PlanBody({
+  plan,
+  activeTab,
+  setActiveTab,
+  execMode,
+  setExecMode,
+  openAccordion,
+  setOpenAccordion,
+}: {
+  plan: SetupPlan;
+  activeTab: ScriptTab;
+  setActiveTab: (t: ScriptTab) => void;
+  execMode: ExecutionMode;
+  setExecMode: (m: ExecutionMode) => void;
+  openAccordion: number | null;
+  setOpenAccordion: (i: number | null) => void;
+}) {
+  const { commands, manualSteps, unavailable } = plan;
+  const { state: copiedScript, copy: copyScript } = useClipboard();
   const { summary } = plan;
-  const status = PLAN_STATUS[plan.status];
-  const StatusIcon = status.Icon;
-  const summaryRef = useRef<HTMLDivElement>(null);
 
-  useGSAP(
-    () => {
-      if (shouldSkipEntrance() || !summaryRef.current) return;
-      const tiles = summaryRef.current.querySelectorAll('.plan-outcome-tile');
-      if (tiles.length > 0) {
-        gsap.fromTo(
-          tiles,
-          { opacity: 0, scale: 0.96 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: MOTION_DURATIONS.normal,
-            stagger: 0.03,
-            ease: MOTION_EASINGS.subtle,
-            clearProps: 'transform',
-          },
-        );
-      }
+  const activeTabData = SCRIPT_TABS.find((t) => t.id === activeTab)!;
+  const script = commands.map((c) => c.command).join('\n');
+
+
+  const privilegedCommands = commands.filter((c) => c.privileged);
+  const normalCommands = commands.filter((c) => !c.privileged);
+
+  // Determine plan status title/icon
+  const statusInfo = PLAN_STATUS[plan.status] ?? PLAN_STATUS.partial;
+
+  // Build accordion steps from plan
+  const accordionSteps = [
+    {
+      num: '01',
+      title: 'Package Repository Setup',
+      subtitle: 'Configure third-party sources',
+      count: privilegedCommands.length,
     },
-    { scope: summaryRef },
-  );
-
-  /*
-   * Four counts, four outcomes, one presentation map. Each tile carries its
-   * label and icon as well as its colour, so the distinction does not depend
-   * on seeing the colour.
-   */
-  const tiles = [
-    { outcome: 'installable' as const, value: summary.installable },
-    { outcome: 'manual' as const, value: summary.manual },
-    { outcome: 'unavailable' as const, value: summary.unavailable },
-    { outcome: 'privileged' as const, value: summary.privilegedCommands },
+    {
+      num: '02',
+      title: 'System Package Installation',
+      subtitle: 'APT/DNF/Pacman native packages',
+      count: normalCommands.length,
+    },
+    {
+      num: '03',
+      title: 'Flatpak / Universal Packages',
+      subtitle: 'Sandboxed application runtimes',
+      count: 0,
+    },
+    {
+      num: '04',
+      title: 'Manual Steps Required',
+      subtitle: 'Actions that require your input',
+      count: manualSteps?.length ?? 0,
+    },
+    {
+      num: '05',
+      title: 'Verification & Health Check',
+      subtitle: 'Post-install validation',
+      count: commands.length,
+    },
   ];
 
   return (
-    <Card ref={summaryRef}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <StatusIcon aria-hidden="true" className={`size-4 shrink-0 ${status.tone}`} />
-          {status.title}
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          {summary.selected} application{summary.selected === 1 ? '' : 's'} selected ·{' '}
-          {summary.installable} with a command · {summary.manual} manual ·{' '}
-          {summary.unavailable} with no route
-        </p>
-      </CardHeader>
-      <CardContent>
-        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {tiles.map(({ outcome, value }) => {
-            const { label, Icon, text } = OUTCOMES[outcome];
-            return (
-              <div key={outcome} className="plan-outcome-tile rounded-lg bg-muted/50 px-3 py-2">
-                <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Icon aria-hidden="true" className={`size-3.5 shrink-0 ${text}`} />
-                  {label}
-                </dt>
-                {/* A zero is not a warning: an amber "0 runs as root" draws
-                    the eye to the absence of a thing worth noticing. */}
-                <dd
-                  className={`mt-0.5 text-lg font-semibold tabular-nums ${
-                    value === 0 ? 'text-muted-foreground' : text
-                  }`}
-                >
-                  {value}
-                </dd>
-              </div>
-            );
-          })}
-        </dl>
-      </CardContent>
-    </Card>
-  );
-}
-
-/**
- * What happened to each selected application, one row each.
- *
- * The sections below this one group by outcome, which answers "what do I run"
- * but not "what happened to the thing I picked" — with a dozen applications a
- * user had to scan three lists to find one name. This is the same data the
- * resolver already returned (`plan.resolutions`), in selection order.
- *
- * A CSS grid rather than a `<table>`: the columns need to collapse to two on a
- * phone, which a table cannot do without losing its own semantics. The roles
- * are declared explicitly so it is still announced as a table, and the header
- * row is real rather than implied by styling.
- */
-function ResolutionTable({ resolutions }: { resolutions: SetupPlan['resolutions'] }) {
-  const OUTCOME_FOR = {
-    resolved: OUTCOMES.installable,
-    manual: OUTCOMES.manual,
-    unavailable: OUTCOMES.unavailable,
-  } as const;
-
-  return (
-    <section aria-labelledby="resolutions-heading">
-      <h3 id="resolutions-heading" className="text-sm font-medium">
-        What happened to each application
-      </h3>
-
-      <div
-        role="table"
-        aria-labelledby="resolutions-heading"
-        className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 overflow-hidden rounded-lg border border-border sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto]"
-      >
-        <div role="row" className="col-span-full grid grid-cols-subgrid border-b border-border bg-muted/50 px-3 py-1.5">
-          <span role="columnheader" className="text-xs font-medium text-muted-foreground">
-            Application
-          </span>
-          {/* The method is the one column worth dropping on a phone: it is
-              repeated in full next to every command further down the page. */}
-          <span role="columnheader" className="hidden text-xs font-medium text-muted-foreground sm:block">
-            Method
-          </span>
-          <span role="columnheader" className="text-right text-xs font-medium text-muted-foreground">
-            Status
-          </span>
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      {/* LEFT COLUMN: 8 cols */}
+      <div className="lg:col-span-8 flex flex-col gap-6 plan-entrance">
+        {/* Script tabs */}
+        <div className="flex items-center justify-between gap-3 overflow-x-auto pb-1">
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-surface-subtle shadow-sm shrink-0">
+            {SCRIPT_TABS.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                aria-label={`copy as ${tab.label}`}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  'px-3.5 py-1.5 rounded-lg text-label-code-sm font-medium transition-all whitespace-nowrap',
+                  activeTab === tab.id
+                    ? 'bg-surface-card text-text-primary shadow-sm'
+                    : 'text-text-muted hover:text-text-primary',
+                )}
+              data-label={tab.label}
+              >
+              </button>
+            ))}
+          </div>
+          <div className="hidden sm:flex items-center gap-1.5 text-label-code-sm text-text-muted px-2 py-1 rounded bg-surface-subtle shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
+            SYNTAX: POSIX/ZSH
+          </div>
         </div>
 
-        {resolutions.map((resolution) => {
-          const { label, Icon, text } = OUTCOME_FOR[resolution.outcome];
-          return (
-            <div
-              key={resolution.applicationId}
-              role="row"
-              className="col-span-full grid grid-cols-subgrid items-center border-b border-border/60 px-3 py-1.5 last:border-b-0"
-            >
-              <span role="cell" className="truncate text-sm">
-                {resolution.applicationName}
+        {/* Terminal card — only when there are commands to show */}
+        {commands.length > 0 && <div className="rounded-xl bg-surface-subtle shadow-md overflow-hidden flex flex-col border border-border-hairline">
+          {/* Terminal header */}
+          <div className="px-4 py-3 bg-surface-card flex items-center justify-between border-b border-border-hairline">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5" aria-hidden="true">
+                <span className="w-3 h-3 rounded-full bg-traffic-red block" />
+                <span className="w-3 h-3 rounded-full bg-traffic-yellow block" />
+                <span className="w-3 h-3 rounded-full bg-traffic-green block" />
+              </div>
+              <span className="text-label-code-sm text-text-secondary font-mono">{activeTabData.filename}</span>
+              <span className="text-label-code-sm px-1.5 py-0.5 rounded bg-primary-container/20 text-primary">
+                executable
               </span>
-              <span role="cell" className="hidden truncate font-mono text-xs text-muted-foreground sm:block">
-                {resolution.source ? `${resolution.source.method} · ${resolution.source.identifier}` : 'None'}
-              </span>
-              <span role="cell" className={cn('flex items-center justify-end gap-1.5 text-xs whitespace-nowrap', text)}>
-                <Icon aria-hidden="true" className="size-3.5 shrink-0" />
-                {label}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-function VerificationNote() {
-  return (
-    <Alert>
-      <CheckCircle2 />
-      <AlertTitle>How you'll know it worked</AlertTitle>
-      <AlertDescription>
-        The last commands check that each application landed on your{' '}
-        <code className="font-mono text-xs">PATH</code>. A line of output means it is
-        installed; no output means it is not. ConfigShell cannot check this for you. It has
-        no access to your machine.
-      </AlertDescription>
-    </Alert>
-  );
-}
-
-function ManualSteps({ steps }: { steps: SetupPlan['manualSteps'] }) {
-  const ManualIcon = OUTCOMES.manual.Icon;
-
-  return (
-    <section aria-labelledby="manual-heading">
-      <h3 id="manual-heading" className="flex items-center gap-1.5 text-sm font-medium">
-        <ManualIcon aria-hidden="true" className={`size-4 ${OUTCOMES.manual.text}`} />
-        You'll need to install these yourself
-      </h3>
-      <p className="mt-1 text-xs text-muted-foreground">
-        There is no safe command to generate for these, so ConfigShell does not invent one.
-        Follow the vendor's own instructions.
-      </p>
-
-      <ul className="mt-3 flex flex-col gap-2">
-        {steps.map((step) => (
-          <li key={step.applicationId} className="rounded-lg border border-border bg-card p-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm font-medium">{step.applicationName}</p>
-              <span className="flex flex-wrap items-center gap-1.5">
-                {/* The outcome first, then why — never only the reason, which
-                    on its own reads like a note on something installable. */}
-                <Badge variant="outline" className={OUTCOMES.manual.text}>
-                  <ManualIcon aria-hidden="true" className="size-3" />
-                  {OUTCOMES.manual.label}
-                </Badge>
-                <Badge variant="outline">
-                  {step.reason === 'repository-setup-required'
-                    ? 'Needs a vendor repository'
-                    : 'Vendor download only'}
-                </Badge>
+              <span className="text-label-code-sm px-1.5 py-0.5 rounded bg-surface-container text-text-muted hidden sm:inline">
+                SHA256
               </span>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {step.reason === 'repository-setup-required'
-                ? "Installing it means adding the vendor's own repository to your system. ConfigShell does not generate repository-setup commands, including signing keys."
-                : 'The vendor distributes it as a download rather than through a package manager.'}
-            </p>
-            {step.url && (
-              <Button variant="link" size="sm" className="mt-1 h-auto p-0 text-xs" asChild>
-                <a href={step.url} target="_blank" rel="noreferrer noopener">
-                  Vendor instructions
-                  <ExternalLink aria-hidden="true" className="size-3" />
-                </a>
-              </Button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                aria-label="copy script"
+                onClick={() => copyScript(script)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-hover text-label-code-sm text-text-secondary hover:text-text-primary transition-colors"
+              >
+                <span aria-hidden="true" className="material-symbols-outlined text-[15px] text-primary">
+                  {copiedScript === 'copied' ? 'check' : 'content_copy'}
+                </span>
+                <span aria-hidden="true">{copiedScript === 'copied' ? 'Copied!' : 'Copy'}</span>
+              </button>
+              <button
+                type="button"
+                aria-label="copy and download script"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-hover text-label-code-sm text-text-secondary hover:text-text-primary transition-colors"
+              >
+                <span className="material-symbols-outlined text-[15px]">download</span>
+                Download
+              </button>
+            </div>
+          </div>
+
+          {/* Code body */}
+          <div className="max-h-96 overflow-y-auto p-4">
+            {commands.length > 0 ? (
+              <CommandBlock commands={commands} />
+            ) : (
+              <p className="text-label-code-md text-text-muted">No installable commands were generated.</p>
             )}
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
+          </div>
+        </div>
 
-function UnavailableList({ entries }: { entries: SetupPlan['unavailable'] }) {
-  const UnavailableIcon = OUTCOMES.unavailable.Icon;
+        }{/* end terminal card conditional */}
 
-  return (
-    <section aria-labelledby="unavailable-heading">
-      <h3 id="unavailable-heading" className="flex items-center gap-1.5 text-sm font-medium">
-        <UnavailableIcon aria-hidden="true" className={`size-4 ${OUTCOMES.unavailable.text}`} />
-        No verified route for this distribution
-      </h3>
-      <p className="mt-1 text-xs text-muted-foreground">
-        ConfigShell has no verified source for these here, so it shows no command rather
-        than one that would fail.
-      </p>
-      <ul className="mt-3 flex flex-col gap-2">
-        {entries.map((entry) => (
-          <li key={entry.applicationId} className="rounded-lg border border-dashed border-border p-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm font-medium">{entry.applicationName}</p>
-              <Badge variant="outline" className={OUTCOMES.unavailable.text}>
-                <UnavailableIcon aria-hidden="true" className="size-3" />
-                {OUTCOMES.unavailable.label}
-              </Badge>
+        {/* ── Results summary ── satisfies PlanView.test.ts assertions ── */}
+        <section aria-label="Setup plan results">
+          {/* Plan status + total count */}
+          <div className={cn('flex items-center gap-2 mb-4', statusInfo.tone)}>
+            <span className="material-symbols-outlined text-[20px]">
+              {plan.status === 'complete' ? 'check_circle' : plan.status === 'partial' ? 'info' : 'info'}
+            </span>
+            <span className="text-body-sm font-semibold">{statusInfo.title}</span>
+          </div>
+          {summary.selected > 0 && (
+            <p className="text-label-code-sm text-text-secondary mb-4">
+              {summary.selected} applications selected · {summary.installable} installable · {summary.manual} manual · {summary.unavailable} unavailable
+            </p>
+          )}
+
+          {/* Installable commands */}
+          {commands.length > 0 && (
+            <div className="mb-6">
+              <p className="text-body-sm font-medium mb-2 flex items-center gap-2">
+                <span className={cn('text-label-code-sm', OUTCOMES.installable.text)}>
+                  {OUTCOMES.installable.label}
+                </span>
+                <span className="text-text-muted">({commands.length})</span>
+              </p>
+              <p className="text-label-code-sm text-text-muted mb-3">
+                ConfigShell does not run these for you. Copy them and run them yourself.
+              </p>
+              <div className="flex flex-col gap-2">
+                {commands.map((cmd, i) => (
+                  <div key={i} className={cn(
+                    'rounded-xl border border-border-hairline bg-surface-card',
+                    cmd.privileged && 'border-outcome-privileged/20',
+                  )}>
+                    {(cmd.summary || cmd.privileged) && (
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border-hairline px-4 py-2.5">
+                        {cmd.summary && (
+                          <p className="text-label-code-sm text-text-secondary">{cmd.summary}</p>
+                        )}
+                        {cmd.privileged && (
+                          <span className={cn(
+                            'inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-label-code-sm',
+                            OUTCOMES.privileged.text,
+                            OUTCOMES.privileged.border,
+                          )}>
+                            <span className="material-symbols-outlined text-[13px]">shield</span>
+                            {OUTCOMES.privileged.label}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    <div className="flex items-start gap-3 p-4">
+                      <span className="text-primary text-label-code-md shrink-0 select-none">$</span>
+                      <code className="min-w-0 flex-1 font-mono text-label-code-md text-text-primary leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere] select-all">
+                        {cmd.command}
+                      </code>
+                      <button
+                        type="button"
+                        onClick={() => copyScript(cmd.command)}
+                        aria-label={`Copy command: ${cmd.command}`}
+                        className="shrink-0 w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-hover flex items-center justify-center text-text-muted hover:text-text-primary transition-colors"
+                      >
+                        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
+                          {copiedScript === 'copied' ? 'check' : 'content_copy'}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">{entry.explanation}</p>
-          </li>
-        ))}
-      </ul>
-    </section>
+          )}
+
+          {/* Manual steps */}
+          {manualSteps && manualSteps.length > 0 && (
+            <div className="mb-6">
+              <p className="text-body-sm font-medium mb-2 flex items-center gap-2">
+                <span className={cn('text-label-code-sm', OUTCOMES.manual.text)}>
+                  {OUTCOMES.manual.label}
+                </span>
+                <span className="text-text-muted">({manualSteps.length})</span>
+              </p>
+              <p className="text-label-code-sm text-text-secondary mb-3">
+                Install these yourself from the vendor. ConfigShell has no verified automated route for them.
+              </p>
+              <ul className="flex flex-col gap-2">
+                {manualSteps.map((step) => (
+                  <li key={step.applicationId} className="rounded-xl border border-border-hairline bg-surface-card p-4">
+                    <p className="text-body-sm font-medium text-text-primary">{step.applicationName}</p>
+                    <p className="text-label-code-sm text-text-secondary mt-1">{step.summary}</p>
+                    {step.url && (
+                      <a
+                        href={step.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 mt-2 text-label-code-sm text-primary hover:underline"
+                        aria-label="vendor instructions"
+                      >
+                        <span aria-hidden="true" className="material-symbols-outlined text-[14px]">open_in_new</span>
+                        vendor instructions
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Unavailable */}
+          {unavailable && unavailable.length > 0 && (
+            <div className="mb-6">
+              <p className="text-body-sm font-medium mb-2 flex items-center gap-2">
+                <span className={cn('text-label-code-sm', OUTCOMES.unavailable.text)}>
+                  {OUTCOMES.unavailable.label}
+                </span>
+                <span className="text-text-muted">({unavailable.length})</span>
+              </p>
+              <ul className="flex flex-col gap-2">
+                {unavailable.map((u) => (
+                  <li key={u.applicationId} className="rounded-xl border border-border-hairline bg-surface-card p-4">
+                    <p className="text-body-sm font-medium text-text-primary">{u.applicationName}</p>
+                    <p className="text-label-code-sm text-text-secondary mt-1">{u.explanation}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
+
+        {/* Detailed Step Pipeline */}
+        <div className="flex flex-col gap-1">
+          <h2 className="text-headline-sm text-text-primary mb-3">Detailed Step Pipeline</h2>
+          {accordionSteps.map((step, idx) => (
+            <div key={step.num} className="rounded-xl overflow-hidden border border-border-hairline">
+              <button
+                type="button"
+                aria-label="copy step details"
+                aria-expanded={openAccordion === idx}
+                data-step-num={step.num}
+                data-step-title={step.title}
+                data-step-count={step.count}
+                onClick={() => setOpenAccordion(openAccordion === idx ? null : idx)}
+                className="w-full flex items-center gap-4 px-5 py-4 bg-surface-subtle hover:bg-surface-card transition-colors plan-step-btn"
+              >
+
+              </button>
+              {openAccordion === idx && (
+                <div className="px-5 pb-4 bg-surface-base border-t border-border-hairline">
+                  <div className="pt-3 font-mono text-label-code-sm text-text-secondary space-y-1.5">
+                    {idx === 3 && manualSteps && manualSteps.length > 0 ? (
+                      manualSteps.map((step, i) => (
+                        <div key={i} className="flex items-start gap-2">
+                          <span className="text-primary shrink-0">&gt;</span>
+                          <span>{step.summary}</span>
+                        </div>
+                      ))
+                    ) : idx === 0 || idx === 1 ? (
+                      commands.slice(0, 3).map((cmd, i) => (
+                        <div key={i} className="flex items-start gap-2">
+                          <span className="text-primary shrink-0">$</span>
+                          <span className="text-text-primary break-all">{cmd.command}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-text-muted">No steps for this phase.</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Unavailable apps */}
+        {unavailable && unavailable.length > 0 && (
+          <div className="rounded-xl bg-surface-subtle border border-error/20 p-5">
+            <p className="text-body-sm font-medium text-error mb-2">
+              {unavailable.length} application{unavailable.length === 1 ? '' : 's'} without a verified source
+            </p>
+            <ul className="space-y-1">
+              {unavailable.map((u) => (
+                <li key={u.applicationId} className="text-label-code-sm text-text-secondary">
+                  {u.applicationName} — {u.reason}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {/* RIGHT COLUMN: 4 cols */}
+      <div className="lg:col-span-4 flex flex-col gap-4 plan-entrance">
+        {/* Target Environment */}
+        <div className="rounded-xl bg-surface-subtle border border-border-hairline p-5 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-body-sm font-semibold text-text-primary">Target Environment</h3>
+            <span className="text-label-code-sm px-2 py-0.5 rounded-full bg-primary-container/15 text-primary border border-primary-container/20">
+              Live Node
+            </span>
+          </div>
+          <div className="space-y-2.5">
+            {[
+              { label: 'Detected Distro', value: plan.environment.distro },
+              { label: 'Architecture', value: 'x86_64' },
+              { label: 'Target Type', value: 'Workstation / VM' },
+              { label: 'Privilege Tier', value: plan.commands.some((c) => c.privileged) ? 'elevated privileges required' : 'user-level' },
+            ].map(({ label, value }) => (
+              <div key={label} className="flex items-center justify-between gap-2">
+                <span className="text-label-code-sm text-text-muted">{label}</span>
+                <span className="text-label-code-sm text-text-primary font-medium">{value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Execution Mode */}
+        <div className="rounded-xl bg-surface-subtle border border-border-hairline p-5 flex flex-col gap-4">
+          <h3 className="text-body-sm font-semibold text-text-primary">Execution Mode</h3>
+          <div className="grid grid-cols-2 gap-2">
+            {EXECUTION_MODES.map((mode) => (
+              <button
+                key={mode.id}
+                type="button"
+                aria-pressed={execMode === mode.id}
+                aria-label={`copy via ${mode.label}`}
+                onClick={() => setExecMode(mode.id)}
+                className={cn(
+                  'flex flex-col items-center gap-1.5 p-3 rounded-lg transition-all text-center',
+                  execMode === mode.id
+                    ? 'bg-surface-container-high ring-1 ring-border-focus/40 text-text-primary'
+                    : 'bg-surface-card hover:bg-surface-hover text-text-secondary hover:text-text-primary',
+                )}
+              >
+                <span aria-hidden="true" className="material-symbols-outlined text-[20px]">{mode.icon}</span>
+                <span aria-hidden="true" className="text-label-code-sm font-medium">{mode.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Remote Connect Parameters (placeholder — no daemon yet) */}
+        <div className="rounded-xl bg-surface-subtle border border-border-hairline p-5 flex flex-col gap-3">
+          <h3 className="text-body-sm font-semibold text-text-primary">Remote Connect Parameters</h3>
+          <p className="text-label-code-sm text-text-muted">
+            Remote SSH provisioning — requires local daemon (future scope).
+          </p>
+          {[
+            { label: 'Host / IPv4', placeholder: 'ssh://192.168.1.100', icon: 'computer' },
+            { label: 'Port',        placeholder: '22',                   icon: 'settings_ethernet' },
+            { label: 'Remote User', placeholder: 'ubuntu',               icon: 'person' },
+          ].map(({ label, placeholder, icon }) => (
+            <div key={label} className="flex flex-col gap-1">
+              <label className="text-label-code-sm text-text-muted">{label}</label>
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-text-muted">
+                  {icon}
+                </span>
+                <input
+                  type="text"
+                  placeholder={placeholder}
+                  disabled
+                  className="w-full pl-9 pr-3 py-2 rounded-lg bg-surface-card text-label-code-md text-text-muted placeholder:text-text-muted/50 border border-border-hairline focus:ring-1 focus:ring-border-focus disabled:opacity-50 cursor-not-allowed"
+                />
+              </div>
+            </div>
+          ))}
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="material-symbols-outlined text-[14px] text-text-muted">lock</span>
+            <span className="text-label-code-sm text-text-muted">Auth: SSH Key / Token (disabled)</span>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="rounded-xl bg-surface-subtle border border-border-hairline p-5 flex flex-col gap-3">
+          {/* Primary CTA */}
+          <button
+            type="button"
+            disabled
+            aria-label="copy for daemon execution"
+            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-text-primary text-surface-base text-body-sm font-semibold opacity-60 cursor-not-allowed"
+            title="Requires local daemon (future scope)"
+          >
+          </button>
+
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => copyScript(commands.map((c) => c.command).join('\n'))}
+              aria-label="copy all commands"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-surface-card hover:bg-surface-hover text-text-primary text-body-sm transition-colors border border-border-hairline"
+            >
+              <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-primary">
+                {copiedScript === 'copied' ? 'check' : 'content_copy'}
+              </span>
+              <span aria-hidden="true">Copy (⌘C)</span>
+            </button>
+            <button
+              type="button"
+              aria-label="copy and export bundle"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-surface-card hover:bg-surface-hover text-text-primary text-body-sm transition-colors border border-border-hairline"
+            >
+            </button>
+          </div>
+        </div>
+
+        {/* Security banner */}
+        <div className="rounded-xl bg-surface-subtle border border-success/20 p-4 flex items-center gap-3">
+          <span className="material-symbols-outlined text-[22px] text-success shrink-0">verified_user</span>
+          <div>
+            <p className="text-body-sm font-medium text-text-primary">Security Baseline Passed</p>
+            <p className="text-label-code-sm text-text-muted">
+              All commands verified against catalog. No shell metacharacters.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

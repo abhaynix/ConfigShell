@@ -34,6 +34,9 @@ tmp/
 .env.production.local
 # Keep the checked-in template (matched by .env.* above, so re-include it)
 
+# AI tooling configs (may contain API keys)
+opencode.json
+
 # -----------------------------------------------------------------------------
 # Logs
 # -----------------------------------------------------------------------------
