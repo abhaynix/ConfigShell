@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "test": "tsx --test src/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "clean": "rm -rf dist",
+    "format": "prettier --write ."
   },
   "license": "Apache-2.0",
   "devDependencies": {

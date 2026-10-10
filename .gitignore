@@ -93,3 +93,6 @@ yarn.lock
 # Local media and downloadable skill archives.
 /brag-output/
 /*.skill.zip
+
+# Turborepo local cache
+.turbo

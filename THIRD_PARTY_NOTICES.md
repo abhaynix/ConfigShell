@@ -124,3 +124,8 @@ packages. The only non-permissive licenses present are **OFL-1.1** (the Geist fo
 above) and **MPL-2.0** (`lightningcss`, pulled in by Tailwind as a build tool — file-level
 copyleft that imposes no obligation on this project's own source, since the package is used
 unmodified and is not redistributed).
+
+## Development tooling added for the monorepo
+
+- **Turborepo (`turbo`)** — MIT License. Copyright Vercel, Inc. Used to orchestrate existing workspace tasks. Source: <https://github.com/vercel/turbo>.
+- **Prettier** — MIT License. Used by the opt-in workspace `format` scripts. Source: <https://github.com/prettier/prettier>.

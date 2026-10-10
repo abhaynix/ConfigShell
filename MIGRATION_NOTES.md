@@ -24,3 +24,9 @@
 - Existing docs disagree with manifests about pnpm version, counts, commands and whether root `pnpm dev` starts both apps. Workspace manifests and CI are treated as executable truth; docs will be reconciled without changing product behavior.
 - Source-only workspaces intentionally have no emitted build artifacts. Turbo tasks will preserve those packages' no-build behavior rather than add placeholder outputs.
 - The local `opencode.json` was ignored and may contain private tool settings; its contents were not read. A backup was retained at `/home/devx/.codex/backups/configshell/opencode.json.2026-10-10` before removing the checkout copy.
+
+## Phase 3: Turbo task mapping
+
+- Added Turbo and Prettier without changing existing dependency versions.
+- Apps run their real `dev` and `build` tasks. All workspaces expose real lint, typecheck, test, clean, and format commands; Turbo skips tasks a workspace does not implement.
+- `catalog`, `installer`, `mcp`, `testing`, and `tests/contract` are source/test workspaces: they do not have a standalone dev server or emitted build artifacts. Giving them placeholder `dev` or `build` scripts would create misleading commands and change package output behavior, so those tasks remain app-specific.
