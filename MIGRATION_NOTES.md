@@ -36,3 +36,11 @@
 
 - Each completed phase ran install, typecheck, lint, test, and build. Phase 5 performs the final frozen-lockfile, runtime, MCP, Docker, and Markdown-link checks.
 - The pre-existing Vite bundle-size warning remains: the main JavaScript chunk is about 510 KB before gzip.
+
+## Phase 5 verification
+
+- `pnpm install --no-frozen-lockfile` succeeded; this pnpm CLI rejects the equivalent `--frozen-lockfile=false` spelling.
+- `pnpm check` completed successfully: 22 Turbo tasks passed. The targeted MCP suite passed all 57 tests, including the stdio/HTTP parity check.
+- Started the production server on port 3137. `/health` returned 200 with valid catalog integrity and `/` served the built web app.
+- `docker compose -f infra/docker/compose.yml config` succeeded and resolved the repository-root build context. Docker image build/boot could not run because the host has no reachable Docker daemon; Docker CLI, but not Podman or Buildah, is installed.
+- Asset sync and generated-copy comparisons succeeded. The local Markdown link scan found zero broken links.
