@@ -44,6 +44,6 @@ week is fine and welcome; it is not nagging.
 
 - Installing software on your machine. **Nothing in this project installs anything yet**,
   by design — see [`ROADMAP.md`](ROADMAP.md).
-- Distributions other than Ubuntu, Debian, Fedora, and Arch Linux. Support for others is a
+- Distributions other than Ubuntu, Fedora, Arch Linux, and openSUSE. Support for others is a
   contribution, not a request queue.
 - Deployment, hosting, or production use. Nothing here is production-ready.

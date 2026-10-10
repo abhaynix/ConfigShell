@@ -69,6 +69,7 @@ test('parseEnvironment ignores a caller-supplied ecosystem', () => {
 test('parseEnvironment rejects unknown values rather than coercing them', () => {
   for (const input of [
     { distro: 'Gentoo' },
+    { distro: 'Debian' },
     { distro: 'ubuntu' }, // case-sensitive on purpose
     { distro: 'Ubuntu', os: 'windows' },
     { distro: 'Ubuntu', architecture: 'riscv64' },
@@ -103,12 +104,11 @@ test('every distribution maps to exactly one family', () => {
       `${distro} -> ${environment.family}`,
     );
   }
-  assert.equal(createEnvironment('Ubuntu').family, createEnvironment('Debian').family);
   assert.notEqual(createEnvironment('Ubuntu').family, createEnvironment('Fedora').family);
 });
 
 test('type guards accept only catalog values', () => {
-  assert.ok(isDistro('Debian'));
+  assert.ok(!isDistro('Debian'));
   assert.ok(!isDistro('debian'));
   assert.ok(!isDistro(undefined));
   assert.ok(isArchitecture('x86_64'));

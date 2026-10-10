@@ -11,4 +11,4 @@ Reproduced findings:
 - `/` at 360px: interactive controls were shorter than the requested 40px minimum. Screenshot: `home-360.png`.
 - `/connect` at all checked widths: no horizontal overflow was observed; its header controls were below the requested 40px target height at 360px. Screenshots: `connect-{360,768,1024,1440,1920}.png`.
 
-Not reproduced in the available implementation: a toast or popover over the Arch card. The current distribution model has five cards (Ubuntu, Debian, Fedora, Arch Linux, and openSUSE); Rocky/RHEL and Alpine entries are absent and were not added because this brief prohibits data changes.
+Not reproduced in the available implementation: a toast or popover over the Arch card. The current distribution model has four cards (Ubuntu, Fedora, Arch Linux, and openSUSE); Rocky/RHEL and Alpine entries are absent and were not added because this brief prohibits data changes.

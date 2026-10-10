@@ -53,12 +53,12 @@ export function OsSelector() {
                   <Check className="size-2.5" />
                 </span>
               ) : (
-                <Badge variant="secondary" className="h-4 px-1 text-[9px] shrink-0 font-normal">
+                <Badge variant="secondary" className="h-4 px-1 text-xs shrink-0 font-normal">
                   Planned
                 </Badge>
               )}
             </div>
-            <span className="block truncate text-[10px] text-muted-foreground">{os.note}</span>
+            <span className="block truncate text-xs text-muted-foreground">{os.note}</span>
           </div>
         ))}
       </div>

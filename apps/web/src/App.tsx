@@ -4,7 +4,8 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AppCatalog } from '@/components/applications/AppCatalog';
+import { CatalogRegion } from '@/components/applications/CatalogRegion';
+import { PageContainer } from '@/components/layout/PageContainer';
 import { ConnectView } from '@/components/connect/ConnectView';
 import { AppDetailSheet } from '@/components/applications/AppDetailSheet';
 import { EnvironmentStep } from '@/components/environment/EnvironmentStep';
@@ -16,20 +17,10 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { useSetupPlan } from '@/hooks/useSetupPlan';
 import type { Application, Distro, Role } from '@configshell/catalog';
 import { gsap, useGSAP, shouldSkipEntrance, MOTION_EASINGS } from '@/lib/motion';
-import { AmbientGlow } from '@/components/layout/AmbientGlow';
 import { StepperBar } from '@/components/layout/StepperBar';
 
-/**
- * The deterministic ConfigShell flow — now mapped to 6-route ChaiCode nav.
- *
- * view 'build' = screens for 'app-catalog', 'os-and-distro', 'role-matrix'
- * view 'plan'  = screen for 'plan-and-generate'
- * view 'connect' = '/connect' path for 'cli-detection'
- * view 'docs'  = placeholder for 'docs'
- *
- * Selection state lives here — single source of truth for all views.
- */
-export type NavRoute = 'app-catalog' | 'os-and-distro' | 'role-matrix' | 'plan-and-generate' | 'cli-detection' | 'docs';
+/** Selection state lives here — one source of truth for the app views. */
+export type NavRoute = 'app-catalog' | 'os-and-distro' | 'role-matrix' | 'plan-and-generate' | 'cli-detection';
 type View = 'build' | 'plan' | 'connect';
 
 /**
@@ -63,7 +54,6 @@ export default function App() {
       : 'app-catalog',
   );
   const [distro, setDistro] = useState<Distro | null>(null);
-  const [distroVersion, setDistroVersion] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [appliedRoleId, setAppliedRoleId] = useState<string | null>(null);
   const [detailApp, setDetailApp] = useState<Application | null>(null);
@@ -117,11 +107,6 @@ export default function App() {
     if (route === 'cli-detection') {
       window.history.pushState({}, '', CONNECT_PATH);
       setView('connect');
-      return;
-    }
-
-    if (route === 'docs') {
-      setActiveRoute(route);
       return;
     }
 
@@ -310,43 +295,25 @@ export default function App() {
       >
         <main
           ref={mainRef}
-          className="flex-1 pt-16 bg-surface-base min-h-screen"
-          style={view === 'build' ? { paddingBottom: 'calc(var(--stepper-height, 0px) + 24px)' } : undefined}
+          className="flex-1 bg-surface-base min-h-dvh"
         >
           {view === 'build' ? (
-            <div className="flex flex-col w-full relative">
-              <AmbientGlow />
-              <div className="max-w-7xl mx-auto w-full px-4 md:px-6 py-10 flex flex-col gap-16 relative z-10">
-                {/* SCREEN 3: OS & Distro + Role Matrix */}
-                <div ref={osSectionRef} className="motion-entrance-env flex flex-col gap-10">
-                  <EnvironmentStep
-                    distro={distro}
-                    distroVersion={distroVersion}
-                    onSelect={setDistro}
-                    onSelectVersion={setDistroVersion}
-                  />
-                  <div ref={roleSectionRef} className="motion-entrance-roles">
-                    <RoleSelector
-                      appliedRoleId={appliedRoleId}
-                      onApply={applyRole}
-                      onClear={clearAll}
-                    />
-                  </div>
+            <div className="relative w-full">
+              <PageContainer className="page-content flex flex-col">
+                <div ref={osSectionRef} className="motion-entrance-env">
+                  <EnvironmentStep distro={distro} onSelect={setDistro} />
                 </div>
-
-                {/* SCREEN 1: App Catalog */}
+                <div ref={roleSectionRef} className="motion-entrance-roles">
+                  <RoleSelector appliedRoleId={appliedRoleId} onApply={applyRole} onClear={clearAll} />
+                </div>
                 <div ref={catalogSectionRef} className="motion-entrance-catalog">
-                  <AppCatalog
+                  <CatalogRegion
                     selectedIds={selectedIds}
-                    distro={distro}
                     onToggle={toggleApp}
                     onOpenDetails={setDetailApp}
-                    onContinue={buildPlan}
-                    canContinue={canContinue}
-                    blockedReason={blockedReason}
                   />
                 </div>
-              </div>
+              </PageContainer>
             </div>
           ) : (
             <div ref={planHeadingRef} tabIndex={-1} className="outline-none">
@@ -364,14 +331,10 @@ export default function App() {
           )}
         </main>
 
-        {/* Sticky bottom stepper bar (build view only) */}
+        {/* Selection summary and plan action (build view only) */}
         {view === 'build' && (
           <StepperBar
-            distro={distro}
-            distroVersion={distroVersion}
-            appliedRoleId={appliedRoleId}
             selectedCount={selectedIds.size}
-            selectedIds={selectedIds}
             canContinue={canContinue}
             blockedReason={blockedReason}
             onContinue={buildPlan}

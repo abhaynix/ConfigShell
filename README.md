@@ -195,7 +195,7 @@ Website → Linux detection state → Distribution selection → Application cat
 | Piece | Status |
 | ----- | ------ |
 | Linux application discovery (UI + verified catalog) | **implemented** |
-| Manual distribution selection (Ubuntu / Debian / Fedora / Arch / openSUSE) | **implemented** |
+| Manual distribution selection (Ubuntu / Fedora / Arch / openSUSE) | **implemented** |
 | Browser-only "looks like Linux" detection | **implemented** |
 | Search | **implemented** |
 | Category filtering | **implemented** |

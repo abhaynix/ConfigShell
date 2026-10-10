@@ -12,6 +12,20 @@ version is below `1.0.0`, the public surface may change in a minor release — s
 
 ## [Unreleased]
 
+### Changed
+
+- **Removed catalog clutter**: repeated distro availability copy, redundant package source/result badges, duplicate counts, repeated Details actions and helper copy, simulated telemetry, unused status and theme components, and ambient effects. Package cards now open details across the card and keep one add/remove action; presets show at most three tags. The selection summary is no longer sticky, so it cannot cover the page.
+- **Removed Debian as a supported distribution.** The catalog, planner, API and UI now accept only Ubuntu, Fedora, Arch Linux and openSUSE.
+- **Added local full-colour logos** for 92 catalog applications and the four supported distributions. The remaining 68 application entries use category-coloured initials because no suitable logo was included. `LOGOS.md` records sources and license notes; logos remain the property of their respective owners.
+- **Expanded the linux-catalog skill package** with the local logo assets and `references/LOGOS.md`.
+
+- **Redesigned the web catalog flow** with a shared responsive layout, section headings, design tokens, consistent catalog cards, working search/category/sort/view controls, skeleton loading, explicit empty and retryable error states, and truthful copy. Removed simulated system telemetry and unsupported automation, execution, readiness and cluster claims. Local system detection is labeled as coming soon.
+- **Rebuilt navigation for keyboard and small-screen use.** The header is 56px on mobile and 64px on desktop, links remain visible from tablet upward, and the mobile drawer traps focus, closes with Escape, restores focus and locks page scrolling. Touch targets are at least 44px.
+- **Removed the Material Symbols font dependency** and use the existing Lucide icons.
+- **Added a valid `robots.txt`** so production static hosting does not return the SPA document to crawler requests for that path.
+- **Added the `linux-catalog` beginner skill package** with repository-backed setup, development, build and run instructions, scripts, design tokens, references and an installable zip. It describes the planner accurately and does not claim to install or provision software.
+
+
 ### Added
 
 - **A `/connect` page on the site**, linked from the header as "Connect AI". It shows this

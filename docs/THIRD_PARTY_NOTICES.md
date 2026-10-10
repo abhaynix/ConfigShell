@@ -25,7 +25,6 @@ These end up in `apps/web/dist` and are therefore distributed to users of a depl
 | `tw-animate-css` | MIT | animation utilities imported by `src/index.css` |
 | `shadcn` | MIT | `shadcn/tailwind.css` is imported by `src/index.css` |
 | `@fontsource-variable/geist` | **OFL-1.1** | see "Fonts" below |
-| `@fontsource-variable/material-symbols-outlined` | **OFL-1.1** | self-hosted icon font; see "Fonts" below |
 | `express` | MIT | the API server in `apps/server`; also serves the built web app |
 | `@modelcontextprotocol/server` | MIT | the official MCP TypeScript SDK (v2), used by `packages/mcp` |
 | `@modelcontextprotocol/node` | MIT | the official MCP TypeScript SDK (v2), used by `packages/mcp` |
@@ -74,11 +73,6 @@ the font files. The `.woff2` files are emitted into `apps/web/dist/assets/` by t
 **any deployment of this project distributes them**, and this notice must travel with it.
 The full license text ships inside the package at
 `node_modules/@fontsource-variable/geist/LICENSE`.
-
-**Material Symbols Outlined Variable**, via `@fontsource-variable/material-symbols-outlined`,
-is licensed under the [SIL Open Font License 1.1](https://openfontlicense.org). Its license
-and copyright notice ship inside the package at
-`node_modules/@fontsource-variable/material-symbols-outlined/LICENSE`.
 
 ## Icons
 

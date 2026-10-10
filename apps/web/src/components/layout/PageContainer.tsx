@@ -28,8 +28,8 @@ export function PageContainer({ children, className, as: Component = 'div', ref 
   return (
     <Component
       ref={ref}
-      className={cn('mx-auto w-full', className)}
-      style={{ maxWidth: 'var(--layout-max-width)', paddingInline: 'var(--layout-gutter)' }}
+      className={cn('page-container mx-auto w-full', className)}
+      style={{ maxWidth: 'var(--layout-max-width)' }}
     >
       {children}
     </Component>

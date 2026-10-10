@@ -23,7 +23,7 @@ future integration layer and is *not* blocked on AI — see [`mcp.md`](mcp.md).
 ### Phase 1 — web foundation
 - Vite + React 19 + TypeScript + Tailwind v4 + shadcn/ui (Radix base) application.
 - Browser-only "does this look like Linux" indicator (never claims a distribution).
-- Manual distribution selection: Ubuntu, Debian, Fedora, Arch Linux.
+- Manual distribution selection: Ubuntu, Fedora, Arch Linux, and openSUSE.
 - Application browser with search and category filtering.
 - Multi-select with a selection summary (desktop sidebar, mobile sheet + sticky bar).
 - Dark/light theme, dark by default, persisted to `localStorage`.

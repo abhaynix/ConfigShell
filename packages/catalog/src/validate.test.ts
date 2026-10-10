@@ -83,7 +83,7 @@ test('rejects the same identifier twice under one method', () => {
     app({
       installation: [
         { method: 'apt', identifier: 'foo', distros: ['Ubuntu'], origin: 'distro' },
-        { method: 'apt', identifier: 'foo', distros: ['Debian'], origin: 'vendor' },
+        { method: 'apt', identifier: 'foo', distros: ['Ubuntu'], origin: 'vendor' },
       ],
     }),
   ]);
@@ -94,8 +94,8 @@ test('allows one method to have several distinct sources', () => {
   const errors = validateCatalog([
     app({
       installation: [
-        { method: 'apt', identifier: 'foo-ce', distros: ['Ubuntu', 'Debian'], origin: 'vendor' },
-        { method: 'apt', identifier: 'foo.io', distros: ['Ubuntu', 'Debian'], origin: 'distro' },
+        { method: 'apt', identifier: 'foo-ce', distros: ['Ubuntu'], origin: 'vendor' },
+        { method: 'apt', identifier: 'foo.io', distros: ['Ubuntu'], origin: 'distro' },
       ],
     }),
   ]);
@@ -160,7 +160,7 @@ test('accepts a well-formed entry', () => {
   const errors = validateCatalog([
     app({
       installation: [
-        { method: 'apt', identifier: 'foo', distros: ['Ubuntu', 'Debian'], origin: 'distro' },
+        { method: 'apt', identifier: 'foo', distros: ['Ubuntu'], origin: 'distro' },
         { method: 'flatpak', identifier: 'com.example.Foo', origin: 'community' },
         {
           method: 'official',
@@ -176,7 +176,7 @@ test('accepts a well-formed entry', () => {
 
 test('distro-specific sources only claim distros that use that package manager', () => {
   const expected: Record<string, readonly string[]> = {
-    apt: ['Ubuntu', 'Debian'],
+    apt: ['Ubuntu'],
     dnf: ['Fedora'],
     pacman: ['Arch Linux'],
   };
@@ -315,4 +315,3 @@ test('validateCatalog validates featured and popularity', () => {
   const nanPop = validateCatalog([app({ popularity: Number.NaN })]);
   assert.ok(nanPop.some((e) => e.includes('popularity must be a number between 0 and 100')));
 });
-

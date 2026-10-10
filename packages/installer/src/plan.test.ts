@@ -9,6 +9,7 @@ import type { InstallStep, SetupPlan } from './types.ts';
 const UBUNTU = createEnvironment('Ubuntu');
 const FEDORA = createEnvironment('Fedora');
 const ARCH = createEnvironment('Arch Linux');
+const OPENSUSE = createEnvironment('openSUSE');
 
 function app(id: string): Application {
   const entry = findApplication(id);
@@ -142,7 +143,7 @@ test('the plan is deterministic for a given selection and environment', () => {
 });
 
 test('the whole catalog plans cleanly on every distribution', () => {
-  for (const environment of [UBUNTU, createEnvironment('Debian'), FEDORA, ARCH]) {
+  for (const environment of [UBUNTU, FEDORA, ARCH, OPENSUSE]) {
     const p = buildPlan(resolveAll(APPLICATIONS, environment), environment);
     const accounted =
       p.steps

@@ -278,7 +278,7 @@ function HowToConnect() {
                   <li key={step}>{step}</li>
                 ))}
               </ol>
-              <p className="mt-2.5 text-[11px] leading-relaxed text-muted-foreground/80">
+              <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">
                 {host.note}
               </p>
             </CardContent>
@@ -342,7 +342,7 @@ function WhatItCanDo({ connection }: { connection: McpConnection }) {
         {connection.tools.map((tool) => (
           <li key={tool.name} className="rounded-lg border border-border bg-card p-3">
             <p className="text-sm font-medium">{tool.title}</p>
-            <code className="mt-0.5 block font-mono text-[11px] text-muted-foreground">
+            <code className="mt-0.5 block font-mono text-xs text-muted-foreground">
               {tool.name}
             </code>
           </li>
@@ -363,7 +363,7 @@ function WhatItCanDo({ connection }: { connection: McpConnection }) {
                 key={capability.name}
                 className="flex flex-col gap-1 rounded-lg border border-dashed border-border p-3 sm:flex-row sm:items-baseline sm:gap-3"
               >
-                <Badge variant="outline" className="w-fit shrink-0 font-mono text-[11px]">
+                <Badge variant="outline" className="w-fit shrink-0 font-mono text-xs">
                   {capability.name}
                 </Badge>
                 <span className="text-xs text-muted-foreground">{capability.reason}</span>

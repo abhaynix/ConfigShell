@@ -9,15 +9,12 @@ import {
   Video,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
-import type { Category } from '@configshell/catalog';
+import type { Category, CategoryId } from '@configshell/catalog';
 
 /**
  * One icon per catalog category, in one place.
  *
- * Safe, generic placeholders — never a vendor logo. The catalog card, the
- * category filter chips and the selection list all read this map, so an
- * application is recognisable by the same mark wherever it appears and a new
- * category is a one-line change here rather than three.
+ * One semantic icon and accent mapping shared by chips, presets and package cards.
  */
 export const CATEGORY_ICON: Record<Category, ComponentType<{ className?: string }>> = {
   General: Laptop,
@@ -28,4 +25,26 @@ export const CATEGORY_ICON: Record<Category, ComponentType<{ className?: string 
   'Data & AI': Brain,
   'Content Creator': Video,
   Gaming: Gamepad2,
+};
+
+export const CATEGORY_ID: Record<Category, CategoryId> = {
+  General: 'general',
+  Student: 'student',
+  Developer: 'developer',
+  'Web Developer': 'web-developer',
+  DevOps: 'devops',
+  'Data & AI': 'data-ai',
+  'Content Creator': 'content-creator',
+  Gaming: 'gaming',
+};
+
+export const CATEGORY_NAME: Record<CategoryId, Category> = {
+  general: 'General',
+  student: 'Student',
+  developer: 'Developer',
+  'web-developer': 'Web Developer',
+  devops: 'DevOps',
+  'data-ai': 'Data & AI',
+  'content-creator': 'Content Creator',
+  gaming: 'Gaming',
 };

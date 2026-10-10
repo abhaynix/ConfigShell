@@ -112,9 +112,9 @@ Every application belongs to exactly one. No new categories were added.
 
 ## Supported distributions
 
-**Ubuntu**, **Debian**, **Fedora**, **Arch Linux**. The `Distro` union lives in this
-package and `apps/web/src/components/environment/distros.ts` imports it, so the selector
-in the UI cannot drift from what catalog entries can declare support for.
+**Ubuntu**, **Fedora**, **Arch Linux**, and **openSUSE**. The `Distro` union and selector
+options both come from this package, so the UI cannot drift from the distributions catalog
+entries can declare support for.
 
 ## Version policy
 
@@ -159,8 +159,7 @@ from one fixed template — `command -v <binary>` — and nothing else.
 Two rules:
 
 1. **The same "verified or omitted" discipline as identifiers.** If the binary name differs
-   between distributions, omit it. `chromium` is the worked example: Debian and Ubuntu ship
-   `chromium`, Fedora ships `chromium-browser`, so the entry carries no `verify` at all.
+   between supported distributions, omit it.
 2. **Omit it when there is no route that puts a binary on `PATH`.** Flatpak applications are
    launched with `flatpak run <id>`, and vendor downloads vary. A test enforces this: an
    entry whose only sources are `flatpak` or `official` must not claim a binary.
@@ -232,7 +231,7 @@ identifier.
 | Communication | 5    |     |           |         |     |             |         |
 
 Native package-manager coverage (i.e. excluding Flatpak/Snap/official): 25/31 on Ubuntu,
-25/31 on Debian, 22/31 on Fedora, 23/31 on Arch Linux.
+22/31 on Fedora, 23/31 on Arch Linux.
 
 The list is intentionally small. 31 verified entries are worth more than hundreds of
 half-checked ones, and every future addition carries the same verification cost.
@@ -261,7 +260,7 @@ Budget most of the effort for verification, not for typing.
      category: 'Utilities',
      homepage: 'https://example.com/',
      installation: [
-       { method: 'apt', identifier: 'example-app', origin: 'distro', distros: ['Ubuntu', 'Debian'] },
+       { method: 'apt', identifier: 'example-app', origin: 'distro', distros: ['Ubuntu'] },
        { method: 'flatpak', identifier: 'com.example.App', origin: 'vendor' },
      ],
    },

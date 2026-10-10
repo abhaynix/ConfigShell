@@ -25,19 +25,10 @@ export const APPLICATIONS: readonly Application[] = [
     "installation": [
       {
         "method": "apt",
-        "identifier": "firefox-esr",
-        "origin": "distro",
-        "distros": [
-          "Debian"
-        ]
-      },
-      {
-        "method": "apt",
         "identifier": "firefox",
         "origin": "vendor",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ],
         "url": "https://support.mozilla.org/kb/install-firefox-linux"
       },
@@ -86,8 +77,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "google-chrome-stable",
         "origin": "vendor",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -121,8 +111,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "brave-browser",
         "origin": "vendor",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ],
         "url": "https://brave.com/linux/"
       },
@@ -158,14 +147,6 @@ export const APPLICATIONS: readonly Application[] = [
     "homepage": "https://www.chromium.org/chromium-projects/",
     "popularity": 85,
     "installation": [
-      {
-        "method": "apt",
-        "identifier": "chromium",
-        "origin": "distro",
-        "distros": [
-          "Debian"
-        ]
-      },
       {
         "method": "dnf",
         "identifier": "chromium",
@@ -208,8 +189,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "code",
         "origin": "vendor",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ],
         "url": "https://code.visualstudio.com/docs/setup/linux"
       },
@@ -298,8 +278,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "sublime-text",
         "origin": "vendor",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ],
         "url": "https://www.sublimetext.com/docs/linux_repositories.html"
       },
@@ -341,8 +320,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "git",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -380,8 +358,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "docker-ce",
         "origin": "vendor",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ],
         "url": "https://docs.docker.com/engine/install/"
       },
@@ -390,8 +367,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "docker.io",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -435,8 +411,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "nodejs",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -479,8 +454,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "curl",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -518,8 +492,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "htop",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -557,8 +530,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "neovim",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -605,8 +577,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "insomnia",
         "origin": "vendor",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ],
         "url": "https://docs.insomnia.rest/insomnia/install"
       },
@@ -639,8 +610,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "dbeaver-ce",
         "origin": "vendor",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ],
         "url": "https://dbeaver.io/download/"
       },
@@ -702,8 +672,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "gh",
         "origin": "vendor",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ],
         "url": "https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
       },
@@ -741,8 +710,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "gnome-tweaks",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -780,8 +748,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "flameshot",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -829,8 +796,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "timeshift",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -868,8 +834,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "gparted",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -907,8 +872,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "vlc",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -990,8 +954,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "audacity",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -1039,8 +1002,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "gimp",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -1088,8 +1050,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "slack-desktop",
         "origin": "vendor",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ],
         "url": "https://slack.com/downloads/linux"
       },
@@ -1162,8 +1123,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "telegram-desktop",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -1202,8 +1162,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "thunderbird",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -1277,8 +1236,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "vivaldi-stable",
         "origin": "vendor",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ],
         "url": "https://vivaldi.com/download/"
       },
@@ -1334,8 +1292,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "torbrowser-launcher",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -1377,8 +1334,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "microsoft-edge-stable",
         "origin": "vendor",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ],
         "url": "https://www.microsoft.com/edge/download"
       },
@@ -1437,8 +1393,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "epiphany-browser",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -1542,8 +1497,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "emacs",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -1590,8 +1544,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "vim",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -1628,8 +1581,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "geany",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -1671,8 +1623,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "kate",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -1719,8 +1670,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "micro",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -1831,8 +1781,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "codeblocks",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -1874,8 +1823,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "nano",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -1938,8 +1886,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "tmux",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -1976,8 +1923,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "btop",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2019,8 +1965,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "ripgrep",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2062,8 +2007,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "fd-find",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2097,8 +2041,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "fzf",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2135,8 +2078,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "bat",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2199,8 +2141,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "jq",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2263,8 +2204,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "wget",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2301,8 +2241,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "aria2",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2339,8 +2278,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "ncdu",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2377,8 +2315,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "tree",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2415,8 +2352,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "zsh",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2453,8 +2389,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "fish",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2525,8 +2460,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "fastfetch",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2563,8 +2497,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "neofetch",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2630,8 +2563,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "ranger",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2739,8 +2671,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "tldr",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2777,8 +2708,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "glances",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2820,8 +2750,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "hyperfine",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2858,8 +2787,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "python3",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2896,8 +2824,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "golang-go",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2939,8 +2866,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "rustc",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -2982,8 +2908,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "gcc",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3020,8 +2945,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "clang",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3058,8 +2982,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "cmake",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3101,8 +3024,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "ninja-build",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3181,8 +3103,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "default-jdk",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3219,8 +3140,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "ruby-full",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3262,8 +3182,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "php",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3300,8 +3219,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "podman",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3437,8 +3355,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "ansible",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3475,8 +3392,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "valgrind",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3513,8 +3429,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "sqlitebrowser",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3669,8 +3584,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "libreoffice",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3807,8 +3721,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "bleachbit",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3845,8 +3758,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "stacer",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3883,8 +3795,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "baobab",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3926,8 +3837,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "filelight",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -3969,8 +3879,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "gnome-disk-utility",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4007,8 +3916,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "okular",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4050,8 +3958,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "evince",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4093,8 +4000,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "keepassxc",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4164,8 +4070,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "remmina",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4227,8 +4132,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "p7zip-full",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4265,8 +4169,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "syncthing",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4303,8 +4206,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "redshift-gtk",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4341,8 +4243,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "rclone",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4379,8 +4280,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "virt-manager",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4417,8 +4317,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "xournalpp",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4487,8 +4386,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "copyq",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4530,8 +4428,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "blender",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4578,8 +4475,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "kdenlive",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4621,8 +4517,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "inkscape",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4669,8 +4564,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "krita",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4748,8 +4642,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "handbrake",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4788,8 +4681,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "ffmpeg",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4823,8 +4715,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "darktable",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4866,8 +4757,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "rawtherapee",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4909,8 +4799,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "mpv",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4952,8 +4841,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "strawberry",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -4995,8 +4883,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "rhythmbox",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -5038,8 +4925,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "simplescreenrecorder",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -5076,8 +4962,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "imagemagick",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -5114,8 +4999,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "peek",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -5183,8 +5067,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "lmms",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -5226,8 +5109,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "signal-desktop",
         "origin": "vendor",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ],
         "url": "https://signal.org/download/linux/"
       },
@@ -5267,8 +5149,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "element-desktop",
         "origin": "vendor",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ],
         "url": "https://element.io/download"
       },
@@ -5329,8 +5210,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "hexchat",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -5372,8 +5252,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "weechat",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -5410,8 +5289,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "irssi",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -5453,8 +5331,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "mumble",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -5661,8 +5538,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "steam-installer",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -5716,8 +5592,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "lutris",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {
@@ -5780,8 +5655,7 @@ export const APPLICATIONS: readonly Application[] = [
         "identifier": "mangohud",
         "origin": "distro",
         "distros": [
-          "Ubuntu",
-          "Debian"
+          "Ubuntu"
         ]
       },
       {

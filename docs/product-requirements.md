@@ -169,7 +169,7 @@ Initial package ecosystems:
 
 | Ecosystem       | Package Manager | Status |
 | --------------- | --------------- | ------ |
-| Debian family   | APT             | in scope — verified (Ubuntu, Debian) |
+| Ubuntu family   | APT             | in scope — verified (Ubuntu) |
 | Fedora family   | DNF             | in scope — verified (Fedora) |
 | Arch family     | Pacman          | in scope — verified (Arch Linux) |
 | openSUSE family | Zypper          | **in scope** — ecosystem implemented; catalog coverage partial |
@@ -1446,4 +1446,3 @@ with:
 **Future = CLI/agent/cross-platform**
 
 That will give you a precise implementation backlog instead of rebuilding parts of ConfigShell that you've already created.
-

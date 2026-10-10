@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { SiteHeader } from './SiteHeader';
+import { SiteFooter } from './SiteFooter';
 import type { NavRoute } from '@/App';
 
 interface AppShellProps {
@@ -16,7 +17,7 @@ interface AppShellProps {
  */
 export function AppShell({ children, activeRoute, onNavigate, onOpenConnect, connectActive }: AppShellProps) {
   return (
-    <div className="flex min-h-screen w-full flex-col bg-surface-base text-on-surface">
+    <div className="flex min-h-dvh w-full flex-col bg-surface-base text-on-surface">
       <SiteHeader
         activeRoute={activeRoute}
         onNavigate={onNavigate}
@@ -24,6 +25,7 @@ export function AppShell({ children, activeRoute, onNavigate, onOpenConnect, con
         connectActive={connectActive}
       />
       {children}
+      <SiteFooter />
     </div>
   );
 }

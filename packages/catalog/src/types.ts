@@ -103,11 +103,10 @@ export function findCategory(idOrName: string): CategoryDefinition | undefined {
   return CATEGORY_DEFINITIONS.find((c) => c.id === lower || c.name.toLowerCase() === lower);
 }
 
-export type Distro = 'Ubuntu' | 'Debian' | 'Fedora' | 'Arch Linux' | 'openSUSE';
+export type Distro = 'Ubuntu' | 'Fedora' | 'Arch Linux' | 'openSUSE';
 
 export const DISTROS: readonly Distro[] = [
   'Ubuntu',
-  'Debian',
   'Fedora',
   'Arch Linux',
   'openSUSE',
@@ -130,7 +129,6 @@ export type DistroFamily = 'debian' | 'fedora' | 'arch' | 'suse';
 
 export const DISTRO_FAMILIES: Record<Distro, DistroFamily> = {
   Ubuntu: 'debian',
-  Debian: 'debian',
   Fedora: 'fedora',
   'Arch Linux': 'arch',
   openSUSE: 'suse',
@@ -177,7 +175,7 @@ export const PACKAGE_ECOSYSTEMS: readonly PackageEcosystem[] = [
  * distribution means adding it here and nowhere else.
  */
 export const ECOSYSTEM_DISTROS: Record<PackageEcosystem, readonly Distro[]> = {
-  apt: ['Ubuntu', 'Debian'],
+  apt: ['Ubuntu'],
   dnf: ['Fedora'],
   pacman: ['Arch Linux'],
   zypper: ['openSUSE'],
