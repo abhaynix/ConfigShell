@@ -160,7 +160,7 @@ importers:
     devDependencies:
       '@configshell/test-utils':
         specifier: workspace:*
-        version: link:../../packages/test-utils
+        version: link:../../packages/testing
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.6
@@ -215,7 +215,7 @@ importers:
     devDependencies:
       '@configshell/test-utils':
         specifier: '*'
-        version: link:../../packages/test-utils
+        version: link:../../packages/testing
       '@tailwindcss/vite':
         specifier: ^4.1.14
         version: 4.3.3(vite@6.4.3(@types/node@22.20.3)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.23.13))
@@ -249,27 +249,6 @@ importers:
       '@types/node':
         specifier: ^22.14.0
         version: 22.20.3
-      tsx:
-        specifier: ^4.21.0
-        version: 4.23.13
-      typescript:
-        specifier: ~5.8.2
-        version: 5.8.3
-
-  packages/contract-tests:
-    devDependencies:
-      '@configshell/catalog':
-        specifier: workspace:*
-        version: link:../catalog
-      '@configshell/mcp':
-        specifier: workspace:*
-        version: link:../mcp
-      '@types/node':
-        specifier: ^22.14.0
-        version: 22.20.3
-      server:
-        specifier: workspace:*
-        version: link:../../apps/server
       tsx:
         specifier: ^4.21.0
         version: 4.23.13
@@ -313,7 +292,7 @@ importers:
     devDependencies:
       '@configshell/test-utils':
         specifier: workspace:*
-        version: link:../test-utils
+        version: link:../testing
       '@modelcontextprotocol/client':
         specifier: ^2.0.0
         version: 2.0.0
@@ -327,11 +306,32 @@ importers:
         specifier: ~5.8.2
         version: 5.8.3
 
-  packages/test-utils:
+  packages/testing:
     devDependencies:
       '@types/node':
         specifier: ^22.14.0
         version: 22.20.3
+      tsx:
+        specifier: ^4.21.0
+        version: 4.23.13
+      typescript:
+        specifier: ~5.8.2
+        version: 5.8.3
+
+  tests/contract:
+    devDependencies:
+      '@configshell/catalog':
+        specifier: workspace:*
+        version: link:../../packages/catalog
+      '@configshell/mcp':
+        specifier: workspace:*
+        version: link:../../packages/mcp
+      '@types/node':
+        specifier: ^22.14.0
+        version: 22.20.3
+      server:
+        specifier: workspace:*
+        version: link:../../apps/server
       tsx:
         specifier: ^4.21.0
         version: 4.23.13

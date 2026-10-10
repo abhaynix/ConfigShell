@@ -6,7 +6,7 @@ repository, and every platform runs that same image.
 ```
 GitHub repository
       ↓
-  Dockerfile            one build definition, no platform-specific logic
+  infra/docker/Dockerfile  one build definition, no platform-specific logic
       ↓
   container image
       ↓
@@ -53,7 +53,7 @@ The container:
 docker compose up -d          # http://localhost:3000
 ```
 
-`compose.yml` is a convenience wrapper around the same `Dockerfile`: it adds
+`infra/docker/compose.yml` is a convenience wrapper around the same `Dockerfile`: it adds
 the hardening flags a bare `docker run` would need spelled out (read-only root
 filesystem, all capabilities dropped, `no-new-privileges`). Publish on a
 different host port with `API_PORT=8080 docker compose up -d`.
@@ -82,7 +82,7 @@ the canonical one**:
 ```json
 {
   "services": {
-    "configshell": { "runtime": "container", "root": ".", "entrypoint": "Dockerfile" }
+    "configshell": { "runtime": "container", "root": ".", "entrypoint": "infra/docker/Dockerfile" }
   },
   "rewrites": [{ "source": "/(.*)", "destination": { "service": "configshell" } }]
 }

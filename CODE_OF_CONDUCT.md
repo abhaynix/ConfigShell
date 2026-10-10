@@ -56,7 +56,7 @@ project maintainers responsible for enforcement at:
 > **`conduct@example.com`** — ⚠️ **placeholder.** Replace this with a real contact address
 > (or a link to GitHub's private report form) before or immediately after publishing this
 > repository. Until it is replaced, reports can be sent privately to a maintainer listed in
-> [`MAINTAINERS.md`](MAINTAINERS.md).
+> [`GOVERNANCE.md`](GOVERNANCE.md).
 
 All complaints will be reviewed and investigated promptly and fairly. All community leaders
 are obligated to respect the privacy and security of the reporter of any incident.

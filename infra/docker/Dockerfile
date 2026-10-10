@@ -60,8 +60,8 @@ COPY apps/web/package.json ./apps/web/
 COPY packages/catalog/package.json ./packages/catalog/
 COPY packages/installer/package.json ./packages/installer/
 COPY packages/mcp/package.json ./packages/mcp/
-COPY packages/test-utils/package.json ./packages/test-utils/
-COPY packages/contract-tests/package.json ./packages/contract-tests/
+COPY packages/testing/package.json ./packages/testing/
+COPY tests/contract/package.json ./tests/contract/
 
 RUN pnpm install --frozen-lockfile
 

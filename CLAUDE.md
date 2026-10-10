@@ -148,8 +148,8 @@ not represented by empty files.
   `tsconfig.json` extends it and adds only its own `include` (and on the server, a
   `types: ["node"]`). Keep shared options there rather than per-workspace.
 - **Tests**: **293**, on Node's built-in runner via `tsx`, in seven workspaces —
-  `packages/test-utils` (6), `packages/catalog` (49), `packages/installer` (79),
-  `packages/mcp` (57), `apps/server` (53), `packages/contract-tests` (13), `apps/web` (36). `docs/testing.md` is the
+  `packages/testing` (6), `packages/catalog` (49), `packages/installer` (79),
+  `packages/mcp` (57), `apps/server` (53), `tests/contract` (13), `apps/web` (36). `docs/testing.md` is the
   authority on coverage and gaps. `test-utils` holds the **architecture enforcement** tests:
   dependency direction, acyclicity, and that command syntax stays inside the installer.
   They exercise real data and the real app, not fixtures and mocks. **`apps/web` has no DOM
@@ -261,11 +261,11 @@ node --test path/to/src/file.test.ts
 This is a public repository. Keep these accurate when you change anything they describe:
 
 - **All community-health documents live in `docs/`, not the repository root:**
-  `docs/CONTRIBUTING.md` (setup, branch/commit conventions, PR expectations),
-  `docs/SECURITY.md` (private vulnerability reporting — `docs/security-model.md` is the
-  *model*, not the policy), `docs/CODE_OF_CONDUCT.md`, `docs/SUPPORT.md`,
-  `docs/MAINTAINERS.md`, `docs/ROADMAP.md`, `docs/CHANGELOG.md`,
-  `docs/THIRD_PARTY_NOTICES.md`, `docs/NOTICE`. Only `README.md`, `CLAUDE.md` and `LICENSE`
+  `CONTRIBUTING.md` (setup, branch/commit conventions, PR expectations),
+  `SECURITY.md` (private vulnerability reporting — `docs/security-model.md` is the
+  *model*, not the policy), `CODE_OF_CONDUCT.md`, `SUPPORT.md`,
+  `GOVERNANCE.md`, `docs/ROADMAP.md`, `CHANGELOG.md`,
+  `THIRD_PARTY_NOTICES.md`, `NOTICE`. Only `README.md`, `CLAUDE.md` and `LICENSE`
   are at the root. Relative links from `docs/*` to the README need `../`.
 - `.github/`: CI workflow, issue templates, PR template, `CODEOWNERS`, `dependabot.yml`,
   `GOOD_FIRST_ISSUES.md`.

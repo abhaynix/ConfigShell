@@ -4,7 +4,7 @@ Real, self-contained work in this codebase — not placeholder tasks. Each one n
 files it touches and what "done" looks like, so you can start without waiting for a
 maintainer to scope it for you.
 
-**Before you start:** read [`CONTRIBUTING.md`](../docs/CONTRIBUTING.md), run `pnpm install` and
+**Before you start:** read [`CONTRIBUTING.md`](../CONTRIBUTING.md), run `pnpm install` and
 `pnpm check` to confirm a clean baseline, and **open (or comment on) an issue saying you
 are taking it** so two people do not do the same work. Anything marked ⚠️ needs agreement
 on the approach before you write code.

@@ -24,10 +24,10 @@ name: configshell
 services:
   server:
     build:
-      context: .
+      context: ../..
       # The repository's only container definition, so what runs here is what
       # deploys. Explicit rather than relying on the default lookup.
-      dockerfile: Dockerfile
+      dockerfile: infra/docker/Dockerfile
     image: configshell:latest
     environment:
       # Matches apps/server/src/config/env.ts defaults; every value is

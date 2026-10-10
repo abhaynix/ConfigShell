@@ -22,8 +22,8 @@ and the product must remain fully usable without it.
 
 **Quick links:** [What works today](#what-exists-today) ·
 [Install](#installation) · [Development](#development) ·
-[Contributing](docs/CONTRIBUTING.md) · [Roadmap](docs/ROADMAP.md) ·
-[Good first issues](.github/GOOD_FIRST_ISSUES.md) · [Security](docs/SECURITY.md)
+[Contributing](CONTRIBUTING.md) · [Roadmap](docs/ROADMAP.md) ·
+[Good first issues](.github/GOOD_FIRST_ISSUES.md) · [Security](SECURITY.md)
 
 ---
 
@@ -434,13 +434,13 @@ Full detail — per-workspace coverage, the security test cases, and an honest l
 Contributions are welcome, and the most useful ones right now are catalog additions, tests,
 and documentation fixes.
 
-- [`CONTRIBUTING.md`](docs/CONTRIBUTING.md) — setup, branch and commit conventions, pull request
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — setup, branch and commit conventions, pull request
   process, and what reviewers look for.
 - [`.github/GOOD_FIRST_ISSUES.md`](.github/GOOD_FIRST_ISSUES.md) — 16 real tasks with the
   files each one touches.
-- [`CODE_OF_CONDUCT.md`](docs/CODE_OF_CONDUCT.md) — expected conduct in every project space.
-- [`MAINTAINERS.md`](docs/MAINTAINERS.md) — who maintains what and who decides what.
-- [`SUPPORT.md`](docs/SUPPORT.md) — where questions go.
+- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) — expected conduct in every project space.
+- [`GOVERNANCE.md`](GOVERNANCE.md) — who maintains what and who decides what.
+- [`SUPPORT.md`](SUPPORT.md) — where questions go.
 
 House rules, in short: keep features modular, avoid unnecessary dependencies, keep catalog
 data separate from the UI, never introduce unsafe command execution, add tests for
@@ -465,7 +465,7 @@ Security is a design constraint, not an afterthought:
 - **Security-sensitive operations are logged** and auditable.
 
 The full model is in [`docs/security-model.md`](docs/security-model.md). To **report a vulnerability**,
-follow [`SECURITY.md`](docs/SECURITY.md) — not a public issue.
+follow [`SECURITY.md`](SECURITY.md) — not a public issue.
 
 ---
 
@@ -484,8 +484,8 @@ follow [`SECURITY.md`](docs/SECURITY.md) — not a public issue.
 | [`docs/mcp.md`](docs/mcp.md) | MCP interface — the tool surface, and what it deliberately withholds |
 | [`docs/agent.md`](docs/agent.md) | Local Linux agent — **not started**; rules it must follow |
 | [`ROADMAP.md`](docs/ROADMAP.md) | Done, current, planned, and explicitly out of scope |
-| [`CHANGELOG.md`](docs/CHANGELOG.md) | Notable changes and the versioning policy |
-| [`THIRD_PARTY_NOTICES.md`](docs/THIRD_PARTY_NOTICES.md) | Third-party licenses and attribution |
+| [`CHANGELOG.md`](CHANGELOG.md) | Notable changes and the versioning policy |
+| [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) | Third-party licenses and attribution |
 
 `CLAUDE.md` holds working notes for AI coding assistants used on this repository; it is not
 required reading for contributors, but it is kept accurate.
@@ -510,8 +510,8 @@ Details, including what is deliberately **not** on the roadmap, are in
 ## License
 
 Distributed under the **Apache License 2.0** — see [`LICENSE`](LICENSE) for the full text
-and [`NOTICE`](docs/NOTICE) for the copyright notice. Third-party components and their licenses
-are listed in [`THIRD_PARTY_NOTICES.md`](docs/THIRD_PARTY_NOTICES.md).
+and [`NOTICE`](NOTICE) for the copyright notice. Third-party components and their licenses
+are listed in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
 Application names in the catalog are trademarks of their respective owners; this project is
 not affiliated with or endorsed by any of them and redistributes none of their software.
@@ -519,6 +519,6 @@ not affiliated with or endorsed by any of them and redistributes none of their s
 ## Maintainers
 
 Created and maintained by **AbhiDevepl** and **tejjasdev** — see
-[`MAINTAINERS.md`](docs/MAINTAINERS.md).
+[`GOVERNANCE.md`](GOVERNANCE.md).
 
 GitHub: [AbhiDevepl/configshell](https://github.com/AbhiDevepl/configshell)

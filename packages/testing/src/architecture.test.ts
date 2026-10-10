@@ -5,7 +5,7 @@
  * not check is a comment, and comments do not fail CI — so this reads the
  * workspace manifests and the imports themselves.
  *
- * It lives here because `packages/test-utils` is the only workspace that
+ * It lives here because `packages/testing` is the only workspace that
  * depends on nothing: a test asserting "nobody may depend upwards" should not
  * itself have to depend on the things it is policing.
  */
@@ -83,7 +83,7 @@ function layerOf(name: string): number | undefined {
 }
 
 function manifests(): Manifest[] {
-  return ['apps', 'packages'].flatMap((group) =>
+  return ['apps', 'packages', 'tests', 'tooling'].flatMap((group) =>
     readdirSync(join(REPO_ROOT, group))
       .map((name) => join(REPO_ROOT, group, name, 'package.json'))
       .filter((path) => {

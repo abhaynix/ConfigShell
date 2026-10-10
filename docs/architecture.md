@@ -154,7 +154,7 @@ nothing at the transport level forces them to agree. When each shaped its own pl
 drifted — HTTP grew `summary.executed` while MCP grew a richer `execution` block, and HTTP's
 manual steps leaked internal step fields that MCP's did not — and the cross-adapter tests
 compared the fields both happened to share, so neither difference failed anything.
-`packages/contract-tests` now compares the whole object, which is the assertion that would
+`tests/contract` now compares the whole object, which is the assertion that would
 have caught it.
 
 `presentSetupPlan` validates its own output before returning it (`validateSetupPlan`): the
@@ -322,7 +322,7 @@ finished than it is. The design lives in `docs/ai.md` until there is something t
 
 ## Dependency direction
 
-One way, and **enforced by test** (`packages/test-utils/src/architecture.test.ts`) rather
+One way, and **enforced by test** (`packages/testing/src/architecture.test.ts`) rather
 than merely described here — a boundary a test does not check is a comment.
 
 ```

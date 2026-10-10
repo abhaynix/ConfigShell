@@ -58,7 +58,7 @@ Report it privately, in either of these ways:
    > **`security@example.com`** — ⚠️ **placeholder.** The repository owner must replace this
    > with a real, monitored address (or enable GitHub private vulnerability reporting and
    > delete this option) before publishing. Until then, contact a maintainer listed in
-   > [`MAINTAINERS.md`](MAINTAINERS.md) privately.
+   > [`GOVERNANCE.md`](GOVERNANCE.md) privately.
 
 Please include:
 

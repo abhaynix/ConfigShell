@@ -182,7 +182,7 @@ apps/server       planning API — Express app in apps/server/src (no build step
 packages/catalog  verified application catalog (single source of truth)
 packages/installer deterministic resolution + setup plans + command generation
 packages/mcp      stdio MCP server over the catalog and installer (read-only)
-packages/test-utils architecture-enforcement tests shared across workspaces
+packages/testing architecture-enforcement tests shared across workspaces
 docs/             architecture, catalog, security-model, development, ai, mcp, agent,
                   the PRD and technical audit, plus the community-health documents
                   (CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT, MAINTAINERS,

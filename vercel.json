@@ -4,7 +4,7 @@
     "configshell": {
       "runtime": "container",
       "root": ".",
-      "entrypoint": "Dockerfile"
+      "entrypoint": "infra/docker/Dockerfile"
     }
   },
   "rewrites": [{ "source": "/(.*)", "destination": { "service": "configshell" } }]

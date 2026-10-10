@@ -29,13 +29,13 @@ and no assertion library — `node:test` and `node:assert/strict`.
 
 | Workspace | Tests | What they actually check |
 | --------- | ----- | ------------------------ |
-| `packages/test-utils` | 6 | **Architecture enforcement**: dependency direction, acyclicity, forbidden edges, and that package-manager syntax stays inside `packages/installer` |
+| `packages/testing` | 6 | **Architecture enforcement**: dependency direction, acyclicity, forbidden edges, and that package-manager syntax stays inside `packages/installer` |
 | `packages/catalog` | 49 | All 31 real catalog entries validate; the environment model; role presets name only real applications |
 | `packages/installer` | 79 | Every application resolved on every distribution; the cross-ecosystem contract matrix (apt/dnf/pacman/zypper); plan ordering and determinism; golden command output per package manager; the canonical setup plan — status, counts, validation failure modes, byte-identical determinism, hostile catalog entries |
 | `packages/mcp` | 57 | The tool surface; **interoperability with the official MCP client** over the real protocol and over a spawned stdio process; hostile arguments |
 | `apps/server` | 53 | The real Express app over an ephemeral port: every endpoint, every rejection path, single-port production serving |
 | `apps/web` | 36 | The API client's contract, structural safety invariants, and rendering for every plan outcome and every state of the connect page (server-rendered, no DOM runner) |
-| `packages/contract-tests` | 13 | **Cross-adapter**: the HTTP API and the MCP server must answer the same question the same way — including a whole-object comparison of the setup plan |
+| `tests/contract` | 13 | **Cross-adapter**: the HTTP API and the MCP server must answer the same question the same way — including a whole-object comparison of the setup plan |
 
 **They test real data and the real application**, not fixtures and mocks. The catalog suite
 validates the actual catalog; the server suite drives the actual app; the MCP suite connects
@@ -69,7 +69,7 @@ failing to: each adapter used to shape the plan itself, the two drifted, and the
 compared only the fields both happened to share — so the drift passed. The plan assertion is
 now a whole-object comparison, which is the only form that would have caught it.
 
-`packages/contract-tests` runs the real Express app on an ephemeral port and the real MCP
+`tests/contract` runs the real Express app on an ephemeral port and the real MCP
 tool handlers in the same process, then asserts they agree on: catalog contents, search
 results, role presets, per-source resolution (including *why* each source was rejected), the
 entire setup plan across all five distributions, plan status for complete/partial/empty
@@ -78,7 +78,7 @@ distributions. A divergence in either adapter fails here rather than reaching a 
 
 ### Architecture tests
 
-`packages/test-utils/src/architecture.test.ts` enforces the dependency graph the
+`packages/testing/src/architecture.test.ts` enforces the dependency graph the
 architecture doc describes — because a boundary that no test checks is a comment. It reads
 the workspace manifests and asserts: no upward dependencies, no cycles, `packages/catalog`
 depends on nothing, `web → installer` and `ai → installer` never exist, and package-manager
@@ -95,7 +95,7 @@ guarantee is that the machinery is absent, not that it is guarded:
 - `packages/mcp` contains no command vocabulary either, and never registers
   `detect_system`, `check_installed` or `execute_setup`.
 
-They share `packages/test-utils`, which refuses to scan an empty tree — a structural test
+They share `packages/testing`, which refuses to scan an empty tree — a structural test
 whose scan came back empty would pass vacuously.
 
 ## Cross-layer coverage
