@@ -203,10 +203,10 @@ A render error currently leaves a blank page. Add a small error boundary around 
 | --- | --- |
 | **Difficulty** | Starter |
 | **Area** | `apps/web`, docs |
-| **Files** | `apps/web/vite.config.ts`, `apps/web/metadata.json`, `apps/web/README.md` |
+| **Files** | `apps/web/vite.config.ts`, `apps/web/README.md` |
 | **Skills** | reading configuration carefully |
 
-`vite.config.ts` contains an `aistudioMediaPlugin` and a `DISABLE_HMR` switch from a Google AI Studio template, and `metadata.json` is an AI Studio manifest that declares a server-side Gemini capability the project does not implement. The directory the plugin serves from (`apps/web/public/assets/aistudio/`) is not in the repository — it is a local, self-ignored artifact. Work out what is still load-bearing, document it, and propose what can go.
+`vite.config.ts` contains an `aistudioMediaPlugin` and a `DISABLE_HMR` switch from a Google AI Studio template, and the AI Studio manifest was removed because it advertised an unimplemented Gemini capability. The directory the plugin serves from (`apps/web/public/assets/aistudio/`) is not in the repository — it is a local, self-ignored artifact. Work out what is still load-bearing, document it, and propose what can go.
 
 **Done when:** a new contributor can tell from the docs what that code is for. ⚠️ Removing any of it needs maintainer agreement — the maintainers may still use that tooling.
 

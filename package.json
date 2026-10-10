@@ -2,7 +2,7 @@
   "name": "configshell",
   "version": "0.1.0",
   "private": true,
-  "description": "ConfigShell — open-source Linux software discovery and setup-plan generation",
+  "description": "ConfigShell \u2014 open-source Linux software discovery and setup-plan generation",
   "type": "module",
   "workspaces": [
     "apps/*",
@@ -22,7 +22,8 @@
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
     "dev:web": "npm run dev --workspace=web",
     "qa:layout": "tsx scripts/qa-layout.ts",
-    "mcp": "npm run start --workspace=@configshell/mcp"
+    "mcp": "npm run start --workspace=@configshell/mcp",
+    "assets:sync": "tsx tooling/scripts/sync-assets.ts"
   },
   "license": "Apache-2.0",
   "devDependencies": {

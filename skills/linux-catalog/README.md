@@ -34,6 +34,6 @@ Visit <http://localhost:5173>. Read `SKILL.md` for the walkthrough, build and pr
 
 - `SKILL.md`: beginner workflow and project boundaries
 - `scripts/`: setup, dev, build and run command helpers
-- `assets/design-tokens.css`: design token reference copied from the app
-- `assets/logos/`: local distribution and application logo assets used by the catalog
+- `assets/design-tokens.css`: generated design-token reference from `packages/assets/design-tokens.css`
+- `assets/logos/`: generated local distribution and application logo assets; source files are in `packages/assets/logos/`
 - `references/`: catalog model, real command reference, and logo sources/licensing

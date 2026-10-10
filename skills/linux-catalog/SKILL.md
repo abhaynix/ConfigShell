@@ -73,7 +73,7 @@ Supported distributions and ecosystem mappings live in `packages/catalog/src/typ
 
 ## Design reference
 
-`assets/design-tokens.css` is a copy of the web app's design tokens. Use it as a visual reference; it is not a separate runtime dependency. See `references/catalog-model.md` and `references/real-commands.md` for the verified project structure and commands.
+`assets/design-tokens.css` is generated from `packages/assets/design-tokens.css` by `pnpm assets:sync`. Use it as a visual reference; it is not a separate runtime dependency. See `references/catalog-model.md` and `references/real-commands.md` for the verified project structure and commands.
 
 ## Troubleshooting
 
