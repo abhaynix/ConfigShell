@@ -1,6 +1,6 @@
 import { DistroSelector } from './DistroSelector';
 import { LinuxDetectionCard } from './LinuxDetectionCard';
-import { OsSelector } from './OsSelector';
+import { SectionHeading } from '@/components/layout/SectionHeading';
 import type { Distro } from '@configshell/catalog';
 
 interface EnvironmentStepProps {
@@ -8,30 +8,30 @@ interface EnvironmentStepProps {
   onSelect: (distro: Distro) => void;
 }
 
-/**
- * Environment establishment — choose distribution and environment.
- */
 export function EnvironmentStep({ distro, onSelect }: EnvironmentStepProps) {
   return (
-    <section aria-label="Environment selection">
-      {/*
-        The browser's own signal, first: it answers "am I even on Linux" before
-        the user is asked to name a distribution. It is a hint and says so —
-        the choice below is always explicit, because a browser cannot identify
-        a distribution (see useLinuxDetection).
-      */}
-      <div className="mb-2.5">
-        <LinuxDetectionCard />
-      </div>
-
-      {/*
-        Stacked until there is room, then two tracks sized by what they hold
-        rather than by a 12-column scaffold: the OS list is three fixed choices,
-        the distribution list is longer and takes the rest.
-      */}
-      <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-[minmax(15rem,1fr)_minmax(0,2fr)] lg:items-start">
-        <OsSelector />
-        <DistroSelector selected={distro} onSelect={onSelect} />
+    <section aria-labelledby="env-heading" className="page-section">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <SectionHeading
+          className="lg:col-span-7"
+          as="h1"
+          id="env-heading"
+          eyebrow="Linux application catalog · Step 1"
+          title="Choose a target environment"
+          description="Select a supported Linux distribution. The browser can report a broad OS hint, but it cannot read your kernel or package manager."
+        />
+        <div className="lg:col-span-5"><LinuxDetectionCard /></div>
+        <div id="distribution-family" className="lg:col-span-12 scroll-mt-24">
+          <SectionHeading
+            eyebrow="Supported targets"
+            title="Linux distributions"
+            className="mb-6"
+          />
+          <DistroSelector
+            selected={distro}
+            onSelect={onSelect}
+          />
+        </div>
       </div>
     </section>
   );

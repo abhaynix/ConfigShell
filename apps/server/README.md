@@ -93,7 +93,7 @@ Request bodies are capped at 16 kB and a selection at 200 ids.
 a failure mode without adding a guarantee.
 
 That means nothing structural forces the two to agree, so it is asserted instead:
-`packages/contract-tests` runs this app and the MCP tools side by side and fails if they
+`tests/contract` runs this app and the MCP tools side by side and fails if they
 describe the same resolution differently. See [`docs/testing.md`](../../docs/testing.md).
 
 ## Logging

@@ -47,7 +47,6 @@ test('the native package manager wins on every distribution that has the package
   // no zypper identifier has been verified yet.
   const table: [Distro, string][] = [
     ['Ubuntu', 'apt:git'],
-    ['Debian', 'apt:git'],
     ['Fedora', 'dnf:git'],
     ['Arch Linux', 'pacman:git'],
   ];

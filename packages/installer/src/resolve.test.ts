@@ -5,9 +5,9 @@ import type { Application, Environment } from '@configshell/catalog';
 import { resolve, resolveAll } from './resolve.ts';
 
 const UBUNTU = createEnvironment('Ubuntu');
-const DEBIAN = createEnvironment('Debian');
 const FEDORA = createEnvironment('Fedora');
 const ARCH = createEnvironment('Arch Linux');
+const OPENSUSE = createEnvironment('openSUSE');
 
 function app(id: string): Application {
   const entry = findApplication(id);
@@ -24,7 +24,6 @@ function chosen(id: string, env: Environment): string {
 
 test('the distribution’s own repository wins over every add-on route', () => {
   // Firefox has apt, dnf, pacman, flatpak and snap routes. The native one wins.
-  assert.equal(chosen('firefox', DEBIAN), 'apt:firefox-esr');
   assert.equal(chosen('firefox', FEDORA), 'dnf:firefox');
   assert.equal(chosen('firefox', ARCH), 'pacman:firefox');
   assert.equal(chosen('git', UBUNTU), 'apt:git');
@@ -35,7 +34,7 @@ test('a vendor repository is never silently used, but a usable route still wins'
   // ConfigShell will not set up. It does have a Flathub package, so it still
   // resolves — to that, with the third-party packaging stated out loud rather
   // than to Google's repo behind the user's back.
-  for (const env of [UBUNTU, DEBIAN, FEDORA]) {
+  for (const env of [UBUNTU, FEDORA]) {
     const r = resolve(app('google-chrome'), env);
     assert.equal(r.outcome, 'resolved', `${env.distro}`);
     assert.ok(r.outcome === 'resolved');
@@ -62,7 +61,7 @@ test('an application whose only route needs a vendor repository becomes a manual
         method: 'apt',
         identifier: 'vendor-only',
         origin: 'vendor',
-        distros: ['Ubuntu', 'Debian'],
+        distros: ['Ubuntu'],
         url: 'https://example.com/install',
       },
     ],
@@ -77,7 +76,7 @@ test('an application whose only route needs a vendor repository becomes a manual
 
 test('the generated route never requires a repository the user has not added', () => {
   // The property that matters, across the whole catalog and every distribution.
-  for (const environment of [UBUNTU, DEBIAN, FEDORA, ARCH]) {
+  for (const environment of [UBUNTU, FEDORA, ARCH, OPENSUSE]) {
     for (const entry of APPLICATIONS) {
       const r = resolve(entry, environment);
       if (r.outcome !== 'resolved') continue;
@@ -95,7 +94,7 @@ test('the generated route never requires a repository the user has not added', (
 });
 
 test('a resolved native source is always the environment’s own package manager', () => {
-  for (const environment of [UBUNTU, DEBIAN, FEDORA, ARCH]) {
+  for (const environment of [UBUNTU, FEDORA, ARCH, OPENSUSE]) {
     for (const entry of APPLICATIONS) {
       const r = resolve(entry, environment);
       if (r.outcome !== 'resolved') continue;
@@ -156,24 +155,24 @@ test('an application with no sources at all is unavailable, with a reason', () =
 });
 
 test('an application verified only for other distributions is unavailable here', () => {
-  const debianOnly: Application = {
-    id: 'debian-only',
-    name: 'Debian Only',
-    description: 'Verified for Debian alone.',
+  const fedoraOnly: Application = {
+    id: 'fedora-only',
+    name: 'Fedora Only',
+    description: 'Verified for Fedora alone.',
     category: 'General',
     homepage: 'https://example.com',
     installation: [
-      { method: 'apt', identifier: 'debian-only', origin: 'distro', distros: ['Debian'] },
+      { method: 'dnf', identifier: 'fedora-only', origin: 'distro', distros: ['Fedora'] },
     ],
   };
-  const r = resolve(debianOnly, UBUNTU);
+  const r = resolve(fedoraOnly, UBUNTU);
   assert.equal(r.outcome, 'unavailable');
   assert.ok(r.outcome === 'unavailable');
   assert.equal(r.reason, 'no-source-for-environment');
 });
 
 test('every resolution explains itself and records what it considered', () => {
-  for (const environment of [UBUNTU, DEBIAN, FEDORA, ARCH]) {
+  for (const environment of [UBUNTU, FEDORA, ARCH, OPENSUSE]) {
     for (const entry of APPLICATIONS) {
       const r = resolve(entry, environment);
       const text = r.outcome === 'resolved' ? r.reason : r.explanation;
@@ -201,8 +200,8 @@ test('resolution is deterministic and order-preserving', () => {
 });
 
 test('every catalog application resolves to a stated outcome on every distribution', () => {
-  // No holes: 31 applications × 4 distributions, all accounted for.
-  for (const environment of [UBUNTU, DEBIAN, FEDORA, ARCH]) {
+  // No holes: every application has an outcome for every supported distribution.
+  for (const environment of [UBUNTU, FEDORA, ARCH, OPENSUSE]) {
     for (const entry of APPLICATIONS) {
       const r = resolve(entry, environment);
       assert.ok(

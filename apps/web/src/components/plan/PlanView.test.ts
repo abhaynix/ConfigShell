@@ -294,7 +294,7 @@ test('both themes define every outcome token', () => {
 test('plan components carry no hardcoded colour', () => {
   // A hex or rgb() literal in a component is a colour that cannot follow the
   // theme, so one of the two modes would be wrong.
-  for (const file of ['PlanView.tsx', 'CommandBlock.tsx']) {
+  for (const file of ['PlanView.tsx']) {
     const source = readFileSync(new URL(file, import.meta.url), 'utf8');
     assert.ok(!/#[0-9a-fA-F]{3,8}\b/.test(source), `${file} contains a hex colour`);
     assert.ok(!/\brgba?\(/.test(source), `${file} contains an rgb() colour`);

@@ -169,10 +169,12 @@ describe("GET /api/applications/:id", () => {
     assert.equal((await get("/api/applications/no-such-app")).status, 404);
   });
 
-  test("rejects an unknown distribution", async () => {
-    const { status, body } = await get("/api/applications/git?distro=Gentoo");
-    assert.equal(status, 400);
-    assert.equal(body.error.details.errors[0].field, "distro");
+  test("rejects unsupported distributions", async () => {
+    for (const distro of ["Gentoo", "Debian"]) {
+      const { status, body } = await get(`/api/applications/git?distro=${distro}`);
+      assert.equal(status, 400);
+      assert.equal(body.error.details.errors[0].field, "distro");
+    }
   });
 });
 
@@ -281,7 +283,7 @@ describe("POST /api/plan", () => {
 
   test("resolves the same selection differently per distribution", async () => {
     const ids = ["git"];
-    const apt = await post("/api/plan", { environment: { distro: "Debian" }, applicationIds: ids });
+    const apt = await post("/api/plan", { environment: { distro: "Ubuntu" }, applicationIds: ids });
     const arch = await post("/api/plan", {
       environment: { distro: "Arch Linux" },
       applicationIds: ids,
@@ -359,7 +361,15 @@ describe("POST /api/plan — untrusted input", () => {
   });
 
   test("a missing or malformed environment is rejected", async () => {
-    for (const environment of [undefined, {}, { distro: "Gentoo" }, "Ubuntu", null, []]) {
+    for (const environment of [
+      undefined,
+      {},
+      { distro: "Gentoo" },
+      { distro: "Debian" },
+      "Ubuntu",
+      null,
+      [],
+    ]) {
       const { status } = await post("/api/plan", { environment, applicationIds: ["git"] });
       assert.equal(status, 400, `environment ${JSON.stringify(environment)}`);
     }
@@ -627,7 +637,7 @@ describe("safety invariants", () => {
     const { body: catalog } = await get("/api/applications");
     const ids = catalog.data.applications.map((a) => a.id);
 
-    for (const distro of ["Ubuntu", "Debian", "Fedora", "Arch Linux"]) {
+    for (const distro of ["Ubuntu", "Fedora", "Arch Linux"]) {
       const { body } = await post("/api/plan", {
         environment: { distro },
         applicationIds: ids,

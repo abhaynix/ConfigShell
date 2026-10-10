@@ -1,140 +1,136 @@
-import { Github, Plug } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { PageContainer } from '@/components/layout/PageContainer';
+import { Search, Menu, X } from 'lucide-react';
+import type { NavRoute } from '@/App';
+import { PageContainer } from './PageContainer';
 import { cn } from '@/lib/utils';
-import { ThemeToggle } from './ThemeToggle';
-import { gsap, useGSAP, shouldSkipEntrance, MOTION_DURATIONS, MOTION_EASINGS } from '@/lib/motion';
 
 interface SiteHeaderProps {
-  /** Navigate to the connect page. */
+  activeRoute: NavRoute;
+  onNavigate: (route: NavRoute) => void;
   onOpenConnect: () => void;
-  /** True while that page is showing, so the link can mark itself current. */
   connectActive?: boolean;
 }
 
-export function SiteHeader({ onOpenConnect, connectActive }: SiteHeaderProps) {
-  const headerRef = useRef<HTMLElement>(null);
-  const [scrolled, setScrolled] = useState(false);
+const NAV_ITEMS: { route: NavRoute; label: string; short: string }[] = [
+  { route: 'app-catalog', label: 'Catalog', short: 'Catalog' },
+  { route: 'os-and-distro', label: 'Distributions', short: 'Distros' },
+  { route: 'role-matrix', label: 'Presets', short: 'Presets' },
+  { route: 'plan-and-generate', label: 'Setup plan', short: 'Plan' },
+  { route: 'cli-detection', label: 'Connect', short: 'Connect' },
+];
+
+export function SiteHeader({ activeRoute, onNavigate, onOpenConnect, connectActive }: SiteHeaderProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 4);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    if (!menuOpen) return;
+    const menuButton = menuButtonRef.current;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const links = drawerRef.current?.querySelectorAll<HTMLElement>('a, button');
+    links?.[0]?.focus();
 
-  useGSAP(
-    () => {
-      if (shouldSkipEntrance()) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setMenuOpen(false);
+        return;
+      }
+      if (event.key !== 'Tab' || !links?.length) return;
+      const first = links[0];
+      const last = links[links.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', onKeyDown);
+      menuButton?.focus();
+    };
+  }, [menuOpen]);
 
-      gsap.fromTo(
-        '.header-brand',
-        { opacity: 0, x: -8 },
-        {
-          opacity: 1,
-          x: 0,
-          duration: MOTION_DURATIONS.normal,
-          ease: MOTION_EASINGS.subtle,
-          clearProps: 'transform',
-        },
-      );
-
-      gsap.fromTo(
-        '.header-action-item',
-        { opacity: 0, y: -4 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: MOTION_DURATIONS.normal,
-          stagger: 0.04,
-          delay: 0.05,
-          ease: MOTION_EASINGS.subtle,
-          clearProps: 'transform',
-        },
-      );
-    },
-    { scope: headerRef },
-  );
+  const active = (route: NavRoute) => connectActive ? route === 'cli-detection' : route === activeRoute;
+  const navigate = (route: NavRoute) => {
+    setMenuOpen(false);
+    if (route === 'cli-detection') onOpenConnect();
+    else onNavigate(route);
+  };
 
   return (
-    <header
-      ref={headerRef}
-      className={cn(
-        'sticky top-0 z-30 w-full border-b transition-colors duration-200 motion-reduce:transition-none',
-        scrolled
-          ? 'border-border bg-background/80 backdrop-blur-md'
-          : 'border-transparent bg-transparent',
-      )}
-    >
-      {/*
-        Three fixed roles: brand, context, actions. A grid rather than
-        `justify-between` so the middle track is the one that absorbs the
-        free space (and collapses first on a phone) — the brand and the
-        actions keep their own intrinsic width at every size.
-      */}
-      <PageContainer className="grid grid-cols-[auto_1fr_auto] items-center gap-3 py-2.5">
-        <div className="header-brand flex items-center gap-2.5">
-          <span
-            aria-hidden="true"
-            className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground"
-          >
-            C
-          </span>
-          <span className="text-sm font-semibold tracking-tight">ConfigShell</span>
-        </div>
+    <>
+      <header className="site-header">
+        <PageContainer className="site-header__row">
+          <a href="/" onClick={(event) => { event.preventDefault(); navigate('app-catalog'); }} className="site-brand" aria-label="ConfigShell home">
+            <span className="site-brand__mark" aria-hidden="true">&gt;_</span>
+            <span>ConfigShell</span>
+          </a>
 
-        <p className="header-action-item hidden min-w-0 truncate text-xs text-muted-foreground sm:block">
-          Discover Linux software. Nothing installs without your say.
-        </p>
+          <nav className="site-nav" aria-label="Main navigation">
+            {NAV_ITEMS.map(({ route, label, short }) => (
+              <a
+                key={route}
+                href={route === 'cli-detection' ? '/connect' : '/'}
+                aria-current={active(route) ? 'page' : undefined}
+                onClick={(event) => { event.preventDefault(); navigate(route); }}
+                className={cn('site-nav__link', active(route) && 'is-active')}
+              >
+                <span className="hidden lg:inline">{label}</span>
+                <span className="lg:hidden">{short}</span>
+              </a>
+            ))}
+          </nav>
 
-        <div className="col-start-3 flex items-center gap-1">
-          {/*
-            A real link, not a button: the connect page has an address, so it
-            must be middle-clickable, shareable and openable in a new tab. The
-            click handler routes in-app; the href is what makes it a link.
-          */}
-          <div className="header-action-item">
-            <Button
-              variant={connectActive ? 'secondary' : 'ghost'}
-              size="sm"
-              asChild
-              {...(connectActive ? { 'aria-current': 'page' as const } : {})}
+          <div className="site-header__actions">
+            <button
+              type="button"
+              className="site-icon-button hidden sm:inline-flex"
+              aria-label="Focus package search"
+              onClick={() => document.getElementById('app-search')?.focus()}
             >
+              <Search aria-hidden="true" />
+            </button>
+            <button type="button" className="site-cta" onClick={() => navigate('app-catalog')}>Choose apps</button>
+            <button
+              ref={menuButtonRef}
+              type="button"
+              className="site-icon-button site-menu-button"
+              aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-navigation"
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+            </button>
+          </div>
+        </PageContainer>
+      </header>
+
+      {menuOpen && (
+        <div className="mobile-drawer-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setMenuOpen(false); }}>
+          <nav id="mobile-navigation" ref={drawerRef} className="mobile-drawer" aria-label="Mobile navigation" aria-modal="true" role="dialog">
+            <p className="mobile-drawer__label">Navigate</p>
+            {NAV_ITEMS.map(({ route, label }) => (
               <a
-                href="/connect"
-                onClick={(event) => {
-                  // Let the browser handle modified clicks (new tab, new
-                  // window, download) exactly as it would any other link.
-                  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-                  if (event.button !== 0) return;
-                  event.preventDefault();
-                  onOpenConnect();
-                }}
+                key={route}
+                href={route === 'cli-detection' ? '/connect' : '/'}
+                aria-current={active(route) ? 'page' : undefined}
+                onClick={(event) => { event.preventDefault(); navigate(route); }}
+                className={cn('mobile-drawer__link', active(route) && 'is-active')}
               >
-                <Plug aria-hidden="true" />
-                <span className="hidden sm:inline">Connect AI</span>
-                <span className="sr-only sm:hidden">Connect ConfigShell to your AI</span>
+                {label}
               </a>
-            </Button>
-          </div>
-          <div className="header-action-item">
-            <Button type="button" variant="ghost" size="icon" asChild>
-              <a
-                href="https://github.com/AbhiDevepl/configshell"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="View source on GitHub"
-              >
-                <Github />
-              </a>
-            </Button>
-          </div>
-          <div className="header-action-item">
-            <ThemeToggle />
-          </div>
+            ))}
+          </nav>
         </div>
-      </PageContainer>
-    </header>
+      )}
+    </>
   );
 }

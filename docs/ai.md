@@ -51,7 +51,7 @@ grants no shortcut.
 
 A `packages/ai` workspace consumed by the server (not directly by the browser, which must
 never hold provider credentials) — created when there is code for it, together with its
-`ai → installer` forbidden-edge rule in `packages/test-utils/src/architecture.test.ts`. The
+`ai → installer` forbidden-edge rule in `packages/testing/src/architecture.test.ts`. The
 UI would render plans it receives; it would not talk to a model itself.
 
 ## Before you start

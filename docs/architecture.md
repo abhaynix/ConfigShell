@@ -154,7 +154,7 @@ nothing at the transport level forces them to agree. When each shaped its own pl
 drifted — HTTP grew `summary.executed` while MCP grew a richer `execution` block, and HTTP's
 manual steps leaked internal step fields that MCP's did not — and the cross-adapter tests
 compared the fields both happened to share, so neither difference failed anything.
-`packages/contract-tests` now compares the whole object, which is the assertion that would
+`tests/contract` now compares the whole object, which is the assertion that would
 have caught it.
 
 `presentSetupPlan` validates its own output before returning it (`validateSetupPlan`): the
@@ -200,7 +200,7 @@ not two. Plan generation goes through `src/lib/api.ts`.
 Built primarily from **shadcn/ui** (Radix UI base) components under
 `src/components/ui/` (button, card, badge, checkbox, radio-group, input, toggle-group,
 separator, scroll-area, alert, sheet, empty, label, tooltip) rather than hand-rolled
-markup. `components.json` holds the shadcn config; see `CLAUDE.md`'s "shadcn/ui setup"
+markup. `components.json` holds the shadcn config; see `AGENTS.md`'s "shadcn/ui setup"
 section before adding more components or touching the `@/*` import alias.
 
 - `src/App.tsx` composes the page inside a `TooltipProvider`: `SiteHeader` (layout),
@@ -322,7 +322,7 @@ finished than it is. The design lives in `docs/ai.md` until there is something t
 
 ## Dependency direction
 
-One way, and **enforced by test** (`packages/test-utils/src/architecture.test.ts`) rather
+One way, and **enforced by test** (`packages/testing/src/architecture.test.ts`) rather
 than merely described here — a boundary a test does not check is a comment.
 
 ```
@@ -408,16 +408,14 @@ by filling in those five, and the exhaustive `switch` statements made the compil
 
 ## Repository tooling
 
-- **Package manager:** pnpm workspaces (`apps/*`, `packages/*`), pinned via
-  `packageManager`. Root `package.json` scripts orchestrate the workspaces with pnpm
-  filters. There is deliberately **no Turborepo pipeline** — the dependency graph (one app
-  consuming one package) does not justify one yet.
-- **Lint:** one flat ESLint config at the root (`eslint.config.js`) covering every
-  workspace; `pnpm lint`.
-- **Types:** `tsc --noEmit` per TypeScript workspace; `pnpm typecheck`.
-- **Tests:** Node's built-in runner. `packages/catalog` is the only workspace with tests.
-- **CI:** `.github/workflows/ci.yml` runs install, lint, typecheck, test and build on
-  pushes to `main` and on pull requests, against Node 20 and 22.
+- **Package manager:** pnpm workspaces for apps, packages, tests, tooling, and skills.
+  Root scripts use Turborepo to run real workspace tasks.
+- **Lint:** workspace ESLint scripts share the root flat config.
+- **Types:** strict TypeScript checks per workspace.
+- **Tests:** Node's built-in runner via tsx; see the testing guide for suite coverage.
+- **CI:** the workflow installs, lints, typechecks, tests, and builds on Node 20 and 22.
+
+Source-only packages do not emit build output or provide standalone dev servers.
 
 See `docs/development.md` for the commands and `CONTRIBUTING.md` for the workflow.
 

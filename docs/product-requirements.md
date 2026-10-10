@@ -6,7 +6,7 @@
 **Future Platforms:** macOS, Windows
 **Primary Users:** Developers, students, new Linux users
 **Status:** Planning / MVP definition
-**Repository:** Existing pnpm-workspace monorepo (no Turborepo — see §29)
+**Repository:** pnpm-workspace monorepo orchestrated by Turborepo
 **Amended:** 2026-09-16, per `docs/technical-audit.md` §9
 
 ---
@@ -169,7 +169,7 @@ Initial package ecosystems:
 
 | Ecosystem       | Package Manager | Status |
 | --------------- | --------------- | ------ |
-| Debian family   | APT             | in scope — verified (Ubuntu, Debian) |
+| Ubuntu family   | APT             | in scope — verified (Ubuntu) |
 | Fedora family   | DNF             | in scope — verified (Fedora) |
 | Arch family     | Pacman          | in scope — verified (Arch Linux) |
 | openSUSE family | Zypper          | **in scope** — ecosystem implemented; catalog coverage partial |
@@ -849,10 +849,9 @@ This can become one of ConfigShell's strongest open-source contribution mechanis
 
 # 29. Repository Architecture
 
-> **Corrected.** Turborepo was never actually installed — `turbo.json` was empty and has
-> been deleted. The monorepo is **pnpm workspaces**, orchestrated by root `package.json`
-> scripts with pnpm filters. Do not add a Turbo pipeline unless the dependency graph
-> genuinely needs one.
+> **Historical note (superseded).** At the time of the 2026-09-16 audit, the repository did not
+> use Turborepo. The current repository uses Turbo to orchestrate real workspace tasks; source-only
+> packages do not emit build artifacts or provide standalone dev servers.
 
 The existing repository uses a pnpm-workspace monorepo with:
 
@@ -1397,7 +1396,7 @@ You currently have the beginnings of:
 > because the audit's conclusions were drawn from it.
 
 ```text
-pnpm workspaces           ✓   (Turborepo ✗ — never installed, turbo.json deleted)
+pnpm workspaces + Turborepo task orchestration ✓
 React + Vite + TS         ✓
 Express backend           ~   scaffold only: starts, registers no routes;
                               18 files across controllers/services/routes/
@@ -1446,4 +1445,3 @@ with:
 **Future = CLI/agent/cross-platform**
 
 That will give you a precise implementation backlog instead of rebuilding parts of ConfigShell that you've already created.
-

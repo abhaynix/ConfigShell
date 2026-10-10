@@ -9,6 +9,7 @@ import { resolveAll } from './resolve.ts';
 const UBUNTU = createEnvironment('Ubuntu');
 const FEDORA = createEnvironment('Fedora');
 const ARCH = createEnvironment('Arch Linux');
+const OPENSUSE = createEnvironment('openSUSE');
 
 function app(id: string): Application {
   const entry = findApplication(id);
@@ -76,7 +77,7 @@ test('Snap installs are privileged and batched', () => {
 test('no generated command carries -y or --noconfirm', () => {
   // ConfigShell's plan review is one confirmation; the package manager's own
   // prompt is a second, and it costs nothing to keep.
-  for (const environment of [UBUNTU, FEDORA, ARCH]) {
+  for (const environment of [UBUNTU, FEDORA, ARCH, OPENSUSE]) {
     for (const command of renderPlan(
       buildPlan(resolveAll(APPLICATIONS, environment), environment),
     ).commands) {
@@ -195,7 +196,7 @@ test('real catalog identifiers all pass the strict pattern', () => {
 
 test('no generated command contains a shell metacharacter', () => {
   // The property `docs/security-model.md` claims, asserted rather than assumed.
-  for (const environment of [UBUNTU, createEnvironment('Debian'), FEDORA, ARCH]) {
+  for (const environment of [UBUNTU, FEDORA, ARCH, OPENSUSE]) {
     const rendered = renderPlan(buildPlan(resolveAll(APPLICATIONS, environment), environment));
     for (const { command } of rendered.commands) {
       assert.ok(
@@ -208,7 +209,7 @@ test('no generated command contains a shell metacharacter', () => {
 });
 
 test('verification is generated from one fixed template, never per-application text', () => {
-  for (const environment of [UBUNTU, FEDORA, ARCH]) {
+  for (const environment of [UBUNTU, FEDORA, ARCH, OPENSUSE]) {
     const rendered = renderPlan(buildPlan(resolveAll(APPLICATIONS, environment), environment));
     for (const c of rendered.commands.filter((c) => c.stepKind === 'verify')) {
       assert.match(c.command, /^command -v [A-Za-z0-9][A-Za-z0-9._+-]*$/);

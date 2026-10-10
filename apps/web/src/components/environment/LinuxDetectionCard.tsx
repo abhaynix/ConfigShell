@@ -1,123 +1,32 @@
-import { CircleHelp, Laptop, Loader2, RefreshCw } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { useLinuxDetection } from '@/hooks/useLinuxDetection';
-import { gsap, useGSAP, prefersReducedMotion, shouldSkipEntrance, MOTION_DURATIONS, MOTION_EASINGS } from '@/lib/motion';
+import { MonitorCog } from 'lucide-react';
 
-/**
- * Browser-only "does this look like Linux" indicator. Never attempts to
- * name a specific distribution — see useLinuxDetection for why that isn't
- * reliably possible from a browser.
- */
 export function LinuxDetectionCard() {
-  const { state, redetect } = useLinuxDetection();
-  const [checking, setChecking] = useState(() => !prefersReducedMotion());
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!checking) return;
-    const timer = setTimeout(() => {
-      setChecking(false);
-    }, 180);
-    return () => clearTimeout(timer);
-  }, [checking]);
-
-  useGSAP(
-    () => {
-      if (checking || shouldSkipEntrance()) return;
-      if (!cardRef.current) return;
-
-      gsap.fromTo(
-        cardRef.current,
-        { opacity: 0, scale: 0.97, y: 3 },
-        {
-          opacity: 1,
-          scale: 1,
-          y: 0,
-          duration: MOTION_DURATIONS.feedback,
-          ease: MOTION_EASINGS.subtle,
-          clearProps: 'transform',
-        },
-      );
-    },
-    { dependencies: [checking, state], scope: cardRef },
-  );
-
-  const handleDetectAgain = () => {
-    setChecking(true);
-    redetect();
-  };
-
-  if (checking) {
-    return (
-      <div
-        role="status"
-        aria-live="polite"
-        className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 text-xs text-muted-foreground"
-      >
-        <Loader2 className="size-3.5 shrink-0 animate-spin text-muted-foreground" aria-hidden="true" />
-        <span>Detecting environment…</span>
-      </div>
-    );
-  }
-
-  if (state === 'linux') {
-    return (
-      <div
-        ref={cardRef}
-        className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 text-xs text-foreground"
-      >
-        <Laptop className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
-        <span aria-live="polite" className="font-medium">
-          Linux detected
-        </span>
-        <Badge variant="secondary" className="h-4 px-1 text-[10px] font-normal">
-          Browser signal
-        </Badge>
-        <span aria-hidden="true" className="hidden text-muted-foreground sm:inline">
-          running on Linux
-        </span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="xs"
-          onClick={handleDetectAgain}
-          aria-label="Re-run environment detection"
-          className="ml-auto h-6 shrink-0 px-1.5 text-[11px] text-muted-foreground hover:text-foreground"
-        >
-          <RefreshCw aria-hidden="true" className="size-3" />
-          Detect again
-        </Button>
-      </div>
-    );
-  }
+  const { state } = useLinuxDetection();
+  const browserHint = state === 'linux' ? 'Linux browser detected' : state === 'not-linux' ? 'Non-Linux browser' : 'Browser OS unavailable';
 
   return (
-    <div
-      ref={cardRef}
-      className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-xs text-foreground"
-    >
-      <CircleHelp className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
-      <span aria-live="polite" className="font-medium">
-        Linux unconfirmed
-      </span>
-      <span aria-hidden="true" className="hidden text-muted-foreground sm:inline">
-        {state === 'not-linux'
-          ? "Doesn't look like Linux. Choose manually."
-          : 'Insufficient signal. Choose manually.'}
-      </span>
-      <Button
-        type="button"
-        variant="ghost"
-        size="xs"
-        onClick={handleDetectAgain}
-        aria-label="Re-run environment detection"
-        className="ml-auto h-6 shrink-0 px-1.5 text-[11px] text-muted-foreground hover:text-foreground"
-      >
-        <RefreshCw aria-hidden="true" className="size-3" />
-        Detect again
-      </Button>
-    </div>
+    <aside aria-labelledby="fingerprint-heading" className="fingerprint-card">
+      <div className="fingerprint-card__title">
+        <MonitorCog size={20} aria-hidden="true" />
+        <h2 id="fingerprint-heading">Active host fingerprint</h2>
+      </div>
+      <p className="fingerprint-card__hint">{browserHint}. A browser cannot inspect the host kernel, architecture, package manager, or init system.</p>
+      <dl className="fingerprint-grid">
+        {[
+          ['OS hint', browserHint],
+          ['Linux kernel', 'Unavailable in browser'],
+          ['Architecture', 'Unavailable in browser'],
+          ['Package manager', 'Choose a distribution'],
+          ['Init system', 'Unavailable in browser'],
+        ].map(([label, value]) => (
+          <div key={label} className="fingerprint-tile">
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="fingerprint-card__note">Local system detection is coming soon. Choose a distribution below to continue.</p>
+    </aside>
   );
 }

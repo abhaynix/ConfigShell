@@ -12,11 +12,10 @@ export interface LinuxDetection {
  * The browser-only "is this Linux?" signal.
  *
  * Best-effort and explicit about what it is not: normal browser APIs do not
- * reliably expose which distribution is running (Ubuntu vs. Debian vs. Fedora
- * vs. Arch), so exact distribution must always be a manual choice (see
- * `src/components/environment/distros.ts` and `DistroSelector`). Real distro
- * detection is a future local-agent capability, not something this hook should
- * ever try to fake.
+ * reliably expose which distribution is running (Ubuntu vs. Fedora vs. Arch),
+ * so exact distribution must always be a manual choice (see `DistroSelector`).
+ * Real distribution detection is a future local-agent capability, not
+ * something this hook should ever try to fake.
  *
  * `attempt` is a counter, not an input: the signal is deterministic for a
  * given environment, so detection is re-run on demand via `redetect` rather

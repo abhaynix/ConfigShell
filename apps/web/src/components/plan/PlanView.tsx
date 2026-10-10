@@ -1,30 +1,12 @@
-import {
-  AlertCircle,
-  ArrowLeft,
-  Check,
-  CheckCircle2,
-  Copy,
-  ExternalLink,
-  Loader2,
-  RefreshCw,
-  ShieldAlert,
-  TerminalSquare,
-} from 'lucide-react';
+import { AlertCircle, ArrowLeft, Copy, LoaderCircle, RefreshCw } from 'lucide-react';
 import { useRef } from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
-import { Separator } from '@/components/ui/separator';
-import { Kbd } from '@/components/ui/kbd';
 import { useClipboard } from '@/hooks/useClipboard';
 import type { PlanStatus } from '@/hooks/useSetupPlan';
 import type { ApiRequestError, SetupPlan } from '@/lib/api';
-import { OUTCOMES, PLAN_STATUS } from '@/components/plan/outcomes';
-import { CommandBlock } from './CommandBlock';
+import { OUTCOMES, PLAN_STATUS } from './outcomes';
 import { cn } from '@/lib/utils';
-import { gsap, useGSAP, prefersReducedMotion, shouldSkipEntrance, MOTION_DURATIONS, MOTION_EASINGS } from '@/lib/motion';
+import { PageContainer } from '@/components/layout/PageContainer';
+import { SectionHeading } from '@/components/layout/SectionHeading';
 
 interface PlanViewProps {
   status: PlanStatus;
@@ -34,586 +16,130 @@ interface PlanViewProps {
   onRetry: () => void;
 }
 
-/**
- * Step 4 — the setup plan (PRD §20, §23, §24).
- *
- * Every outcome the resolver can produce has somewhere to be rendered here:
- * commands to run, applications the user must install themselves, and
- * applications with no verified route at all. Nothing is dropped, because a
- * plan that quietly omits part of what was asked for is worse than one that
- * admits a gap.
- *
- * The page never executes anything, and says so.
- */
 export function PlanView({ status, plan, error, onBack, onRetry }: PlanViewProps) {
-  const containerRef = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      if (shouldSkipEntrance() || !containerRef.current) return;
-
-      gsap.fromTo(
-        '.plan-header-block',
-        { opacity: 0, y: 6 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: MOTION_DURATIONS.normal,
-          ease: MOTION_EASINGS.subtle,
-          clearProps: 'transform',
-        },
-      );
-    },
-    { scope: containerRef },
-  );
-
+  const headingRef = useRef<HTMLHeadingElement>(null);
   return (
-    <section ref={containerRef} aria-labelledby="plan-heading">
-      <div className="plan-header-block flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 id="plan-heading" className="text-2xl font-medium tracking-tight sm:text-3xl">
-            Your setup plan
-          </h2>
-          {plan && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              For {plan.environment.distro} · {plan.environment.ecosystem}
-            </p>
-          )}
+    <section aria-labelledby="plan-heading" className="page-section py-8">
+      <PageContainer className="grid gap-8">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <SectionHeading
+            as="h1"
+            id="plan-heading"
+            eyebrow="Setup plan"
+            title="Review your setup plan"
+            description={plan ? `Resolved for ${plan.environment.distro} · ${plan.environment.ecosystem}.` : 'Generating a plan from the selected applications and distribution.'}
+          />
+          <button type="button" onClick={onBack} className="secondary-button"><ArrowLeft size={16} aria-hidden="true" /> Back to selection</button>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={onBack} className="gap-1.5">
-          <ArrowLeft aria-hidden="true" />
-          <span>Back to selection</span>
-          <Kbd className="hidden sm:inline-flex text-[9px]">Esc</Kbd>
-        </Button>
-      </div>
 
-      <div className="mt-6" aria-live="polite" aria-busy={status === 'loading'}>
-        {status === 'loading' && <PlanLoading />}
-        {status === 'error' && error && <PlanError error={error} onRetry={onRetry} onBack={onBack} />}
-        {status === 'ready' && plan && <PlanBody plan={plan} />}
-      </div>
+        <div ref={headingRef} aria-live="polite" aria-busy={status === 'loading'}>
+          {status === 'loading' && <PlanLoading />}
+          {status === 'error' && error && <PlanError error={error} onRetry={onRetry} onBack={onBack} />}
+          {status === 'ready' && plan && <PlanResults plan={plan} />}
+        </div>
+      </PageContainer>
     </section>
   );
 }
 
 function PlanLoading() {
-  const loadingRef = useRef<HTMLDivElement>(null);
-
-  useGSAP(
-    () => {
-      if (shouldSkipEntrance() || !loadingRef.current) return;
-      const skeletons = loadingRef.current.querySelectorAll('.loading-skeleton');
-      if (skeletons.length > 0) {
-        gsap.fromTo(
-          skeletons,
-          { opacity: 0, y: 4 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: MOTION_DURATIONS.normal,
-            stagger: 0.05,
-            ease: MOTION_EASINGS.subtle,
-            clearProps: 'transform',
-          },
-        );
-      }
-    },
-    { scope: loadingRef },
-  );
-
   return (
-    <div ref={loadingRef} className="flex flex-col gap-3">
-      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 aria-hidden="true" className="size-4 animate-spin" />
-        Resolving your selection against the catalog…
-      </p>
-      {/* Skeleton shaped like the result, so the layout does not jump. */}
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="loading-skeleton h-16 animate-pulse rounded-lg border border-border bg-muted/40" />
-      ))}
+    <div className="catalog-state" role="status">
+      <LoaderCircle className="animate-spin text-primary" aria-hidden="true" />
+      <h2>Building your setup plan</h2>
+      <p>Checking the selected applications against the catalog.</p>
+      <div className="plan-loading-lines" aria-hidden="true"><span /><span /><span /></div>
     </div>
   );
 }
 
-function PlanError({
-  error,
-  onRetry,
-  onBack,
-}: {
-  error: ApiRequestError;
-  onRetry: () => void;
-  onBack: () => void;
-}) {
-  const offline = error.kind === 'offline';
-
+function PlanError({ error, onRetry, onBack }: { error: ApiRequestError; onRetry: () => void; onBack: () => void }) {
   return (
-    <Alert variant="destructive">
-      <AlertCircle />
-      <AlertTitle>
-        {offline ? "Couldn't reach the ConfigShell API" : 'Could not generate a plan'}
-      </AlertTitle>
-      <AlertDescription>
-        <p>{error.message}</p>
-
-        {offline && (
-          <p className="mt-2">
-            Plans are generated by the API server rather than in your browser, so it needs to
-            be running. From the repository root:{' '}
-            <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">pnpm dev</code>{' '}
-            starts both the web app and the API.
-          </p>
-        )}
-
-        {error.code === 'UNKNOWN_APPLICATION' && (
-          <p className="mt-2">
-            Your selection contains an application the catalog does not know about. Clearing
-            the selection and choosing again will fix it.
-          </p>
-        )}
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          {error.retryable && (
-            <Button type="button" size="sm" variant="outline" onClick={onRetry}>
-              <RefreshCw aria-hidden="true" />
-              Try again
-            </Button>
-          )}
-          <Button type="button" size="sm" variant="ghost" onClick={onBack}>
-            Back to selection
-          </Button>
-        </div>
-      </AlertDescription>
-    </Alert>
+    <div className="catalog-state" role="alert">
+      <AlertCircle className="text-error" aria-hidden="true" />
+      <h2>Could not generate a plan</h2>
+      <p>{error.message}</p>
+      {error.kind === 'offline' && <p>From the repository root, run <code>pnpm dev</code> to start the application server.</p>}
+      <div className="flex flex-wrap gap-2">
+        {error.retryable && <button type="button" onClick={onRetry} className="primary-button"><RefreshCw size={16} aria-hidden="true" /> Try again</button>}
+        <button type="button" onClick={onBack} className="secondary-button">Back to selection</button>
+      </div>
+    </div>
   );
 }
 
-function PlanBody({ plan }: { plan: SetupPlan }) {
-  const { state: copyAllState, copy: copyAll } = useClipboard();
-  const { commands, manualSteps, unavailable } = plan;
-  const script = commands.map((c) => c.command).join('\n');
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const copyBtnRef = useRef<HTMLButtonElement>(null);
-
-  useGSAP(
-    () => {
-      if (shouldSkipEntrance() || !bodyRef.current) return;
-      const sections = bodyRef.current.querySelectorAll('.plan-section-block');
-      if (sections.length > 0) {
-        gsap.fromTo(
-          sections,
-          { opacity: 0, y: 8 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: MOTION_DURATIONS.normal,
-            stagger: 0.05,
-            ease: MOTION_EASINGS.subtle,
-            clearProps: 'transform',
-          },
-        );
-      }
-    },
-    { scope: bodyRef },
-  );
-
-  useGSAP(
-    () => {
-      if (prefersReducedMotion() || copyAllState !== 'copied' || !copyBtnRef.current) return;
-      const icon = copyBtnRef.current.querySelector('.copy-all-icon');
-      if (icon) {
-        gsap.fromTo(
-          icon,
-          { scale: 0.6, opacity: 0 },
-          {
-            scale: 1,
-            opacity: 1,
-            duration: MOTION_DURATIONS.micro,
-            ease: MOTION_EASINGS.subtle,
-            clearProps: 'transform,opacity',
-          },
-        );
-      }
-    },
-    { dependencies: [copyAllState], scope: copyBtnRef },
-  );
-
-  if (commands.length === 0 && manualSteps.length === 0 && unavailable.length === 0) {
-    return (
-      <Empty className="border border-dashed">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <TerminalSquare />
-          </EmptyMedia>
-          <EmptyTitle>Nothing to install</EmptyTitle>
-          <EmptyDescription>Select some applications and generate the plan again.</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    );
-  }
+function PlanResults({ plan }: { plan: SetupPlan }) {
+  const { state: copied, copy } = useClipboard();
+  const statusInfo = PLAN_STATUS[plan.status] ?? PLAN_STATUS.partial;
+  const { commands, manualSteps, unavailable, summary } = plan;
+  const allCommands = commands.map((command) => command.command).join('\n');
 
   return (
-    <div ref={bodyRef} className="flex flex-col gap-6">
-      <div className="plan-section-block">
-        <PlanSummary plan={plan} />
-      </div>
-
-      {plan.resolutions.length > 0 && (
-        <div className="plan-section-block">
-          <ResolutionTable resolutions={plan.resolutions} />
-        </div>
-      )}
+    <div className="grid gap-8">
+      <section className="plan-summary" aria-labelledby="plan-summary-heading">
+        <h2 id="plan-summary-heading" className={cn('text-headline-md', statusInfo.tone)}>{statusInfo.title}</h2>
+        <p className="text-body-sm text-text-secondary">
+          {summary.selected} applications selected · {summary.installable} installable · {summary.manual} manual · {summary.unavailable} unavailable
+        </p>
+      </section>
 
       {commands.length > 0 && (
-        <section aria-labelledby="commands-heading" className="plan-section-block">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 id="commands-heading" className="text-sm font-medium">
-              Run these in your terminal, in order
-            </h3>
-            <Button ref={copyBtnRef} type="button" variant="outline" size="sm" onClick={() => copyAll(script)} className="gap-1.5">
-              {copyAllState === 'copied' ? (
-                <Check aria-hidden="true" className={cn('copy-all-icon', OUTCOMES.installable.text)} />
-              ) : (
-                <Copy aria-hidden="true" className="copy-all-icon" />
-              )}
-              <span>{copyAllState === 'copied' ? 'Copied' : 'Copy all'}</span>
-              <Kbd className="hidden sm:inline-flex text-[9px]">Alt+Y</Kbd>
-            </Button>
+        <section aria-labelledby="commands-heading" className="grid gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 id="commands-heading" className="text-headline-md text-text-primary">Commands to review</h2>
+              <p className="text-body-sm text-text-secondary">ConfigShell does not run these for you. Review and run them yourself when ready.</p>
+            </div>
+            <button type="button" className="secondary-button" onClick={() => copy(allCommands)}>
+              <Copy size={16} aria-hidden="true" /> {copied === 'copied' ? 'Copied' : 'Copy all commands'}
+            </button>
           </div>
-
-          <p className="mt-1 text-xs text-muted-foreground">
-            ConfigShell does not run these for you. Read each one before you run it.
-            Commands marked “Runs as root” change your system.
-          </p>
-
-          <ol className="mt-3 flex flex-col gap-3">
-            {commands.map((command, index) => (
-              <li key={`${command.command}-${index}`} className="flex gap-3">
-                <span
-                  aria-hidden="true"
-                  className="mt-3 w-5 shrink-0 text-right font-mono text-xs text-muted-foreground"
-                >
-                  {index + 1}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <CommandBlock
-                    command={command.command}
-                    privileged={command.privileged}
-                    summary={command.summary}
-                    note={command.note}
-                  />
-                </div>
-              </li>
-            ))}
-          </ol>
+          {commands.map((command, index) => (
+            <article key={`${command.stepKind}:${index}`} className="plan-command">
+              <div className="plan-command__header">
+                <span className={OUTCOMES.installable.text}>{OUTCOMES.installable.label}</span>
+                {command.summary && <span>{command.summary}</span>}
+                {command.privileged && <span className={cn('plan-command__privilege', OUTCOMES.privileged.text)}>{OUTCOMES.privileged.label}</span>}
+              </div>
+              <div className="plan-command__body">
+                <code>{command.command}</code>
+                <button type="button" className="secondary-button" aria-label={`Copy command ${index + 1}`} onClick={() => copy(command.command)}>
+                  <Copy size={16} aria-hidden="true" /> <span className="sr-only">Copy command</span>
+                </button>
+              </div>
+            </article>
+          ))}
         </section>
       )}
 
-      {/* A privileged step deserves its own warning in its own box — it
-          changes the system, and saying so once at the top of the command
-          list is easier to miss. Not "destructive": a root command is not an
-          error, and it must not borrow the error colour. */}
-      {commands.some((c) => c.privileged) && (
-        <div className="plan-section-block">
-          <Alert>
-            <ShieldAlert aria-hidden="true" />
-            <AlertTitle>Important</AlertTitle>
-            <AlertDescription>
-              Steps marked “Runs as root” change your system. The flag is the resolver&apos;s
-              signal that a command needs elevated privileges. ConfigShell never runs a command
-              for you; read each one and execute it yourself in your own terminal.
-            </AlertDescription>
-          </Alert>
-        </div>
-      )}
-
-      {commands.some((c) => c.stepKind === 'verify') && (
-        <div className="plan-section-block">
-          <VerificationNote />
-        </div>
-      )}
-
       {manualSteps.length > 0 && (
-        <div className="plan-section-block">
-          <ManualSteps steps={manualSteps} />
-        </div>
+        <section className="plan-outcome-list" aria-labelledby="manual-heading">
+          <h2 id="manual-heading" className={OUTCOMES.manual.text}>{OUTCOMES.manual.label}</h2>
+          <p className="text-body-sm text-text-secondary">Install these yourself, following the vendor instructions.</p>
+          {manualSteps.map((step) => (
+            <article key={step.applicationId} className="plan-outcome-card">
+              <h3>{step.applicationName}</h3>
+              <p>{step.summary}</p>
+              {step.url && <a href={step.url} target="_blank" rel="noreferrer" aria-label={`Vendor instructions for ${step.applicationName}`}>Vendor instructions</a>}
+            </article>
+          ))}
+        </section>
       )}
+
       {unavailable.length > 0 && (
-        <div className="plan-section-block">
-          <UnavailableList entries={unavailable} />
-        </div>
+        <section className="plan-outcome-list" aria-labelledby="unavailable-heading">
+          <h2 id="unavailable-heading" className={OUTCOMES.unavailable.text}>{OUTCOMES.unavailable.label}</h2>
+          <p className="text-body-sm text-text-secondary">No verified installation source is available for these selections on this distribution.</p>
+          {unavailable.map((entry) => (
+            <article key={entry.applicationId} className="plan-outcome-card">
+              <h3>{entry.applicationName}</h3>
+              <p>{entry.explanation}</p>
+            </article>
+          ))}
+        </section>
       )}
 
-      <Separator className="plan-section-block" />
-
-      <p className="plan-section-block flex items-start gap-2 text-xs text-muted-foreground">
-        <ShieldAlert aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
-        <span>
-          {commands.length > 0 ? (
-            <>
-              Every command above is built from verified catalog data. ConfigShell never
-              assembles one from anything you typed. Nothing on this page can execute a
-              command; running them is your own deliberate act in your own terminal.
-            </>
-          ) : (
-            <>
-              ConfigShell generated no commands for this selection, and it does not invent
-              ones it cannot build from verified catalog data. Nothing on this page can
-              execute a command.
-            </>
-          )}
-        </span>
-      </p>
+      <p className="plan-boundary">This is a read-only plan. Nothing is installed or changed on your system.</p>
     </div>
-  );
-}
-
-function PlanSummary({ plan }: { plan: SetupPlan }) {
-  const { summary } = plan;
-  const status = PLAN_STATUS[plan.status];
-  const StatusIcon = status.Icon;
-  const summaryRef = useRef<HTMLDivElement>(null);
-
-  useGSAP(
-    () => {
-      if (shouldSkipEntrance() || !summaryRef.current) return;
-      const tiles = summaryRef.current.querySelectorAll('.plan-outcome-tile');
-      if (tiles.length > 0) {
-        gsap.fromTo(
-          tiles,
-          { opacity: 0, scale: 0.96 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: MOTION_DURATIONS.normal,
-            stagger: 0.03,
-            ease: MOTION_EASINGS.subtle,
-            clearProps: 'transform',
-          },
-        );
-      }
-    },
-    { scope: summaryRef },
-  );
-
-  /*
-   * Four counts, four outcomes, one presentation map. Each tile carries its
-   * label and icon as well as its colour, so the distinction does not depend
-   * on seeing the colour.
-   */
-  const tiles = [
-    { outcome: 'installable' as const, value: summary.installable },
-    { outcome: 'manual' as const, value: summary.manual },
-    { outcome: 'unavailable' as const, value: summary.unavailable },
-    { outcome: 'privileged' as const, value: summary.privilegedCommands },
-  ];
-
-  return (
-    <Card ref={summaryRef}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <StatusIcon aria-hidden="true" className={`size-4 shrink-0 ${status.tone}`} />
-          {status.title}
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          {summary.selected} application{summary.selected === 1 ? '' : 's'} selected ·{' '}
-          {summary.installable} with a command · {summary.manual} manual ·{' '}
-          {summary.unavailable} with no route
-        </p>
-      </CardHeader>
-      <CardContent>
-        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {tiles.map(({ outcome, value }) => {
-            const { label, Icon, text } = OUTCOMES[outcome];
-            return (
-              <div key={outcome} className="plan-outcome-tile rounded-lg bg-muted/50 px-3 py-2">
-                <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Icon aria-hidden="true" className={`size-3.5 shrink-0 ${text}`} />
-                  {label}
-                </dt>
-                {/* A zero is not a warning: an amber "0 runs as root" draws
-                    the eye to the absence of a thing worth noticing. */}
-                <dd
-                  className={`mt-0.5 text-lg font-semibold tabular-nums ${
-                    value === 0 ? 'text-muted-foreground' : text
-                  }`}
-                >
-                  {value}
-                </dd>
-              </div>
-            );
-          })}
-        </dl>
-      </CardContent>
-    </Card>
-  );
-}
-
-/**
- * What happened to each selected application, one row each.
- *
- * The sections below this one group by outcome, which answers "what do I run"
- * but not "what happened to the thing I picked" — with a dozen applications a
- * user had to scan three lists to find one name. This is the same data the
- * resolver already returned (`plan.resolutions`), in selection order.
- *
- * A CSS grid rather than a `<table>`: the columns need to collapse to two on a
- * phone, which a table cannot do without losing its own semantics. The roles
- * are declared explicitly so it is still announced as a table, and the header
- * row is real rather than implied by styling.
- */
-function ResolutionTable({ resolutions }: { resolutions: SetupPlan['resolutions'] }) {
-  const OUTCOME_FOR = {
-    resolved: OUTCOMES.installable,
-    manual: OUTCOMES.manual,
-    unavailable: OUTCOMES.unavailable,
-  } as const;
-
-  return (
-    <section aria-labelledby="resolutions-heading">
-      <h3 id="resolutions-heading" className="text-sm font-medium">
-        What happened to each application
-      </h3>
-
-      <div
-        role="table"
-        aria-labelledby="resolutions-heading"
-        className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 overflow-hidden rounded-lg border border-border sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto]"
-      >
-        <div role="row" className="col-span-full grid grid-cols-subgrid border-b border-border bg-muted/50 px-3 py-1.5">
-          <span role="columnheader" className="text-xs font-medium text-muted-foreground">
-            Application
-          </span>
-          {/* The method is the one column worth dropping on a phone: it is
-              repeated in full next to every command further down the page. */}
-          <span role="columnheader" className="hidden text-xs font-medium text-muted-foreground sm:block">
-            Method
-          </span>
-          <span role="columnheader" className="text-right text-xs font-medium text-muted-foreground">
-            Status
-          </span>
-        </div>
-
-        {resolutions.map((resolution) => {
-          const { label, Icon, text } = OUTCOME_FOR[resolution.outcome];
-          return (
-            <div
-              key={resolution.applicationId}
-              role="row"
-              className="col-span-full grid grid-cols-subgrid items-center border-b border-border/60 px-3 py-1.5 last:border-b-0"
-            >
-              <span role="cell" className="truncate text-sm">
-                {resolution.applicationName}
-              </span>
-              <span role="cell" className="hidden truncate font-mono text-xs text-muted-foreground sm:block">
-                {resolution.source ? `${resolution.source.method} · ${resolution.source.identifier}` : 'None'}
-              </span>
-              <span role="cell" className={cn('flex items-center justify-end gap-1.5 text-xs whitespace-nowrap', text)}>
-                <Icon aria-hidden="true" className="size-3.5 shrink-0" />
-                {label}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-function VerificationNote() {
-  return (
-    <Alert>
-      <CheckCircle2 />
-      <AlertTitle>How you'll know it worked</AlertTitle>
-      <AlertDescription>
-        The last commands check that each application landed on your{' '}
-        <code className="font-mono text-xs">PATH</code>. A line of output means it is
-        installed; no output means it is not. ConfigShell cannot check this for you. It has
-        no access to your machine.
-      </AlertDescription>
-    </Alert>
-  );
-}
-
-function ManualSteps({ steps }: { steps: SetupPlan['manualSteps'] }) {
-  const ManualIcon = OUTCOMES.manual.Icon;
-
-  return (
-    <section aria-labelledby="manual-heading">
-      <h3 id="manual-heading" className="flex items-center gap-1.5 text-sm font-medium">
-        <ManualIcon aria-hidden="true" className={`size-4 ${OUTCOMES.manual.text}`} />
-        You'll need to install these yourself
-      </h3>
-      <p className="mt-1 text-xs text-muted-foreground">
-        There is no safe command to generate for these, so ConfigShell does not invent one.
-        Follow the vendor's own instructions.
-      </p>
-
-      <ul className="mt-3 flex flex-col gap-2">
-        {steps.map((step) => (
-          <li key={step.applicationId} className="rounded-lg border border-border bg-card p-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm font-medium">{step.applicationName}</p>
-              <span className="flex flex-wrap items-center gap-1.5">
-                {/* The outcome first, then why — never only the reason, which
-                    on its own reads like a note on something installable. */}
-                <Badge variant="outline" className={OUTCOMES.manual.text}>
-                  <ManualIcon aria-hidden="true" className="size-3" />
-                  {OUTCOMES.manual.label}
-                </Badge>
-                <Badge variant="outline">
-                  {step.reason === 'repository-setup-required'
-                    ? 'Needs a vendor repository'
-                    : 'Vendor download only'}
-                </Badge>
-              </span>
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {step.reason === 'repository-setup-required'
-                ? "Installing it means adding the vendor's own repository to your system. ConfigShell does not generate repository-setup commands, including signing keys."
-                : 'The vendor distributes it as a download rather than through a package manager.'}
-            </p>
-            {step.url && (
-              <Button variant="link" size="sm" className="mt-1 h-auto p-0 text-xs" asChild>
-                <a href={step.url} target="_blank" rel="noreferrer noopener">
-                  Vendor instructions
-                  <ExternalLink aria-hidden="true" className="size-3" />
-                </a>
-              </Button>
-            )}
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-function UnavailableList({ entries }: { entries: SetupPlan['unavailable'] }) {
-  const UnavailableIcon = OUTCOMES.unavailable.Icon;
-
-  return (
-    <section aria-labelledby="unavailable-heading">
-      <h3 id="unavailable-heading" className="flex items-center gap-1.5 text-sm font-medium">
-        <UnavailableIcon aria-hidden="true" className={`size-4 ${OUTCOMES.unavailable.text}`} />
-        No verified route for this distribution
-      </h3>
-      <p className="mt-1 text-xs text-muted-foreground">
-        ConfigShell has no verified source for these here, so it shows no command rather
-        than one that would fail.
-      </p>
-      <ul className="mt-3 flex flex-col gap-2">
-        {entries.map((entry) => (
-          <li key={entry.applicationId} className="rounded-lg border border-dashed border-border p-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm font-medium">{entry.applicationName}</p>
-              <Badge variant="outline" className={OUTCOMES.unavailable.text}>
-                <UnavailableIcon aria-hidden="true" className="size-3" />
-                {OUTCOMES.unavailable.label}
-              </Badge>
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">{entry.explanation}</p>
-          </li>
-        ))}
-      </ul>
-    </section>
   );
 }

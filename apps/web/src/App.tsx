@@ -4,59 +4,54 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AppCatalog } from '@/components/applications/AppCatalog';
+import { CatalogRegion } from '@/components/applications/CatalogRegion';
+import { PageContainer } from '@/components/layout/PageContainer';
 import { ConnectView } from '@/components/connect/ConnectView';
 import { AppDetailSheet } from '@/components/applications/AppDetailSheet';
 import { EnvironmentStep } from '@/components/environment/EnvironmentStep';
 import { AppShell } from '@/components/layout/AppShell';
-import { PageContainer } from '@/components/layout/PageContainer';
-import { PageIntro } from '@/components/layout/PageIntro';
 import { PlanView } from '@/components/plan/PlanView';
 import { RoleSelector } from '@/components/roles/RoleSelector';
-import { SelectionBar } from '@/components/selection/SelectionBar';
-import { SelectionSummary } from '@/components/selection/SelectionSummary';
-import { StatusBar } from '@/components/layout/StatusBar';
+
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { useSetupPlan } from '@/hooks/useSetupPlan';
 import type { Application, Distro, Role } from '@configshell/catalog';
 import { gsap, useGSAP, shouldSkipEntrance, MOTION_EASINGS } from '@/lib/motion';
+import { StepperBar } from '@/components/layout/StepperBar';
 
-/**
- * The deterministic ConfigShell flow.
- *
- * Two views rather than a wizard: **build** (environment → role → browse →
- * select) stays one scrollable page, because every part of it is something a
- * user revises while looking at the rest. **plan** is separate, because it is a
- * different question — "here is what to run" — and mixing it into the browse
- * page would bury it.
- *
- * Selection state lives here and is the single source of truth for both views.
- */
+/** Selection state lives here — one source of truth for the app views. */
+export type NavRoute = 'app-catalog' | 'os-and-distro' | 'role-matrix' | 'plan-and-generate' | 'cli-detection';
 type View = 'build' | 'plan' | 'connect';
 
 /**
- * The one path with a real URL.
- *
- * `build` and `plan` are steps in a single task and share `/`; moving between
- * them is not a navigation a user would bookmark or share. `connect` is: it
- * shows the MCP endpoint someone is meant to copy, link to and come back to, so
- * it gets an address.
- *
- * Deliberately not `/mcp` — that path is the MCP endpoint itself, mounted by
- * the server ahead of this app, and a browser hitting it gets protocol frames
- * rather than a page.
- *
- * Hand-rolled rather than adding a router: two routes do not justify the
- * dependency, and the server's SPA fallback already serves index.html for any
- * path outside `/api`, `/health` and the MCP endpoint.
+ * Within the 'build' view, sub-sections scroll into view rather than routing.
+ * The active nav pill tracks which section is in view.
  */
+export type BuildSection = 'app-catalog' | 'os-and-distro' | 'role-matrix';
+
 const CONNECT_PATH = '/connect';
+
+function routeToView(route: NavRoute): View {
+  if (route === 'plan-and-generate') return 'plan';
+  if (route === 'cli-detection') return 'connect';
+  return 'build';
+}
+
+function routeFromPath(pathname: string): NavRoute {
+  if (pathname === CONNECT_PATH) return 'cli-detection';
+  return 'app-catalog';
+}
 
 export default function App() {
   const [view, setView] = useState<View>(() =>
     typeof window !== 'undefined' && window.location.pathname === CONNECT_PATH
       ? 'connect'
       : 'build',
+  );
+  const [activeRoute, setActiveRoute] = useState<NavRoute>(() =>
+    typeof window !== 'undefined' && window.location.pathname === CONNECT_PATH
+      ? 'cli-detection'
+      : 'app-catalog',
   );
   const [distro, setDistro] = useState<Distro | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -65,6 +60,14 @@ export default function App() {
 
   const { status, plan, error, generate, reset } = useSetupPlan();
   const planHeadingRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
+  // Ref so navigateTo can call buildPlan even though it's defined after navigateTo
+  const buildPlanRef = useRef<(() => void) | null>(null);
+
+  // Section refs for scrolling
+  const osSectionRef = useRef<HTMLDivElement>(null);
+  const roleSectionRef = useRef<HTMLDivElement>(null);
+  const catalogSectionRef = useRef<HTMLDivElement>(null);
 
   const toggleApp = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -75,7 +78,7 @@ export default function App() {
     });
   }, []);
 
-  const removeApp = useCallback((id: string) => {
+  const _removeApp = useCallback((id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
@@ -88,41 +91,63 @@ export default function App() {
     setAppliedRoleId(null);
   }, []);
 
-  /**
-   * Applying a preset **adds** to the selection rather than replacing it, so a
-   * user who has already hand-picked things does not lose them (PRD §19).
-   */
   const applyRole = useCallback((role: Role) => {
     setSelectedIds((prev) => new Set([...prev, ...role.recommended]));
     setAppliedRoleId(role.id);
   }, []);
 
-  /**
-   * A plan is only true for the selection and distribution it was built from.
-   * Changing either invalidates it, so it is dropped rather than left on screen
-   * describing something the user has moved on from.
-   */
   useEffect(() => {
     reset();
   }, [selectedIds, distro, reset]);
 
-  /** Navigate to the connect page, keeping the address bar honest. */
+  /** Navigate to a specific route, keeping address bar honest. */
+  const navigateTo = useCallback((route: NavRoute) => {
+    setActiveRoute(route);
+
+    if (route === 'cli-detection') {
+      window.history.pushState({}, '', CONNECT_PATH);
+      setView('connect');
+      return;
+    }
+
+    if (route === 'plan-and-generate') {
+      // buildPlan is defined below — safe to call because this callback
+      // only runs on user interaction, after all hooks have initialised.
+      buildPlanRef.current?.();
+      return;
+    }
+
+    window.history.pushState({}, '', '/');
+    setView('build');
+
+    setTimeout(() => {
+      if (route === 'os-and-distro') {
+        osSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (route === 'role-matrix') {
+        roleSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (route === 'app-catalog') {
+        catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 50);
+  }, []);
+
   const openConnect = useCallback(() => {
     window.history.pushState({}, '', CONNECT_PATH);
     setView('connect');
+    setActiveRoute('cli-detection');
   }, []);
 
-  /** Leave it again, restoring `/`. */
   const leaveConnect = useCallback(() => {
     window.history.pushState({}, '', '/');
     setView('build');
+    setActiveRoute('app-catalog');
   }, []);
 
-  // Back/forward must work like any other page, not strand the user on a view
-  // the address bar disagrees with.
   useEffect(() => {
     const onPopState = () => {
-      setView(window.location.pathname === CONNECT_PATH ? 'connect' : 'build');
+      const route = routeFromPath(window.location.pathname);
+      setActiveRoute(route);
+      setView(routeToView(route));
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
@@ -137,16 +162,18 @@ export default function App() {
   const buildPlan = useCallback(() => {
     if (!distro || selectedIds.size === 0) return;
     setView('plan');
+    setActiveRoute('plan-and-generate');
     void generate([...selectedIds], distro);
   }, [distro, selectedIds, generate]);
 
-  // Moving between views is a navigation, so move focus with it rather than
-  // leaving a keyboard or screen-reader user at the bottom of the old page.
+  // Keep ref in sync so navigateTo can reach buildPlan without a stale closure
+  buildPlanRef.current = buildPlan;
+
   useEffect(() => {
     if (view === 'plan') planHeadingRef.current?.focus();
   }, [view]);
 
-  // Global keyboard shortcuts for expert users & accessibility
+  // Global keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
@@ -157,7 +184,6 @@ export default function App() {
           target.tagName === 'SELECT' ||
           target.isContentEditable);
 
-      // Ctrl+Enter / Cmd+Enter: Trigger Build Plan
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         if (view === 'build' && canContinue) {
           e.preventDefault();
@@ -166,14 +192,12 @@ export default function App() {
         return;
       }
 
-      // Alt+C: Clear all selections
       if (e.altKey && (e.key === 'c' || e.key === 'C')) {
         e.preventDefault();
         clearAll();
         return;
       }
 
-      // /: Quick-focus application search
       if (e.key === '/' && !isInput && !e.ctrlKey && !e.metaKey && !e.altKey) {
         const searchInput = document.getElementById('app-search') as HTMLInputElement | null;
         if (searchInput) {
@@ -183,11 +207,21 @@ export default function App() {
         return;
       }
 
-      // Escape: Back to selection when on plan view
+      // ⌘K / Ctrl+K — focus search
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.getElementById('app-search') as HTMLInputElement | null;
+        if (searchInput) {
+          searchInput.focus();
+        }
+        return;
+      }
+
       if (e.key === 'Escape' && !isInput) {
         if (view === 'plan') {
           e.preventDefault();
           setView('build');
+          setActiveRoute('app-catalog');
         }
       }
     };
@@ -195,8 +229,6 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [view, canContinue, buildPlan, clearAll]);
-
-  const mainRef = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
@@ -227,12 +259,6 @@ export default function App() {
             { opacity: 0, y: 8 },
             { opacity: 1, y: 0, duration: 0.3, ease: MOTION_EASINGS.subtle, clearProps: 'transform' },
             0.15,
-          )
-          .fromTo(
-            '.motion-entrance-summary',
-            { opacity: 0, y: 8 },
-            { opacity: 1, y: 0, duration: 0.3, ease: MOTION_EASINGS.subtle, clearProps: 'transform' },
-            0.2,
           );
       } else if (view === 'plan') {
         gsap.fromTo(
@@ -245,14 +271,16 @@ export default function App() {
     { dependencies: [view], scope: mainRef },
   );
 
-  // The connect page is its own <main> and shares none of the build/plan
-  // layout, so it renders beside that container rather than inside it.
   if (view === 'connect') {
     return (
       <TooltipProvider>
-        <AppShell onOpenConnect={openConnect} connectActive>
+        <AppShell
+          activeRoute={activeRoute}
+          onNavigate={navigateTo}
+          onOpenConnect={openConnect}
+          connectActive
+        >
           <ConnectView onBack={leaveConnect} />
-          <StatusBar view="connect" />
         </AppShell>
       </TooltipProvider>
     );
@@ -260,87 +288,59 @@ export default function App() {
 
   return (
     <TooltipProvider>
-      <AppShell onOpenConnect={openConnect}>
-        <PageContainer as="main" ref={mainRef} className="flex-1 pb-6">
+      <AppShell
+        activeRoute={activeRoute}
+        onNavigate={navigateTo}
+        onOpenConnect={openConnect}
+      >
+        <main
+          ref={mainRef}
+          className="flex-1 bg-surface-base min-h-dvh"
+        >
           {view === 'build' ? (
-            <>
-              <div className="motion-entrance-header">
-                <PageIntro />
-              </div>
-
-              {/*
-                The page grid. One column until there is room for two; then
-                primary content takes the free space and the selection panel
-                gets a bounded, readable column. `minmax(0, 1fr)` rather than
-                `1fr` on the first track: a bare `1fr` has a min-content floor,
-                so a long command or identifier inside the catalog would widen
-                the whole page instead of wrapping.
-              */}
-              <div className="grid grid-cols-1 gap-(--layout-gap) lg:grid-cols-[minmax(0,1fr)_minmax(280px,340px)] lg:items-start">
-                {/*
-                  `minmax(0, 1fr)` on the single column is load-bearing, not
-                  decoration: a grid item's default `min-width: auto` lets a
-                  nowrap label inside the environment cards size this track to
-                  max-content, which pushed the whole page past 1200px on a
-                  phone. An `auto` track would do it again.
-                */}
-                <div className="grid auto-rows-min grid-cols-[minmax(0,1fr)] gap-(--layout-gap)">
-                  <div className="motion-entrance-env">
-                    <EnvironmentStep distro={distro} onSelect={setDistro} />
-                  </div>
-                  <div className="motion-entrance-roles">
-                    <RoleSelector
-                      appliedRoleId={appliedRoleId}
-                      onApply={applyRole}
-                      onClear={clearAll}
-                    />
-                  </div>
-                  <div className="motion-entrance-catalog">
-                    <AppCatalog
-                      selectedIds={selectedIds}
-                      onToggle={toggleApp}
-                      onOpenDetails={setDetailApp}
-                    />
-                  </div>
+            <div className="relative w-full">
+              <PageContainer className="page-content flex flex-col">
+                <div ref={osSectionRef} className="motion-entrance-env">
+                  <EnvironmentStep distro={distro} onSelect={setDistro} />
                 </div>
-
-                <div className="motion-entrance-summary lg:sticky lg:top-3 lg:max-h-[calc(100svh-1.5rem)] lg:overflow-y-auto">
-                  <SelectionSummary
+                <div ref={roleSectionRef} className="motion-entrance-roles">
+                  <RoleSelector appliedRoleId={appliedRoleId} onApply={applyRole} onClear={clearAll} />
+                </div>
+                <div ref={catalogSectionRef} className="motion-entrance-catalog">
+                  <CatalogRegion
                     selectedIds={selectedIds}
-                    onRemove={removeApp}
-                    onClear={clearAll}
-                    canContinue={canContinue}
-                    blockedReason={blockedReason}
-                    onContinue={buildPlan}
+                    onToggle={toggleApp}
+                    onOpenDetails={setDetailApp}
                   />
                 </div>
-              </div>
-            </>
+              </PageContainer>
+            </div>
           ) : (
-            <div ref={planHeadingRef} tabIndex={-1} className="py-4 outline-none">
+            <div ref={planHeadingRef} tabIndex={-1} className="outline-none">
               <PlanView
                 status={status}
                 plan={plan}
                 error={error}
-                onBack={() => setView('build')}
+                onBack={() => {
+                  setView('build');
+                  setActiveRoute('app-catalog');
+                }}
                 onRetry={buildPlan}
               />
             </div>
           )}
-        </PageContainer>
+        </main>
 
+        {/* Selection summary and plan action (build view only) */}
         {view === 'build' && (
-          <SelectionBar
-            selectedIds={selectedIds}
-            onRemove={removeApp}
-            onClear={clearAll}
+          <StepperBar
+            selectedCount={selectedIds.size}
             canContinue={canContinue}
             blockedReason={blockedReason}
             onContinue={buildPlan}
+            onClear={clearAll}
           />
         )}
-
-        <StatusBar view={view} />
 
         <AppDetailSheet
           app={detailApp}

@@ -41,7 +41,7 @@ exercise; it is a gap analysis on a healthy base.
 Catalog claims were recomputed from the data rather than trusted: **31 applications, 116
 installation sources**, `apt` 28 / `dnf` 22 / `pacman` 23 / `flatpak` 21 / `snap` 20 /
 `official` 2; `distro` 58 / `vendor` 36 / `community` 22; native coverage 25/25/22/23 for
-Ubuntu/Debian/Fedora/Arch. **Every count in `docs/catalog.md` is exactly correct.**
+Ubuntu/Fedora/Arch. **Every count in `docs/catalog.md` is exactly correct.**
 
 ---
 
@@ -330,7 +330,7 @@ phase are mostly parallelisable.
 | ID | Item |
 | -- | ---- |
 | B1 | Add an `Environment` type to `packages/catalog` (alongside `Distro`), with an explicit `os: 'linux'` field, the selected distribution, the derived package ecosystem, and an optional architecture. Linux-only values; no macOS/Windows data (R-03). |
-| B2 | Derive ecosystem from distribution in one place (`Ubuntu|Debian → apt`, `Fedora → dnf`, `Arch Linux → pacman`) rather than scattering the mapping. `validate.ts`'s `METHOD_DISTROS` is the existing home for this knowledge — reuse it, do not duplicate it. |
+| B2 | Derive ecosystem from distribution in one place (`Ubuntu → apt`, `Fedora → dnf`, `Arch Linux → pacman`) rather than scattering the mapping. `validate.ts`'s `METHOD_DISTROS` is the existing home for this knowledge — reuse it, do not duplicate it. |
 | B3 | Thread the environment through `apps/web`: `App.tsx` → `AppCatalog` → `AppCard`, replacing the write-only `distro` state (§2.2). |
 | B4 | Keep detection honest: `useLinuxDetection` continues to report only "looks like Linux"; the environment is always an explicit user choice. Real detection stays Future. |
 
@@ -480,7 +480,7 @@ back to P0.
 > of this section is kept as the record of what was decided at the audited commit.
 
 Active scope is the repository's **actual verified coverage**: apt / dnf / pacman across
-Ubuntu, Debian, Fedora and Arch Linux. Zypper/openSUSE becomes a later/future ecosystem.
+Ubuntu, Fedora and Arch Linux. Zypper/openSUSE becomes a later/future ecosystem.
 Amend the PRD and any other document to match the implementation rather than expanding the
 catalog to satisfy older PRD wording. No new catalog research is triggered by this.
 
