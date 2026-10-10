@@ -2,7 +2,7 @@
 #
 # Only usernames that are confirmed collaborators belong here: an unrecognised name
 # invalidates the ENTIRE file silently, and no reviews get requested at all.
-# The second maintainer's handle is not yet confirmed — see MAINTAINERS.md — so it is
+# The second maintainer's handle is not yet confirmed — see GOVERNANCE.md — so it is
 # commented out. Uncomment it once verified.
 
 # Default owner for everything in the repository.
@@ -12,9 +12,9 @@
 # Security-sensitive and architectural documents: changes here need maintainer review.
 /docs/security-model.md       @AbhiDevepl
 /docs/architecture.md         @AbhiDevepl
-/docs/ProductRequirements.md  @AbhiDevepl
-/docs/SECURITY.md             @AbhiDevepl
-/docs/NOTICE                  @AbhiDevepl
+/docs/product-requirements.md  @AbhiDevepl
+/SECURITY.md                  @AbhiDevepl
+/NOTICE                       @AbhiDevepl
 /LICENSE                      @AbhiDevepl
 
 # The trusted catalog — data correctness here is a security property.

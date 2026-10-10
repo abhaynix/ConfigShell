@@ -136,9 +136,8 @@ not represented by empty files.
   `ai.md`, `agent.md` and `mcp.md` are **status documents for unstarted layers**: they
   record constraints any future implementation must satisfy and explicitly state that
   nothing is implemented. Don't turn them into descriptions of working features.
-- **Turborepo is not used.** `turbo.json` was empty and has been deleted; root
-  `package.json` scripts orchestrate the workspaces with pnpm filters. Don't add a Turbo
-  pipeline unless the dependency graph actually needs one.
+- **Turborepo** orchestrates root workspace scripts through `turbo.json`. Keep task definitions aligned
+  with real workspace commands; source-only packages have no emitted build step or dev server.
 - **Lint vs. typecheck**: `pnpm lint` at the root is real ESLint (flat config in
   `eslint.config.js`, covering every workspace). `typecheck` is `tsc --noEmit` per
   TypeScript workspace. The old per-workspace `"lint": "tsc --noEmit"` scripts were
@@ -197,21 +196,21 @@ lucide-react dependency already in use). Config lives in `apps/web/components.js
 
 ## Commands
 
-Package manager is pnpm (workspace = `apps/*` + `packages/*`); Node >= 20.
+Package manager is pnpm (workspace = `apps/*`, `packages/*`, `tests/*`, `tooling/*`, and `skills/*`); Node >= 20.
 
 ```sh
 pnpm install                     # install all workspace deps, from repo root
 ```
 
-Root scripts (pnpm filters — there is no Turbo pipeline):
+Root scripts (Turbo orchestrates the real workspace tasks):
 ```sh
 pnpm dev                         # web (5173) + API (3000) in parallel
 pnpm dev:web                     # web only — the plan step needs the API
-pnpm build                       # == pnpm --filter web build
+pnpm build                       # Turbo fan-out; web build -> apps/web/dist
 pnpm start                       # == pnpm --filter server start (API + apps/web/dist)
-pnpm lint                        # eslint . across the whole repo (real ESLint)
-pnpm typecheck                   # tsc --noEmit for every TS workspace (strict, shared base)
-pnpm test                        # 293 tests across seven workspaces
+pnpm lint                        # ESLint in each workspace
+pnpm typecheck                   # strict TypeScript checks across workspaces
+pnpm test                        # Node test suites across workspaces
 pnpm mcp                         # start the MCP server on stdio
 pnpm check                       # lint -> typecheck -> test -> build (what CI runs)
 ```
@@ -260,13 +259,12 @@ node --test path/to/src/file.test.ts
 
 This is a public repository. Keep these accurate when you change anything they describe:
 
-- **All community-health documents live in `docs/`, not the repository root:**
+- **Community-health documents live at the repository root:**
   `CONTRIBUTING.md` (setup, branch/commit conventions, PR expectations),
   `SECURITY.md` (private vulnerability reporting — `docs/security-model.md` is the
   *model*, not the policy), `CODE_OF_CONDUCT.md`, `SUPPORT.md`,
   `GOVERNANCE.md`, `docs/ROADMAP.md`, `CHANGELOG.md`,
-  `THIRD_PARTY_NOTICES.md`, `NOTICE`. Only `README.md`, `AGENTS.md` and `LICENSE`
-  are at the root. Relative links from `docs/*` to the README need `../`.
+  `THIRD_PARTY_NOTICES.md`, `NOTICE`. Technical product documentation lives in `docs/`; `CLAUDE.md` points to these instructions. Relative links from `docs/*` to the README need `../`.
 - `.github/`: CI workflow, issue templates, PR template, `CODEOWNERS`, `dependabot.yml`,
   `GOOD_FIRST_ISSUES.md`.
 - Commit convention: lightweight Conventional Commits (`feat:`, `fix:`, `docs:`,
@@ -282,7 +280,7 @@ This is a public repository. Keep these accurate when you change anything they d
 **One container, one `Dockerfile`, every platform.** `docs/deployment.md` is the source of
 truth; the short version:
 
-- **`Dockerfile`** (repo root) is the *only* container definition. Multi-stage, Node
+- **`infra/docker/Dockerfile`** is the *only* container definition. Multi-stage, Node
   24-alpine, non-root `node` user, binds `0.0.0.0:$PORT`, handles SIGTERM. It packages the
   single Express process that already serves `/` (web), `/api/*`, `/mcp` and `/health` —
   do not add a second image or split MCP into its own service.
@@ -291,7 +289,7 @@ truth; the short version:
   `Dockerfile.vercel`; the config file exists so there is no second Dockerfile to drift.
   Never add a `Dockerfile.vercel` back as a real file — if the config route ever fails,
   make it a **symlink** to `Dockerfile`, which preserves the one-definition property.
-- **`compose.yml`** builds the same `Dockerfile` and adds hardening flags for local runs.
+- **`infra/docker/compose.yml`** builds the same Dockerfile and adds hardening flags for local runs.
   It is a convenience wrapper, not a separate deployment target.
 - **Configuration is one variable in practice**: `PUBLIC_BASE_URL`. The public MCP URL is
   derived as `PUBLIC_BASE_URL + MCP_PATH` (default `/mcp`); `$PORT` comes from the platform.

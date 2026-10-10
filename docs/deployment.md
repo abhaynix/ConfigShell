@@ -67,11 +67,8 @@ docker run --rm -p 3000:3000 -e PUBLIC_BASE_URL=http://localhost:3000 configshel
 
 ## Option B — deploy to a container platform
 
-Point the platform at this repository. Most detect the root `Dockerfile` with
-no configuration at all — Render, Railway, Fly and a plain VPS all do — and the
-only thing that usually needs setting is `PUBLIC_BASE_URL`.
-
-Platforms supply `$PORT` themselves; the server reads it. Do not hardcode one.
+Build from the repository root with infra/docker/Dockerfile. Set PUBLIC_BASE_URL; platforms
+supply PORT.
 
 ### Vercel
 

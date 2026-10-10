@@ -32,19 +32,22 @@ Adding an application that is missing entirely works the same way; check `packag
 
 ---
 
-### 2. Write the first tests for `apps/server`
+### 2. Add component behavior tests for the web app
 
 | | |
 | --- | --- |
-| **Difficulty** | Starter |
-| **Area** | `apps/server` |
-| **Files** | `apps/server/src/config/env.test.ts` |
-| **Skills** | Node's built-in test runner |
+| **Difficulty** | Intermediate |
+| **Area** | `apps/web` |
+| **Files** | `apps/web/src/components/`, test configuration |
+| **Skills** | React, TypeScript, accessible UI testing |
 
-`apps/server/src/config/env.ts` validates `PORT` and `NODE_ENV` and is pure, easily testable logic — and `pnpm --filter server test` currently finds zero test files. Cover: defaults when unset, a valid port, a non-numeric port, out-of-range ports (`0`, `70000`), and an invalid `NODE_ENV`.
+The web app has structural safety tests but no DOM test runner, so component behavior is the
+largest test gap. Propose a small test setup and cover one user-facing interaction, such as
+keyboard selection or an empty catalog state. Keep the test tooling focused and update the
+workspace scripts and documentation if a dependency is added.
 
-**Done when:** `pnpm --filter server test` reports passing tests instead of zero, and the error cases assert on the message, not just that it throws. (You will likely need to export the validation helpers, or set `process.env` before a dynamic `import()` — either is fine; explain which you chose.)
-
+**Done when:** the test runs through the normal workspace test command, asserts user-visible
+behavior, and does not change runtime code outside the behavior being covered.
 ---
 
 ### 3. Add a favicon

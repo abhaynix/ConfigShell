@@ -26,7 +26,7 @@ The package is published to the workspace as `@configshell/catalog` and consumed
 `apps/web` through a `workspace:*` dependency. It is TypeScript source with no build step:
 `main`/`types`/`exports` point directly at `src/index.ts`, and Vite and `tsc` both resolve
 it through the pnpm workspace symlink. That keeps the smallest correct setup — no `dist/`,
-no bundler config, no Turborepo pipeline needed just to read a list of applications.
+no bundler config or generated build output is needed just to read the catalog.
 
 Consumers import only from the package root:
 

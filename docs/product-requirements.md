@@ -6,7 +6,7 @@
 **Future Platforms:** macOS, Windows
 **Primary Users:** Developers, students, new Linux users
 **Status:** Planning / MVP definition
-**Repository:** Existing pnpm-workspace monorepo (no Turborepo — see §29)
+**Repository:** pnpm-workspace monorepo orchestrated by Turborepo
 **Amended:** 2026-09-16, per `docs/technical-audit.md` §9
 
 ---
@@ -1397,7 +1397,7 @@ You currently have the beginnings of:
 > because the audit's conclusions were drawn from it.
 
 ```text
-pnpm workspaces           ✓   (Turborepo ✗ — never installed, turbo.json deleted)
+pnpm workspaces + Turborepo task orchestration ✓
 React + Vite + TS         ✓
 Express backend           ~   scaffold only: starts, registers no routes;
                               18 files across controllers/services/routes/

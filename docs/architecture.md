@@ -408,16 +408,14 @@ by filling in those five, and the exhaustive `switch` statements made the compil
 
 ## Repository tooling
 
-- **Package manager:** pnpm workspaces (`apps/*`, `packages/*`), pinned via
-  `packageManager`. Root `package.json` scripts orchestrate the workspaces with pnpm
-  filters. There is deliberately **no Turborepo pipeline** — the dependency graph (one app
-  consuming one package) does not justify one yet.
-- **Lint:** one flat ESLint config at the root (`eslint.config.js`) covering every
-  workspace; `pnpm lint`.
-- **Types:** `tsc --noEmit` per TypeScript workspace; `pnpm typecheck`.
-- **Tests:** Node's built-in runner. `packages/catalog` is the only workspace with tests.
-- **CI:** `.github/workflows/ci.yml` runs install, lint, typecheck, test and build on
-  pushes to `main` and on pull requests, against Node 20 and 22.
+- **Package manager:** pnpm workspaces for apps, packages, tests, tooling, and skills.
+  Root scripts use Turborepo to run real workspace tasks.
+- **Lint:** workspace ESLint scripts share the root flat config.
+- **Types:** strict TypeScript checks per workspace.
+- **Tests:** Node's built-in runner via tsx; see the testing guide for suite coverage.
+- **CI:** the workflow installs, lints, typechecks, tests, and builds on Node 20 and 22.
+
+Source-only packages do not emit build output or provide standalone dev servers.
 
 See `docs/development.md` for the commands and `CONTRIBUTING.md` for the workflow.
 
