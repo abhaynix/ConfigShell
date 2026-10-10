@@ -264,7 +264,7 @@ This is a public repository. Keep these accurate when you change anything they d
   `SECURITY.md` (private vulnerability reporting — `docs/security-model.md` is the
   *model*, not the policy), `CODE_OF_CONDUCT.md`, `SUPPORT.md`,
   `GOVERNANCE.md`, `docs/ROADMAP.md`, `CHANGELOG.md`,
-  `THIRD_PARTY_NOTICES.md`, `NOTICE`. Technical product documentation lives in `docs/`; `CLAUDE.md` points to these instructions. Relative links from `docs/*` to the README need `../`.
+  `THIRD_PARTY_NOTICES.md`, `NOTICE`. Technical product documentation lives in `docs/`; `CLAUDE.md` points to these instructions. Relative links from `docs/*` to root files need `../`.
 - `.github/`: CI workflow, issue templates, PR template, `CODEOWNERS`, `dependabot.yml`,
   `GOOD_FIRST_ISSUES.md`.
 - Commit convention: lightweight Conventional Commits (`feat:`, `fix:`, `docs:`,

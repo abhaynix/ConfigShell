@@ -176,7 +176,7 @@ The UI already does several things right (`aria-live` counts, labelled controls,
 | --- | --- |
 | **Difficulty** | Starter |
 | **Area** | docs |
-| **Files** | `README.md`, `docs/*.md`, workspace READMEs, `CLAUDE.md` |
+| **Files** | `README.md`, `docs/*.md`, workspace READMEs, `AGENTS.md` |
 | **Skills** | patience, a terminal |
 
 Every command in the docs was verified when written, but docs drift. On a **fresh clone**, run each documented command in order, from the directory the docs say, and record what actually happens.

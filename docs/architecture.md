@@ -200,7 +200,7 @@ not two. Plan generation goes through `src/lib/api.ts`.
 Built primarily from **shadcn/ui** (Radix UI base) components under
 `src/components/ui/` (button, card, badge, checkbox, radio-group, input, toggle-group,
 separator, scroll-area, alert, sheet, empty, label, tooltip) rather than hand-rolled
-markup. `components.json` holds the shadcn config; see `CLAUDE.md`'s "shadcn/ui setup"
+markup. `components.json` holds the shadcn config; see `AGENTS.md`'s "shadcn/ui setup"
 section before adding more components or touching the `@/*` import alias.
 
 - `src/App.tsx` composes the page inside a `TooltipProvider`: `SiteHeader` (layout),

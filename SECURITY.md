@@ -2,7 +2,7 @@
 
 This file is about **reporting** security problems. For how the platform is *designed* to
 be safe — the trust boundaries, the catalog-as-trusted-data model, and the rules that
-govern future AI/MCP/agent work — see [`docs/security-model.md`](security-model.md).
+govern future AI/MCP/agent work — see [`docs/security-model.md`](docs/security-model.md).
 
 ## Supported versions
 
@@ -43,7 +43,7 @@ why identifiers are pattern-checked both in the catalog validator and again imme
 before interpolation), a flaw in the planning API's input validation, dependency
 vulnerabilities, supply-chain problems in the toolchain, and the repository's own hygiene.
 
-The design that contains these is in [`docs/security-model.md`](security-model.md). This
+The design that contains these is in [`docs/security-model.md`](docs/security-model.md). This
 policy will be updated as later layers land.
 
 ## Reporting a vulnerability
@@ -127,5 +127,5 @@ Please give us a reasonable chance to fix an issue before disclosing it publicly
 identifier there is not a cosmetic bug — it is what a future resolver would act on. Hence:
 identifiers must be verified against an authoritative source, no field may ever carry a
 command or shell fragment, and provenance (`origin`) must be recorded honestly. See
-[`docs/catalog.md`](catalog.md). Report a malicious or dangerously wrong catalog entry
+[`docs/catalog.md`](docs/catalog.md). Report a malicious or dangerously wrong catalog entry
 through the private channels above, not in a public issue.

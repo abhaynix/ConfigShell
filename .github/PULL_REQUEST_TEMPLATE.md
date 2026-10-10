@@ -36,7 +36,7 @@ pull request without sources cannot be reviewed. -->
 - [ ] No documentation change needed
 
 <!-- If you changed a command, script, or environment variable, make sure it is correct
-everywhere it appears: README.md, docs/, the workspace README, and CLAUDE.md. -->
+everywhere it appears: README.md, docs/, the workspace README, and AGENTS.md. -->
 
 ## Breaking changes
 

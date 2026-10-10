@@ -849,10 +849,9 @@ This can become one of ConfigShell's strongest open-source contribution mechanis
 
 # 29. Repository Architecture
 
-> **Corrected.** Turborepo was never actually installed — `turbo.json` was empty and has
-> been deleted. The monorepo is **pnpm workspaces**, orchestrated by root `package.json`
-> scripts with pnpm filters. Do not add a Turbo pipeline unless the dependency graph
-> genuinely needs one.
+> **Historical note (superseded).** At the time of the 2026-09-16 audit, the repository did not
+> use Turborepo. The current repository uses Turbo to orchestrate real workspace tasks; source-only
+> packages do not emit build artifacts or provide standalone dev servers.
 
 The existing repository uses a pnpm-workspace monorepo with:
 
