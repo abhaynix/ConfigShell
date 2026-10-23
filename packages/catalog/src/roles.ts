@@ -1,7 +1,7 @@
 /**
  * Role / use-case presets (PRD §15).
  *
- * A preset is a **curated list of catalog ids** and nothing else — no scoring,
+ * A preset is a **curated list of catalog ids** and nothing else, no scoring,
  * no heuristics, and emphatically no model. Picking "Web Developer" selects a
  * fixed, reviewable set of applications that a contributor can argue with in a
  * pull request, which is the whole point: a recommendation nobody can inspect
@@ -13,8 +13,8 @@
  * ## Why these roles and not the PRD's full list
  *
  * PRD §15 also names *AI/ML Developer*, *Designer* and *Video Editor*. The
- * catalog has no applications that would honestly serve them — no Python
- * toolchain, no Inkscape or Krita, no Kdenlive — so those roles are **omitted
+ * catalog has no applications that would honestly serve them, no Python
+ * toolchain, no Inkscape or Krita, no Kdenlive, so those roles are **omitted
  * rather than filled with loosely related entries**. It is the same rule the
  * catalog applies to package identifiers: absence means "not verified yet", and
  * a thin preset would be worse than none. Add the applications first, then the
@@ -29,7 +29,7 @@ export interface Role {
   /** Stable lowercase slug. */
   id: string;
   name: string;
-  /** One line, in the user's terms — what they do, not what they install. */
+  /** One line, in the user's terms, what they do, not what they install. */
   description: string;
   /**
    * Applications selected when the role is chosen. Every id must exist in the
@@ -48,56 +48,56 @@ export const ROLES: readonly Role[] = [
   {
     id: 'general',
     name: 'General',
-    description: 'Everyday desktop essentials — browsing, email, media, communication, and utilities.',
+    description: 'Everyday desktop essentials, browsing, email, media, communication, and utilities.',
     recommended: ['firefox', 'vlc', 'thunderbird', 'flameshot'],
     optional: ['bitwarden', 'timeshift', 'telegram-desktop', 'discord', 'gparted'],
   },
   {
     id: 'student',
     name: 'Student',
-    description: 'Study and coursework — note-taking, documents, research, PDFs, presentations, and collaboration.',
+    description: 'Study and coursework, note-taking, documents, research, PDFs, presentations, and collaboration.',
     recommended: ['libreoffice', 'obsidian', 'zotero', 'firefox', 'vlc'],
     optional: ['okular', 'flameshot', 'thunderbird', 'onlyoffice', 'zoom'],
   },
   {
     id: 'developer',
     name: 'Developer',
-    description: 'Software development essentials — code editors, Git, terminals, runtimes, databases, and developer utilities.',
+    description: 'Software development essentials, code editors, Git, terminals, runtimes, databases, and developer utilities.',
     recommended: ['git', 'vscode', 'neovim', 'ripgrep', 'tmux'],
     optional: ['github-cli', 'dbeaver', 'htop', 'btop', 'fzf'],
   },
   {
     id: 'web-developer',
     name: 'Web Developer',
-    description: 'Web development stack — browsers, Node.js, frontend tooling, API clients, databases, and web utilities.',
+    description: 'Web development stack, browsers, Node.js, frontend tooling, API clients, databases, and web utilities.',
     recommended: ['git', 'vscode', 'nodejs', 'firefox', 'postman'],
     optional: ['bun', 'insomnia', 'google-chrome', 'dbeaver', 'github-cli'],
   },
   {
     id: 'devops',
     name: 'DevOps',
-    description: 'Infrastructure and deployment — containers, Kubernetes, SSH, cloud CLIs, monitoring, and server tools.',
+    description: 'Infrastructure and deployment, containers, Kubernetes, SSH, cloud CLIs, monitoring, and server tools.',
     recommended: ['git', 'docker', 'curl', 'kubectl', 'terraform'],
     optional: ['ansible', 'podman', 'lazydocker', 'htop', 'minikube'],
   },
   {
     id: 'data-ai',
     name: 'Data & AI',
-    description: 'Data science and AI development — Python, Jupyter, ML tools, notebooks, model tooling, and data utilities.',
+    description: 'Data science and AI development, Python, Jupyter, ML tools, notebooks, model tooling, and data utilities.',
     recommended: ['python', 'jupyter', 'git', 'vscode'],
     optional: ['ollama', 'duckdb', 'curl', 'btop'],
   },
   {
     id: 'content-creator',
     name: 'Content Creator',
-    description: 'Video, audio, streaming, and content production — editors, recording tools, codecs, and media utilities.',
+    description: 'Video, audio, streaming, and content production, editors, recording tools, codecs, and media utilities.',
     recommended: ['obs-studio', 'kdenlive', 'audacity', 'gimp', 'vlc'],
     optional: ['blender', 'inkscape', 'handbrake', 'ffmpeg', 'krita'],
   },
   {
     id: 'gaming',
     name: 'Gaming',
-    description: 'Gaming essentials — game clients, compatibility layers, performance tools, and controllers.',
+    description: 'Gaming essentials, game clients, compatibility layers, performance tools, and controllers.',
     recommended: ['steam', 'lutris', 'mangohud', 'discord'],
     optional: ['heroic-games-launcher', 'bottles', 'obs-studio'],
   },
@@ -112,7 +112,7 @@ export function findRole(id: string): Role | undefined {
  * The applications a role names, in catalog order.
  *
  * Returns catalog entries rather than ids so a caller never has to look them up
- * again — and so an id that has fallen out of the catalog cannot silently
+ * again, and so an id that has fallen out of the catalog cannot silently
  * become an empty card in the UI.
  */
 export function applicationsForRole(

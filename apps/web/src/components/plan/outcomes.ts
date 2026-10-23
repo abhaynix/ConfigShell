@@ -4,14 +4,14 @@ import { CheckCircle2, HandMetal, Info, ShieldAlert, type LucideIcon } from 'luc
  * What can happen to one selected application, and how it is presented.
  *
  * The first three mirror the resolver's own outcomes (`resolved`, `manual`,
- * `unavailable` — see `@configshell/installer`). `privileged` is not an outcome
+ * `unavailable`, see `@configshell/installer`). `privileged` is not an outcome
  * but a property of a generated command, and it is here because it is the
  * fourth thing this screen has to distinguish at a glance.
  *
  * ## Why one map
  *
- * Status styling was previously chosen per component — a `text-primary` here,
- * a `variant="destructive"` there, an outline badge somewhere else — so the
+ * Status styling was previously chosen per component, a `text-primary` here,
+ * a `variant="destructive"` there, an outline badge somewhere else, so the
  * same concept looked different in three places and nothing stopped a fourth
  * from inventing a fifth appearance. Presentation lives here; components read
  * it.
@@ -20,7 +20,7 @@ import { CheckCircle2, HandMetal, Info, ShieldAlert, type LucideIcon } from 'luc
  *
  * Every entry carries a `label` and an `Icon` alongside its colour token. A
  * status is always rendered with at least its label, so the distinction
- * survives greyscale, colour blindness, and a screen reader — none of which
+ * survives greyscale, colour blindness, and a screen reader, none of which
  * can see a token.
  */
 export type PlanOutcome = 'installable' | 'manual' | 'unavailable' | 'privileged';
@@ -75,7 +75,7 @@ export const OUTCOMES: Record<PlanOutcome, OutcomePresentation> = {
  * How much of the selection produced a command, from the canonical plan.
  *
  * Mirrors `SetupPlan['status']` from the API rather than re-deriving it from
- * the counts — the server decides this, the same way it decides everything
+ * the counts, the server decides this, the same way it decides everything
  * else on this screen.
  */
 export const PLAN_STATUS = {

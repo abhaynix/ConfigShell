@@ -9,8 +9,8 @@
  * safer one: there is no catalog-fetch path to intercept or poison.
  *
  * **Planning is remote.** Resolution, ordering and command generation happen in
- * `packages/installer`, reached through `POST /api/plan`. The alternative —
- * importing the installer into the browser — would work, but it would put the
+ * `packages/installer`, reached through `POST /api/plan`. The alternative,
+ * importing the installer into the browser, would work, but it would put the
  * one security-critical function in the bundle and give two consumers two
  * places to drift apart. One implementation, one answer.
  *
@@ -19,7 +19,7 @@
  * that instead of silently degrading.
  *
  * Requests carry **catalog ids and a distribution name, and nothing else.** No
- * package name, command, flag or URL is ever sent — no such field exists.
+ * package name, command, flag or URL is ever sent, no such field exists.
  */
 
 import type { Distro, InstallMethod, RepositoryOrigin } from '@configshell/catalog';
@@ -177,11 +177,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     // A 5xx with an unreadable body is almost always a dev proxy reporting that
     // nothing is listening upstream, not the API misbehaving. Calling that
     // "malformed response" sends the reader looking in the wrong place, so it
-    // is classified as offline — which is also the retryable, actionable one.
+    // is classified as offline, which is also the retryable, actionable one.
     if (response.status >= 500) {
       throw new ApiRequestError(
         'offline',
-        'Could not reach the ConfigShell API — it returned no usable response.',
+        'Could not reach the ConfigShell API, it returned no usable response.',
       );
     }
     throw new ApiRequestError(
@@ -212,8 +212,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 /**
  * Generate a setup plan.
  *
- * Sends only `applicationIds` and `{ distro }`. Everything in the response —
- * which source, in what order, with what privileges, and the command text — is
+ * Sends only `applicationIds` and `{ distro }`. Everything in the response,
+ * which source, in what order, with what privileges, and the command text, is
  * decided server-side by `packages/installer`.
  */
 export function createPlan(applicationIds: string[], distro: Distro): Promise<SetupPlan> {
@@ -228,7 +228,7 @@ export function createPlan(applicationIds: string[], distro: Distro): Promise<Se
  * How one application resolves for one distribution.
  *
  * Wraps `GET /api/applications/:id?distro=…`. The UI uses this instead of
- * working applicability out for itself — see `useApplicationResolution`.
+ * working applicability out for itself, see `useApplicationResolution`.
  */
 export async function fetchApplicationResolution(
   applicationId: string,
@@ -261,7 +261,7 @@ export interface McpConnection {
  *
  * Comes from the server because only it knows `PUBLIC_BASE_URL`, and because
  * the tool list belongs to `@configshell/mcp`. A copy compiled into this bundle
- * would be a second source of truth, and it would go stale silently — the same
+ * would be a second source of truth, and it would go stale silently, the same
  * reason this app asks the API for anything the resolver decides.
  */
 export function fetchMcpConnection(): Promise<McpConnection> {

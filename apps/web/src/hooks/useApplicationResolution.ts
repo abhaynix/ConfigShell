@@ -8,7 +8,7 @@ export type ResolutionStatus = 'idle' | 'loading' | 'ready' | 'error';
  * Ask the API how one application resolves for one distribution.
  *
  * The web app deliberately does **not** compute this itself. Which sources
- * apply, and which one wins, is resolver policy — including rules the UI has no
+ * apply, and which one wins, is resolver policy, including rules the UI has no
  * business knowing, such as "a vendor package-manager source needs a repository
  * added first and is therefore not usable". An earlier version of this screen
  * re-derived applicability locally and got it wrong: it highlighted VS Code's

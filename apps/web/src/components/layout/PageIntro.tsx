@@ -2,7 +2,7 @@
  * The single page-level intro, above every section on the build view.
  *
  * One line explains what the page does; the second line sets the boundary the
- * rest of the screen keeps every time it is tempted to cross it — nothing
+ * rest of the screen keeps every time it is tempted to cross it, nothing
  * installs automatically.
  */
 export function PageIntro() {

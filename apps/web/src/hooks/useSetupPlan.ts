@@ -10,7 +10,7 @@ export type PlanStatus = 'idle' | 'loading' | 'ready' | 'error';
  * yet, in flight, a plan, or a failure the user can act on.
  *
  * Deliberately has no fallback path. If the API is unreachable the UI says so
- * and offers a retry — it does not quietly generate a plan in the browser
+ * and offers a retry, it does not quietly generate a plan in the browser
  * instead. Two implementations of command generation is exactly the situation
  * `packages/installer` exists to prevent, and a user who is shown commands has
  * a right to know where they came from.
@@ -21,7 +21,7 @@ export function useSetupPlan() {
   const [error, setError] = useState<ApiRequestError | null>(null);
 
   // Guards against a slow earlier request resolving after a newer one and
-  // overwriting it — a stale plan for a distribution the user has moved on from
+  // overwriting it, a stale plan for a distribution the user has moved on from
   // would be actively misleading.
   const requestId = useRef(0);
 
@@ -47,7 +47,7 @@ export function useSetupPlan() {
     }
   }, []);
 
-  /** Drop the current plan — used when the selection or environment changes. */
+  /** Drop the current plan, used when the selection or environment changes. */
   const reset = useCallback(() => {
     requestId.current += 1;
     setStatus('idle');

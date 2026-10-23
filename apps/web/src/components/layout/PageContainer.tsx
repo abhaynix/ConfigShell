@@ -12,8 +12,8 @@ interface PageContainerProps {
 /**
  * The one content container.
  *
- * Every band that spans the full page — the header, the main grid, the sticky
- * selection bar — puts its contents in this, so they line up with each other
+ * Every band that spans the full page, the header, the main grid, the sticky
+ * selection bar, puts its contents in this, so they line up with each other
  * instead of each picking its own max-width and gutter. Before this, the same
  * `max-w-7xl px-4 sm:px-6` was written out in three places, and the category
  * strip's full-bleed negative margin was tuned against the *wrong* one of them

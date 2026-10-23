@@ -49,7 +49,7 @@ function detectLinux(): LinuxDetectionState {
   const platform = navigator.platform || '';
 
   // Android's UA/platform strings also contain "Linux" (it's Linux-based)
-  // — exclude it so Android visitors aren't told they're "on Linux".
+  //, exclude it so Android visitors aren't told they're "on Linux".
   if (/android/i.test(ua)) return 'not-linux';
 
   if (/linux/i.test(ua) || /linux/i.test(platform)) return 'linux';

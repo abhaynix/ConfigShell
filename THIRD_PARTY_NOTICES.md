@@ -18,13 +18,15 @@ These end up in `apps/web/dist` and are therefore distributed to users of a depl
 | ------- | ------- | ----- |
 | `react`, `react-dom` | MIT | Meta Platforms, Inc. and affiliates |
 | `radix-ui` | MIT | WorkOS — unstyled UI primitives |
+| `@radix-ui/react-dropdown-menu` | MIT | Keyboard-accessible dropdown menu primitive |
 | `lucide-react` | ISC | Icon set; a fork of Feather Icons (MIT) |
+| `motion` | MIT | Navbar transitions and scroll behavior |
 | `class-variance-authority` | Apache-2.0 | |
 | `cn` | MIT | class-name helper used by the shadcn components |
 | `tailwindcss`, `@tailwindcss/vite` | MIT | CSS is generated at build time |
 | `tw-animate-css` | MIT | animation utilities imported by `src/index.css` |
 | `shadcn` | MIT | `shadcn/tailwind.css` is imported by `src/index.css` |
-| `@fontsource-variable/geist` | **OFL-1.1** | see "Fonts" below |
+| `@fontsource-variable/geist-mono`, `@fontsource-variable/manrope`, `@fontsource-variable/montserrat`, `@fontsource-variable/onest` | **OFL-1.1** | see "Fonts" below |
 | `express` | MIT | the API server in `apps/server`; also serves the built web app |
 | `@modelcontextprotocol/server` | MIT | the official MCP TypeScript SDK (v2), used by `packages/mcp` |
 | `@modelcontextprotocol/node` | MIT | the official MCP TypeScript SDK (v2), used by `packages/mcp` |
@@ -64,15 +66,13 @@ change — `tsx watch` covers what it did.
 
 ## Fonts
 
-**Geist Variable**, via `@fontsource-variable/geist`, is licensed under the
-[SIL Open Font License 1.1](https://openfontlicense.org) — Copyright 2024 The Geist Project
-Authors (https://github.com/vercel/geist-font).
+**Geist Mono, Manrope, Montserrat and Onest Variable**, via their `@fontsource-variable/*`
+packages, are licensed under the [SIL Open Font License 1.1](https://openfontlicense.org).
 
 The OFL requires that the font's copyright and license notice accompany any distribution of
 the font files. The `.woff2` files are emitted into `apps/web/dist/assets/` by the build, so
 **any deployment of this project distributes them**, and this notice must travel with it.
-The full license text ships inside the package at
-`node_modules/@fontsource-variable/geist/LICENSE`.
+Each full license text ships inside its package under `node_modules/@fontsource-variable/*/LICENSE`.
 
 ## Icons
 
@@ -93,6 +93,10 @@ it from history).
   MIT-licensed (Copyright 2023 shadcn). shadcn/ui is explicitly distributed as code you
   copy into your project; the files have been kept close to their generated form, and the
   MIT license permits their use and modification here.
+- **ChaiUI** — the theme and navbar components in `apps/web/src/components/` were copied
+  from the ChaiUI registry at https://ui.chaicode.com and adapted in this repository. Its
+  registry documentation states that generated code is yours to change; the component
+  registry is not a runtime package dependency.
 - **Vite AI Studio scaffold** — `apps/web/vite.config.ts` contains a small media-serving
   dev plugin (`aistudioMediaPlugin`) that originated in a Google AI Studio project
   template, and `apps/web/metadata.json` is an AI Studio manifest. Both are development

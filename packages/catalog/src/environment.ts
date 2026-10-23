@@ -2,7 +2,7 @@
  * The environment model: what a user's system is, expressed as validated data.
  *
  * Resolution is a pure function of `(application, environment)`. This module
- * owns the second half of that pair — constructing one, validating untrusted
+ * owns the second half of that pair, constructing one, validating untrusted
  * input into one, and deriving an ecosystem from a distribution.
  *
  * Scope note: nothing here *detects* anything. An `Environment` is always built
@@ -93,7 +93,7 @@ export type ParsedEnvironment =
  *
  * Rejects rather than coerces, and reports every problem at once instead of
  * stopping at the first. A caller-supplied `ecosystem` is **ignored on purpose**
- * — it is derived from the distribution, so it cannot be used to smuggle in a
+ *, it is derived from the distribution, so it cannot be used to smuggle in a
  * mismatched pair such as "Arch Linux with apt".
  */
 export function parseEnvironment(input: unknown): ParsedEnvironment {

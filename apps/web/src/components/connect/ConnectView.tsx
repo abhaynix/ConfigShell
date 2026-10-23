@@ -29,7 +29,7 @@ import { ApiRequestError, fetchMcpConnection, type McpConnection } from '@/lib/a
  *
  * ## Why it does not live at `/mcp`
  *
- * `/mcp` is the endpoint itself — it speaks JSON-RPC over Streamable HTTP and a
+ * `/mcp` is the endpoint itself, it speaks JSON-RPC over Streamable HTTP and a
  * browser visiting it gets protocol frames, not a page. The server mounts it
  * ahead of the SPA fallback for exactly that reason. So the human-facing page
  * is `/connect` and it *shows* the `/mcp` URL.
@@ -38,7 +38,7 @@ import { ApiRequestError, fetchMcpConnection, type McpConnection } from '@/lib/a
  *
  * The server, via `GET /api/mcp`, which derives it from `PUBLIC_BASE_URL`. The
  * browser's own origin is used only as a fallback for display when the API is
- * unreachable, and is labelled as such — a preview or proxy origin is not
+ * unreachable, and is labelled as such, a preview or proxy origin is not
  * necessarily the canonical URL a user should save into an AI host.
  */
 export function ConnectView({ onBack }: { onBack: () => void }) {
@@ -81,8 +81,8 @@ interface ConnectPageProps {
 /**
  * The page itself, as a pure function of its state.
  *
- * Split from the fetching wrapper above so every state it can be in — loading,
- * failed, loaded — renders from props alone, which is what lets
+ * Split from the fetching wrapper above so every state it can be in, loading,
+ * failed, loaded, renders from props alone, which is what lets
  * `ConnectView.test.ts` assert the real markup without a DOM runner.
  */
 export function ConnectPage({ connection, error, loading, onBack }: ConnectPageProps) {
@@ -199,7 +199,7 @@ function McpUrlCard({ connection }: { connection: McpConnection }) {
 
 /**
  * When the API is unreachable the page still has to be useful, so it shows the
- * URL this browser is looking at — clearly labelled as a guess, because a
+ * URL this browser is looking at, clearly labelled as a guess, because a
  * preview or proxy origin is not necessarily the canonical one.
  */
 function ConnectionError({ error }: { error: ApiRequestError }) {

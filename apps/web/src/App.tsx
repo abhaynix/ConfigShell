@@ -19,7 +19,7 @@ import type { Application, Distro, Role } from '@configshell/catalog';
 import { gsap, useGSAP, shouldSkipEntrance, MOTION_EASINGS } from '@/lib/motion';
 import { StepperBar } from '@/components/layout/StepperBar';
 
-/** Selection state lives here — one source of truth for the app views. */
+/** Selection state lives here, one source of truth for the app views. */
 export type NavRoute = 'app-catalog' | 'os-and-distro' | 'role-matrix' | 'plan-and-generate' | 'cli-detection';
 type View = 'build' | 'plan' | 'connect';
 
@@ -111,7 +111,7 @@ export default function App() {
     }
 
     if (route === 'plan-and-generate') {
-      // buildPlan is defined below — safe to call because this callback
+      // buildPlan is defined below, safe to call because this callback
       // only runs on user interaction, after all hooks have initialised.
       buildPlanRef.current?.();
       return;
@@ -207,7 +207,7 @@ export default function App() {
         return;
       }
 
-      // ⌘K / Ctrl+K — focus search
+      // ⌘K / Ctrl+K, focus search
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         const searchInput = document.getElementById('app-search') as HTMLInputElement | null;

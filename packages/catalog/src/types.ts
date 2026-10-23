@@ -2,7 +2,7 @@
  * Catalog data model.
  *
  * Scope note: this describes *what an application is and where it comes from*.
- * It deliberately stops short of describing *how to install it* — no commands,
+ * It deliberately stops short of describing *how to install it*, no commands,
  * no flags, no shell strings. Turning an `InstallationSource` into an actual
  * command is the installer resolver's job (a later phase), and it is the only
  * thing that should ever need to know that `apt` means `apt install`.
@@ -50,49 +50,49 @@ export const CATEGORY_DEFINITIONS: readonly CategoryDefinition[] = [
     id: 'general',
     name: 'General',
     description:
-      'Everyday desktop essentials — browsing, email, media, communication, and utilities.',
+      'Everyday desktop essentials, browsing, email, media, communication, and utilities.',
   },
   {
     id: 'student',
     name: 'Student',
     description:
-      'Study and coursework — note-taking, documents, research, PDFs, presentations, and collaboration.',
+      'Study and coursework, note-taking, documents, research, PDFs, presentations, and collaboration.',
   },
   {
     id: 'developer',
     name: 'Developer',
     description:
-      'Software development essentials — code editors, Git, terminals, runtimes, databases, and developer utilities.',
+      'Software development essentials, code editors, Git, terminals, runtimes, databases, and developer utilities.',
   },
   {
     id: 'web-developer',
     name: 'Web Developer',
     description:
-      'Web development stack — browsers, Node.js, frontend tooling, API clients, databases, and web utilities.',
+      'Web development stack, browsers, Node.js, frontend tooling, API clients, databases, and web utilities.',
   },
   {
     id: 'devops',
     name: 'DevOps',
     description:
-      'Infrastructure and deployment — containers, Kubernetes, SSH, cloud CLIs, monitoring, and server tools.',
+      'Infrastructure and deployment, containers, Kubernetes, SSH, cloud CLIs, monitoring, and server tools.',
   },
   {
     id: 'data-ai',
     name: 'Data & AI',
     description:
-      'Data science and AI development — Python, Jupyter, ML tools, notebooks, model tooling, and data utilities.',
+      'Data science and AI development, Python, Jupyter, ML tools, notebooks, model tooling, and data utilities.',
   },
   {
     id: 'content-creator',
     name: 'Content Creator',
     description:
-      'Video, audio, streaming, and content production — editors, recording tools, codecs, and media utilities.',
+      'Video, audio, streaming, and content production, editors, recording tools, codecs, and media utilities.',
   },
   {
     id: 'gaming',
     name: 'Gaming',
     description:
-      'Gaming essentials — game clients, compatibility layers, performance tools, and controllers.',
+      'Gaming essentials, game clients, compatibility layers, performance tools, and controllers.',
   },
 ] as const;
 
@@ -149,7 +149,7 @@ export type OperatingSystem = 'linux';
 export const OPERATING_SYSTEMS: readonly OperatingSystem[] = ['linux'] as const;
 
 /**
- * A distribution's *native* package ecosystem — the package manager that ships
+ * A distribution's *native* package ecosystem, the package manager that ships
  * with it and whose repositories it is built around.
  *
  * Deliberately narrower than `InstallMethod`: `flatpak` and `snap` are
@@ -194,7 +194,7 @@ export type Architecture = 'x86_64' | 'aarch64';
 export const ARCHITECTURES: readonly Architecture[] = ['x86_64', 'aarch64'] as const;
 
 /**
- * Where the user wants to install something — the second half of every
+ * Where the user wants to install something, the second half of every
  * resolution question, the first half being the application.
  *
  * Always an explicit, validated value. It is never inferred from a browser user
@@ -205,11 +205,11 @@ export const ARCHITECTURES: readonly Architecture[] = ['x86_64', 'aarch64'] as c
 export interface Environment {
   os: OperatingSystem;
   distro: Distro;
-  /** Derived from `distro` — never supplied independently. See `environment.ts`. */
+  /** Derived from `distro`, never supplied independently. See `environment.ts`. */
   family: DistroFamily;
-  /** Derived from `distro` — never supplied independently. See `environment.ts`. */
+  /** Derived from `distro`, never supplied independently. See `environment.ts`. */
   ecosystem: PackageEcosystem;
-  /** Optional, recorded only. Does not affect resolution — see `Architecture`. */
+  /** Optional, recorded only. Does not affect resolution, see `Architecture`. */
   architecture?: Architecture;
 }
 
@@ -239,15 +239,15 @@ export const INSTALL_METHODS: readonly InstallMethod[] = [
 /**
  * Who actually packages this. Worth recording because a lot of official-looking
  * reverse-DNS Flatpak IDs (`com.google.Chrome`, `com.brave.Browser`) are in fact
- * third-party repackagings that the vendor neither publishes nor supports —
+ * third-party repackagings that the vendor neither publishes nor supports,
  * presence on Flathub says the identifier is real, not that the vendor stands
  * behind it. A trusted catalog should not flatten that distinction away.
  *
- * - `distro`    — ships in a supported distribution's own repositories, or is
+ * - `distro`   , ships in a supported distribution's own repositories, or is
  *                 published by that distribution's vendor (e.g. Canonical's
  *                 Chromium snap).
- * - `vendor`    — published by the application's own project/vendor.
- * - `community` — packaged by a third party.
+ * - `vendor`   , published by the application's own project/vendor.
+ * - `community`, packaged by a third party.
  */
 export type RepositoryOrigin = 'distro' | 'vendor' | 'community';
 
@@ -255,7 +255,7 @@ export interface InstallationSource {
   method: InstallMethod;
   /**
    * The identifier the method uses: apt/dnf/pacman package name, Flatpak
-   * application ID, or Snap name. Never invented — an unverified identifier is
+   * application ID, or Snap name. Never invented, an unverified identifier is
    * omitted entirely rather than guessed (see docs/catalog.md).
    */
   identifier: string;
@@ -266,7 +266,7 @@ export interface InstallationSource {
    * flatpak/snap/official, which are distribution-agnostic by design.
    */
   distros?: readonly Distro[];
-  /** Where to get it, for `official` — or the repo setup docs for `vendor` origins. */
+  /** Where to get it, for `official`, or the repo setup docs for `vendor` origins. */
   url?: string;
 }
 
@@ -280,7 +280,7 @@ export interface InstallationSource {
  */
 export interface Verification {
   /**
-   * The command the installed package places on `PATH` — `git`, `nvim`, `code`.
+   * The command the installed package places on `PATH`, `git`, `nvim`, `code`.
    * Subject to the same rule as every other identifier here: verified or
    * omitted, never guessed.
    */
@@ -291,7 +291,7 @@ export interface Application {
   /** Stable, unique, lowercase slug. Selection state in the UI is keyed on this. */
   id: string;
   name: string;
-  /** One line. What the application is — never an installability claim. */
+  /** One line. What the application is, never an installability claim. */
   description: string;
   category: Category;
   /** Official project/vendor homepage. */
@@ -303,7 +303,7 @@ export interface Application {
   installation: readonly InstallationSource[];
   /**
    * How to verify the application afterwards. Optional, and absence means
-   * "no binary name has been verified" — not "unverifiable". Several entries
+   * "no binary name has been verified", not "unverifiable". Several entries
    * legitimately have none: applications distributed only as Flatpaks or Snaps
    * may put nothing predictable on `PATH`, and a binary whose name differs
    * between distributions is omitted rather than guessed at.

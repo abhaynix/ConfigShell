@@ -16,7 +16,7 @@ interface State {
  * uses inline styles and nothing else from this app. A fallback that can itself
  * fail is not a fallback.
  *
- * React has no hook equivalent — an error boundary must be a class component.
+ * React has no hook equivalent, an error boundary must be a class component.
  */
 export class ErrorBoundary extends Component<Props, State> {
   state: State = { error: null };

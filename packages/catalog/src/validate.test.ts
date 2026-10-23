@@ -254,7 +254,7 @@ test('validateCatalog accepts ordinary binary names', () => {
 test('validateCatalog rejects an installation identifier that could reach a shell', () => {
   // The identifier is the *other* catalog field interpolated into a generated
   // command. `renderPlan` re-checks it against the same alphabet and refuses to
-  // build a command — but only at plan time, as a thrown error on a user's
+  // build a command, but only at plan time, as a thrown error on a user's
   // request. Catching it here makes bad data a validation failure instead, which
   // is what the catalog test suite and the `/health` integrity check can see.
   for (const identifier of [

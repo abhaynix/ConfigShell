@@ -36,7 +36,7 @@ test('category filtering is exact and composes with the query', () => {
   assert.deepEqual(searchApplications({ category: 'General', query: 'git' }), []);
 });
 
-test('search is a pure filter — it never mutates or reorders the catalog', () => {
+test('search is a pure filter, it never mutates or reorders the catalog', () => {
   const before = APPLICATIONS.map((a) => a.id);
   searchApplications({ query: 'a' });
   assert.deepEqual(

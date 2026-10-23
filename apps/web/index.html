@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="google-site-verification" content="TiKMTHF8cXfs9oCNFfTThQeW_OxrKqyXvluNmh-4Hto" />
-    <title>ConfigShell — Linux Setup Automation</title>
+    <script>
+      try {
+        const theme = localStorage.getItem('chaiui-theme');
+        document.documentElement.classList.toggle('dark', theme !== 'light');
+        document.documentElement.style.colorScheme = theme === 'light' ? 'light' : 'dark';
+      } catch {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
+    <title>ConfigShell | Linux Setup Automation</title>
     <meta name="description" content="Discover Linux applications, pick a distribution, and build a selection to install yourself." />
     <meta property="og:title" content="ConfigShell" />
     <meta property="og:description" content="Discover Linux applications, pick a distribution, and build a selection to install yourself." />
