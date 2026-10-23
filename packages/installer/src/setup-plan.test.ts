@@ -1,7 +1,7 @@
 /**
  * The canonical setup plan: what every adapter returns.
  *
- * `packages/contract-tests` asserts that HTTP and MCP return *the same* plan.
+ * `tests/contract` asserts that HTTP and MCP return *the same* plan.
  * These tests assert what that plan actually is — its status, its counts, its
  * determinism, and that it refuses to exist when its own invariants fail.
  */

@@ -4,7 +4,7 @@ Real, self-contained work in this codebase — not placeholder tasks. Each one n
 files it touches and what "done" looks like, so you can start without waiting for a
 maintainer to scope it for you.
 
-**Before you start:** read [`CONTRIBUTING.md`](../docs/CONTRIBUTING.md), run `pnpm install` and
+**Before you start:** read [`CONTRIBUTING.md`](../CONTRIBUTING.md), run `pnpm install` and
 `pnpm check` to confirm a clean baseline, and **open (or comment on) an issue saying you
 are taking it** so two people do not do the same work. Anything marked ⚠️ needs agreement
 on the approach before you write code.
@@ -32,19 +32,22 @@ Adding an application that is missing entirely works the same way; check `packag
 
 ---
 
-### 2. Write the first tests for `apps/server`
+### 2. Add component behavior tests for the web app
 
 | | |
 | --- | --- |
-| **Difficulty** | Starter |
-| **Area** | `apps/server` |
-| **Files** | `apps/server/src/config/env.test.ts` |
-| **Skills** | Node's built-in test runner |
+| **Difficulty** | Intermediate |
+| **Area** | `apps/web` |
+| **Files** | `apps/web/src/components/`, test configuration |
+| **Skills** | React, TypeScript, accessible UI testing |
 
-`apps/server/src/config/env.ts` validates `PORT` and `NODE_ENV` and is pure, easily testable logic — and `pnpm --filter server test` currently finds zero test files. Cover: defaults when unset, a valid port, a non-numeric port, out-of-range ports (`0`, `70000`), and an invalid `NODE_ENV`.
+The web app has structural safety tests but no DOM test runner, so component behavior is the
+largest test gap. Propose a small test setup and cover one user-facing interaction, such as
+keyboard selection or an empty catalog state. Keep the test tooling focused and update the
+workspace scripts and documentation if a dependency is added.
 
-**Done when:** `pnpm --filter server test` reports passing tests instead of zero, and the error cases assert on the message, not just that it throws. (You will likely need to export the validation helpers, or set `process.env` before a dynamic `import()` — either is fine; explain which you chose.)
-
+**Done when:** the test runs through the normal workspace test command, asserts user-visible
+behavior, and does not change runtime code outside the behavior being covered.
 ---
 
 ### 3. Add a favicon
@@ -173,7 +176,7 @@ The UI already does several things right (`aria-live` counts, labelled controls,
 | --- | --- |
 | **Difficulty** | Starter |
 | **Area** | docs |
-| **Files** | `README.md`, `docs/*.md`, workspace READMEs, `CLAUDE.md` |
+| **Files** | `README.md`, `docs/*.md`, workspace READMEs, `AGENTS.md` |
 | **Skills** | patience, a terminal |
 
 Every command in the docs was verified when written, but docs drift. On a **fresh clone**, run each documented command in order, from the directory the docs say, and record what actually happens.
@@ -203,10 +206,10 @@ A render error currently leaves a blank page. Add a small error boundary around 
 | --- | --- |
 | **Difficulty** | Starter |
 | **Area** | `apps/web`, docs |
-| **Files** | `apps/web/vite.config.ts`, `apps/web/metadata.json`, `apps/web/README.md` |
+| **Files** | `apps/web/vite.config.ts`, `apps/web/README.md` |
 | **Skills** | reading configuration carefully |
 
-`vite.config.ts` contains an `aistudioMediaPlugin` and a `DISABLE_HMR` switch from a Google AI Studio template, and `metadata.json` is an AI Studio manifest that declares a server-side Gemini capability the project does not implement. The directory the plugin serves from (`apps/web/public/assets/aistudio/`) is not in the repository — it is a local, self-ignored artifact. Work out what is still load-bearing, document it, and propose what can go.
+`vite.config.ts` contains an `aistudioMediaPlugin` and a `DISABLE_HMR` switch from a Google AI Studio template, and the AI Studio manifest was removed because it advertised an unimplemented Gemini capability. The directory the plugin serves from (`apps/web/public/assets/aistudio/`) is not in the repository — it is a local, self-ignored artifact. Work out what is still load-bearing, document it, and propose what can go.
 
 **Done when:** a new contributor can tell from the docs what that code is for. ⚠️ Removing any of it needs maintainer agreement — the maintainers may still use that tooling.
 

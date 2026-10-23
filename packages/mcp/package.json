@@ -2,7 +2,7 @@
   "name": "@configshell/mcp",
   "version": "0.1.0",
   "private": true,
-  "description": "MCP interface — read-only, deterministic tools over the ConfigShell catalog and installer, built on the official MCP TypeScript SDK.",
+  "description": "MCP interface \u2014 read-only, deterministic tools over the ConfigShell catalog and installer, built on the official MCP TypeScript SDK.",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -15,7 +15,10 @@
   "scripts": {
     "start": "tsx src/bin.ts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test src/*.test.ts"
+    "test": "tsx --test src/*.test.ts",
+    "lint": "eslint .",
+    "clean": "rm -rf dist",
+    "format": "prettier --write ."
   },
   "license": "Apache-2.0",
   "dependencies": {

@@ -1,6 +1,9 @@
 packages:
   - 'apps/*'
   - 'packages/*'
+  - 'tests/*'
+  - 'tooling/*'
+  - 'skills/*'
 
 linkWorkspacePackages: true
 

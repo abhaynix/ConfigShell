@@ -54,11 +54,8 @@ vite.config.ts              Vite config (React + Tailwind; proxies /api to the s
 components.json             shadcn/ui config
 ```
 
-There is no `public/` directory in the repository — the app ships no static images or
-icons. Create one if you add an asset (Vite copies its contents to `dist/` verbatim).
-
-There is no `public/` directory in the repository — the app ships no static images or
-icons. Create one if you add an asset (Vite copies its contents to `dist/` verbatim).
+Static logos and design tokens are maintained in packages/assets and copied into the ignored
+public directory by the prebuild and predev sync script. Edit canonical files there.
 
 ## Conventions
 
@@ -74,5 +71,5 @@ icons. Create one if you add an asset (Vite copies its contents to `dist/` verba
   never nest a control inside another interactive element.
 - **No application data lives here.** Add applications to `packages/catalog` instead.
 
-See [`CLAUDE.md`](../../CLAUDE.md) for the full shadcn/ui setup notes and
+See [`AGENTS.md`](../../AGENTS.md) for the shadcn/ui setup notes and
 [`docs/architecture.md`](../../docs/architecture.md) for where this layer sits.

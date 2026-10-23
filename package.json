@@ -2,27 +2,33 @@
   "name": "configshell",
   "version": "0.1.0",
   "private": true,
-  "description": "ConfigShell — open-source Linux software discovery and setup-plan generation",
+  "description": "ConfigShell \u2014 open-source Linux software discovery and setup-plan generation",
   "type": "module",
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "tests/*",
+    "tooling/*",
+    "skills/*"
   ],
   "engines": {
     "node": ">=20"
   },
   "packageManager": "pnpm@12.3.4",
   "scripts": {
-    "dev": "npm run build --workspace=web && tsx apps/server/src/index.ts",
-    "build": "npm run build --workspace=web",
-    "start": "tsx apps/server/src/index.ts",
-    "lint": "eslint .",
-    "typecheck": "npm run typecheck --workspace=web && npm run typecheck --workspace=@configshell/catalog && npm run typecheck --workspace=@configshell/installer && npm run typecheck --workspace=@configshell/test-utils && npm run typecheck --workspace=@configshell/mcp && npm run typecheck --workspace=server && npm run typecheck --workspace=@configshell/contract-tests",
-    "test": "npm run test --workspace=@configshell/test-utils && npm run test --workspace=@configshell/catalog && npm run test --workspace=@configshell/installer && npm run test --workspace=@configshell/mcp && npm run test --workspace=server && npm run test --workspace=@configshell/contract-tests && npm run test --workspace=web",
-    "check": "npm run lint && npm run typecheck && npm run test && npm run build",
-    "dev:web": "npm run dev --workspace=web",
-    "qa:layout": "tsx scripts/qa-layout.ts",
-    "mcp": "npm run start --workspace=@configshell/mcp"
+    "dev": "turbo run dev --filter=web --filter=server --parallel",
+    "build": "turbo run build",
+    "start": "pnpm --filter server start",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "clean": "turbo run clean",
+    "format": "turbo run format",
+    "check": "turbo run lint typecheck test build",
+    "dev:web": "pnpm --filter web dev",
+    "qa:layout": "tsx tooling/scripts/qa-layout.ts",
+    "mcp": "pnpm --filter @configshell/mcp start",
+    "assets:sync": "tsx tooling/scripts/sync-assets.ts"
   },
   "license": "Apache-2.0",
   "devDependencies": {
@@ -31,7 +37,9 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.12.0",
     "playwright": "^1.64.0",
+    "prettier": "3.9.9",
     "tsx": "^4.21.0",
+    "turbo": "2.11.7",
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.46.0"
   }

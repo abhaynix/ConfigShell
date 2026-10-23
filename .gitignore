@@ -22,7 +22,7 @@ coverage/
 generated/
 temp/
 tmp/
-
+docs/.qa
 # -----------------------------------------------------------------------------
 # Environment & secrets
 # -----------------------------------------------------------------------------
@@ -83,3 +83,16 @@ package-lock.json
 yarn.lock
 .pnpm-store/
 .pnpm-debug.log*
+
+# Generated app and skill asset copies; canonical assets live in packages/assets.
+/apps/web/public/logos/
+/apps/web/src/design-tokens.css
+/skills/linux-catalog/assets/logos/
+/skills/linux-catalog/assets/design-tokens.css
+
+# Local media and downloadable skill archives.
+/brag-output/
+/*.skill.zip
+
+# Turborepo local cache
+.turbo
