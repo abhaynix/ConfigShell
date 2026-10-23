@@ -3,7 +3,7 @@
  *
  * Same approach as `PlanView.test.ts`: React's server renderer produces the
  * actual markup on the `tsx --test` runner, so these assertions are about
- * output the component really made — no DOM runner, no new dependency. Click
+ * output the component really made, no DOM runner, no new dependency. Click
  * behaviour (the copy button) is still untested, which is the standing gap in
  * `docs/testing.md`.
  *
@@ -102,7 +102,7 @@ test('a failed load still tells the user something useful', () => {
 test('the loading state renders instead of an empty page', () => {
   const html = render({ connection: null, loading: true });
   assert.match(html, /Loading your connection details/);
-  // No URL card yet — better nothing than a placeholder someone might copy.
+  // No URL card yet, better nothing than a placeholder someone might copy.
   assert.doesNotMatch(html, /configshell\.example/);
 });
 

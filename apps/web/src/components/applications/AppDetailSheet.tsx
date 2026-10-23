@@ -64,7 +64,7 @@ const ORIGIN_INFO: Record<
 
 interface AppDetailSheetProps {
   app: Application | null;
-  /** Null until a distribution is chosen — availability is relative to one. */
+  /** Null until a distribution is chosen, availability is relative to one. */
   distro: Distro | null;
   selected: boolean;
   onToggle: (id: string) => void;
@@ -74,7 +74,7 @@ interface AppDetailSheetProps {
 /**
  * Per-application detail (PRD §12, ROADMAP "Application details").
  *
- * Shows every verified source with its provenance — who packaged each route —
+ * Shows every verified source with its provenance, who packaged each route,
  * and, once a distribution is chosen, **the resolver's own answer** about which
  * ones apply and which would be used.
  *

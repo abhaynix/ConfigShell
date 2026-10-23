@@ -23,7 +23,7 @@ const METHOD_DISTROS: Partial<Record<InstallMethod, readonly Distro[]>> = ECOSYS
 
 /**
  * The shape of a catalog id. Exported because every consumer that accepts an id
- * from outside — the API server, the MCP layer — has to check it, and three
+ * from outside, the API server, the MCP layer, has to check it, and three
  * copies of the same regex is three chances for them to drift apart.
  */
 export const APPLICATION_ID_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -31,7 +31,7 @@ export const APPLICATION_ID_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 /** Upper bound on an id, so an unbounded string is rejected before matching. */
 export const MAX_APPLICATION_ID_LENGTH = 64;
 
-/** Shape only — says nothing about whether the catalog contains it. */
+/** Shape only, says nothing about whether the catalog contains it. */
 export function isApplicationIdShape(value: unknown): value is string {
   return (
     typeof value === 'string' &&
@@ -48,8 +48,8 @@ const ID_PATTERN = APPLICATION_ID_PATTERN;
  *
  * Strict on purpose. This value is interpolated into a generated shell command
  * (`command -v <binary>`), so it is the one field in the catalog with a direct
- * path to a shell. Anything outside this alphabet — a space, a quote, `;`,
- * `$`, a backtick — is rejected here, at the data boundary, before command
+ * path to a shell. Anything outside this alphabet, a space, a quote, `;`,
+ * `$`, a backtick, is rejected here, at the data boundary, before command
  * generation ever sees it. Command generation re-checks it anyway.
  */
 const BINARY_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._+-]*$/;
@@ -60,8 +60,8 @@ const BINARY_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._+-]*$/;
  * The same alphabet as `BINARY_PATTERN`, and for the same reason: an identifier
  * is interpolated into a generated command, so it is the *other* field in the
  * catalog with a direct path to a shell. It covers every identifier form the
- * catalog uses — package names (`docker-ce`, `docker.io`), reverse-DNS Flatpak
- * application IDs (`org.mozilla.firefox`) and Snap names (`sublime-text`) — and
+ * catalog uses, package names (`docker-ce`, `docker.io`), reverse-DNS Flatpak
+ * application IDs (`org.mozilla.firefox`) and Snap names (`sublime-text`), and
  * nothing else. No whitespace, no quotes, no shell metacharacter, and no
  * leading `-`, which would read as a flag rather than a package.
  *
@@ -70,7 +70,7 @@ const BINARY_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._+-]*$/;
  * before interpolation and refuses to build a command otherwise. But an
  * identifier that only fails *there* fails at plan time, as a thrown error on a
  * user's request, long after the bad data was committed. Catching it at the data
- * boundary makes it a validation failure — visible to `validateCatalog`, to the
+ * boundary makes it a validation failure, visible to `validateCatalog`, to the
  * catalog test suite, and to the `/health` integrity check, which is where a
  * catalog-integrity problem should surface.
  */

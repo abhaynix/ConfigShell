@@ -59,14 +59,14 @@ export function prefersReducedMotion(): boolean {
  * `opacity: 0` synchronously, and GSAP's ticker runs on requestAnimationFrame,
  * which a background tab does not fire. Starting one while the tab is hidden
  * therefore paints the content invisible and leaves it that way until the tab
- * is focused — the build view returning from the plan view goes to opacity 0
+ * is focused, the build view returning from the plan view goes to opacity 0
  * and stays there, which is how this was found.
  *
  * Nobody can watch an animation in a hidden tab, so there is nothing to lose
  * by skipping it: the content simply renders at its natural opacity.
  *
  * Use this for anything that *reveals* content. Feedback animations for a
- * click or a selection change do not need it — a user interacting with the
+ * click or a selection change do not need it, a user interacting with the
  * page is by definition looking at it.
  */
 export function shouldSkipEntrance(): boolean {

@@ -7,7 +7,7 @@ type CopyState = 'idle' | 'copied' | 'failed';
  *
  * The Clipboard API needs a secure context and a user gesture, and it can be
  * blocked outright by permissions policy. When it fails the caller is told so
- * it can show the command for manual selection instead — silently pretending a
+ * it can show the command for manual selection instead, silently pretending a
  * copy worked is worse than not offering one.
  *
  * There is no `document.execCommand` fallback: it is deprecated, and the

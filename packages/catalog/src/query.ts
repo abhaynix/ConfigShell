@@ -3,7 +3,7 @@
  *
  * Lives here rather than in a consumer so the web app, the API server and any
  * future CLI all answer "which applications match this?" the same way. Pure
- * functions over the passed-in list — no I/O, no module-level state, and the
+ * functions over the passed-in list, no I/O, no module-level state, and the
  * catalog is never mutated.
  */
 
@@ -11,7 +11,7 @@ import { APPLICATIONS } from './applications.ts';
 import type { Application, Category } from './types.ts';
 
 /**
- * One application by id. `undefined` for an unknown id — callers decide whether
+ * One application by id. `undefined` for an unknown id, callers decide whether
  * that is a 404, a validation error, or a skipped entry.
  */
 export function findApplication(id: string): Application | undefined {
@@ -29,7 +29,7 @@ export interface SearchOptions {
  * Search and filter, preserving catalog order so results are deterministic.
  *
  * Matching is a case-insensitive substring over id, name, description and
- * category. `id` is included so `vscode` finds Visual Studio Code — the web
+ * category. `id` is included so `vscode` finds Visual Studio Code, the web
  * app's current search does not check it, and that gap is a known one.
  * Aliases and tags are a separate, later catalog addition (PRD §14); nothing
  * here pretends they exist.

@@ -1,7 +1,7 @@
 /**
  * API client tests.
  *
- * Node's built-in runner via `tsx` — the same runner the other workspaces use.
+ * Node's built-in runner via `tsx`, the same runner the other workspaces use.
  * No DOM and no component rendering here: this file covers the client's
  * contract with the server, which is the part that can be wrong in ways a
  * screenshot would not show.
@@ -49,7 +49,7 @@ test('a successful response is unwrapped from its data envelope', async () => {
   assert.equal(plan.commands[0]!.command, 'sudo apt-get update');
 });
 
-test('the request carries catalog ids and a distribution — and nothing else', async () => {
+test('the request carries catalog ids and a distribution, and nothing else', async () => {
   // The security property the server's validator relies on, asserted from this
   // side too: there is no field here through which a package name, a flag or a
   // command could be sent.

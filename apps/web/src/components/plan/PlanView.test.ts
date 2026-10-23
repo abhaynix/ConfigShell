@@ -5,8 +5,8 @@
  *
  * `apps/web` has no DOM test runner, and adding one (Vitest + jsdom +
  * testing-library) is three dependencies for what this file needs. React
- * already ships a server renderer, so the components are rendered for real —
- * real props, real branches, real output — into a string, on the same
+ * already ships a server renderer, so the components are rendered for real,
+ * real props, real branches, real output, into a string, on the same
  * `tsx --test` runner every other workspace uses. No new dependency.
  *
  * What that buys: every assertion below is about markup the component actually
@@ -19,7 +19,7 @@
  * These tests check that an outcome renders its `--outcome-*` utility class and
  * its text label. They deliberately do not check a colour: a server renderer
  * resolves no CSS variable, and a test that pinned a hex value would have to be
- * edited every time the theme moved — turning a design change into a test
+ * edited every time the theme moved, turning a design change into a test
  * failure. `both themes define every outcome token` covers the values instead,
  * by reading the stylesheet.
  */
@@ -133,7 +133,7 @@ test('a manual plan is labelled as manual and never shown as installable', () =>
 
 // ------------------------------------------------------------- 3. unavailable
 
-test('an unavailable application shows name, status and reason — and no command', () => {
+test('an unavailable application shows name, status and reason, and no command', () => {
   const html = render(
     plan({
       status: 'none',

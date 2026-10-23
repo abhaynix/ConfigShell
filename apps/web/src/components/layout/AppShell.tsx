@@ -13,7 +13,7 @@ interface AppShellProps {
 
 /**
  * The one page frame every view shares.
- * Dark-only, bg-surface-base, full-height flex column.
+ * Theme-aware, bg-surface-base, full-height flex column.
  */
 export function AppShell({ children, activeRoute, onNavigate, onOpenConnect, connectActive }: AppShellProps) {
   return (

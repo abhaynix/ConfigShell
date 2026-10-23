@@ -20,7 +20,7 @@ const isSource = (name: string) => /\.tsx?$/.test(name) && !name.endsWith('.test
 test('the web app contains no package-manager command vocabulary', () => {
   // Command generation lives in packages/installer and runs server-side. The
   // browser receives command *text* to display and never assembles one, so this
-  // vocabulary should not appear in the app at all — not in a template, not in
+  // vocabulary should not appear in the app at all, not in a template, not in
   // a fallback, not in a "just in case" helper.
   const forbidden = [
     'apt-get install',
